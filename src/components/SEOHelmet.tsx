@@ -137,6 +137,40 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
 
     schemaScript.textContent = JSON.stringify(currentSchema, null, 2);
 
+    // 4. Trigger Google Analytics (gtag) custom page view tracking
+    if (typeof (window as any).gtag === "function") {
+      const sanitizedName = (selectedMovie?.title || selectedMovie?.name || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-");
+      const pathSuffix = modalOpen && selectedMovie 
+        ? `/movie/${selectedMovie.id}-${sanitizedName}`
+        : (activeTab === "home" ? "/" : `/${activeTab}`);
+      
+      const pageLocation = window.location.origin + pathSuffix;
+
+      (window as any).gtag("event", "page_view", {
+        page_title: title,
+        page_location: pageLocation,
+        page_path: pathSuffix,
+        send_to: "G-4F51F8KKEP"
+      });
+
+      // Special dynamic "view_item" event tracking for movies/shows
+      if (modalOpen && selectedMovie) {
+        (window as any).gtag("event", "view_item", {
+          currency: "USD",
+          value: selectedMovie.vote_average,
+          items: [{
+            item_id: String(selectedMovie.id),
+            item_name: selectedMovie.title || selectedMovie.name,
+            item_category: selectedMovie.first_air_date ? "TV Show" : "Movie",
+            index: 1
+          }]
+        });
+      }
+    }
+
   }, [activeTab, selectedMovie, modalOpen, searchQuery]);
 
   return null;
