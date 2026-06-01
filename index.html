@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#050110" />
+    
+    <!-- Primary Static SEO Meta Tags -->
+    <title>Bitcine Stream | Watch Movies & TV Series in Premium HD</title>
+    <meta name="description" content="Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream. Test APIs, query TMDB proxy databases, and experience next-gen media viewing." />
+    <meta name="keywords" content="bitcine, watch movies, stream free, hd video streaming, cinema list, tmdb backend proxy, developer movie dashboard, movie index, latest tv series" />
+    <meta name="author" content="Bitcine Global Network" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph / Social Rich Media Previews (Slack, Discord, Facebook, etc.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Bitcine Stream | Watch Movies & TV Series in Premium HD" />
+    <meta property="og:description" content="Discover premium movie collections, stream direct action-packed HD series, and monitor TMDB backend proxies on Bitcine's ultimate cinematic hub." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200&h=630&fit=crop" />
+    <meta property="og:site_name" content="Bitcine Stream" />
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bitcine Stream | Watch Movies & TV Series in Premium HD" />
+    <meta name="twitter:description" content="Discover premium movie collections, stream direct action-packed HD series, and monitor TMDB backend proxies on Bitcine's ultimate cinematic hub." />
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200&h=630&fit=crop" />
+    
+    <!-- Schema.org Structured Data Metadata (JSON-LD) for Search Rich Snippets -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Bitcine Stream",
+        "url": "https://bitcine.stream/",
+        "description": "Premium multi-source cinema metadata, TV logs, and developers' sandboxed layout system.",
+        "genre": "Cinema & Television Streaming",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://bitcine.stream/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+    
+    <script>
+      (function() {
+        try {
+          var originalFetch = window.fetch;
+          var currentFetch = originalFetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() {
+              return currentFetch || originalFetch;
+            },
+            set: function(val) {
+              currentFetch = val;
+            },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {
+          console.warn("Unable to define window.fetch setter:", e);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

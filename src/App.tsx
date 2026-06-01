@@ -1,0 +1,340 @@
+/**
+ * Bitcine Streaming Applet Controller
+ */
+import { useState, useEffect } from "react";
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { theme } from "./theme";
+import { Movie, ActiveTab } from "./types";
+import { api } from "./services/api";
+
+// Sub-components
+import { Header } from "./components/Header";
+import { Hero } from "./components/Hero";
+import { MovieSlider } from "./components/MovieSlider";
+import { MovieDetailsModal } from "./components/MovieDetailsModal";
+import { MobileBottomNav } from "./components/MobileBottomNav";
+import { BrowseView } from "./components/BrowseView";
+import { ApiExplorer } from "./components/ApiExplorer";
+import { SearchView } from "./components/SearchView";
+import { Footer } from "./components/Footer";
+import { SEOHelmet } from "./components/SEOHelmet";
+
+// Icons 
+import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw } from "lucide-react";
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState<ActiveTab>("home");
+  const [heroMovie, setHeroMovie] = useState<Movie | null>(null);
+  
+  // Categories collections
+  const [trending, setTrending] = useState<Movie[]>([]);
+  const [nowPlaying, setNowPlaying] = useState<Movie[]>([]);
+  const [topRated, setTopRated] = useState<Movie[]>([]);
+  const [upcoming, setUpcoming] = useState<Movie[]>([]);
+
+  // TV Series collections
+  const [trendingTV, setTrendingTV] = useState<Movie[]>([]);
+  const [popularTV, setPopularTV] = useState<Movie[]>([]);
+  const [topRatedTV, setTopRatedTV] = useState<Movie[]>([]);
+  
+  // Detail Overlay control
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalPlayNow, setModalPlayNow] = useState(false);
+
+  // Connection Indicators
+  const [isLoading, setIsLoading] = useState(true);
+  const [apiStatus, setApiStatus] = useState<{
+    ok: boolean;
+    reason?: string;
+  }>({ ok: true });
+
+  // Fetch collections on startup
+  useEffect(() => {
+    const fetchMovieCatalog = async () => {
+      setIsLoading(true);
+      try {
+        // Concurrently query proxied endpoints
+        const [
+          trendingRes, 
+          nowPlayingRes, 
+          topRatedRes, 
+          upcomingRes,
+          trendingTVRes,
+          popularTVRes,
+          topRatedTVRes
+        ] = await Promise.all([
+          api.getTrending().catch(() => ({ results: [] })),
+          api.getNowPlaying().catch(() => ({ results: [] })),
+          api.getTopRated().catch(() => ({ results: [] })),
+          api.getUpcoming().catch(() => ({ results: [] })),
+          api.getTrendingTV().catch(() => ({ results: [] })),
+          api.getPopularTV().catch(() => ({ results: [] })),
+          api.getTopRatedTV().catch(() => ({ results: [] }))
+        ]);
+
+        const trendingList = trendingRes.results || [];
+        const nowPlayingList = nowPlayingRes.results || [];
+        const topRatedList = topRatedRes.results || [];
+        const upcomingList = upcomingRes.results || [];
+        const trendingTVList = trendingTVRes.results || [];
+        const popularTVList = popularTVRes.results || [];
+        const topRatedTVList = topRatedTVRes.results || [];
+
+        // Check if all endpoints returned empty arrays (implies TMDB unconfigured or token invalid)
+        if (
+          trendingList.length === 0 &&
+          nowPlayingList.length === 0 &&
+          topRatedList.length === 0 &&
+          upcomingList.length === 0 &&
+          trendingTVList.length === 0
+        ) {
+          throw new Error("No data returned from TMDB gateway. Activating fallback content.");
+        }
+
+        setTrending(trendingList);
+        setNowPlaying(nowPlayingList);
+        setTopRated(topRatedList);
+        setUpcoming(upcomingList);
+
+        setTrendingTV(trendingTVList);
+        setPopularTV(popularTVList);
+        setTopRatedTV(topRatedTVList);
+
+        // Pick the top trending movie or any movie for the Hero
+        if (trendingList.length > 0) {
+          setHeroMovie(trendingList[0]);
+        } else if (nowPlayingList.length > 0) {
+          setHeroMovie(nowPlayingList[0]);
+        }
+
+        setApiStatus({ ok: true });
+      } catch (err: any) {
+        console.warn("Bitcine Gateway Alert: Using high-fidelity fallback catalog. Reason:", err.message);
+        
+        // Populate gorgeous fallback offline portfolio
+        const fallbacks = api.getFallbackMovies();
+        const fallbackSeriesList = api.getFallbackSeries();
+
+        setTrending(fallbacks);
+        setNowPlaying(fallbacks.slice().reverse());
+        setTopRated(fallbacks.filter(m => m.vote_average >= 8.2));
+        setUpcoming(fallbacks.filter(m => m.vote_average < 8.0));
+
+        setTrendingTV(fallbackSeriesList);
+        setPopularTV(fallbackSeriesList.slice().reverse());
+        setTopRatedTV(fallbackSeriesList.filter(m => m.vote_average >= 8.2));
+        
+        setHeroMovie(fallbacks[0]); // Celestial Echoes
+        setApiStatus({
+          ok: false,
+          reason: "TMDB API Access Token unconfigured. Loading offline premium film vault."
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMovieCatalog();
+  }, []);
+
+  // Set modal hooks for detail viewing or action streams
+  const handleMovieSelect = (movie: Movie) => {
+    setSelectedMovie(movie);
+    setModalPlayNow(false);
+    setModalOpen(true);
+  };
+
+  const handleHeroPlay = (movie: Movie) => {
+    setSelectedMovie(movie);
+    setModalPlayNow(true);
+    setModalOpen(true);
+  };
+
+  const handleSearchToggle = () => {
+    setActiveTab(activeTab === "search" ? "home" : "search");
+  };
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <SEOHelmet 
+        activeTab={activeTab} 
+        selectedMovie={selectedMovie} 
+        modalOpen={modalOpen} 
+      />
+      
+      {/* Background radial gradient wrapper styled to provide a premium viewing experience */}
+      <div 
+        id="applet-core-root" 
+        className="min-h-screen bg-[#050110] text-[#f8fafc] font-sans pb-24 md:pb-8 flex flex-col relative"
+      >
+        {/* Subtle ambient lighting nodes to break template default feel */}
+        <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-purple-900/[0.03] rounded-full filter blur-[150px] pointer-events-none z-0" />
+        <div className="absolute bottom-1/3 left-0 w-[40vw] h-[40vw] bg-indigo-900/[0.03] rounded-full filter blur-[120px] pointer-events-none z-0" />
+
+        {/* Global sticky Glassmorphic Header */}
+        <Header 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          onSearchToggle={handleSearchToggle}
+        />
+
+        {/* Top telemetry notification overlay if running on mock fallback data */}
+        {!apiStatus.ok && activeTab === "home" && (
+          <div 
+            id="offline-vault-badge" 
+            className="fixed top-20 left-4 right-4 md:left-8 md:right-8 z-40 bg-purple-950/40 backdrop-blur-md border border-purple-500/20 rounded-2xl p-3.5 flex items-center justify-between text-xs text-purple-200 animate-[slideDown_0.3s_ease-out]"
+          >
+            <div className="flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 text-violet-400 flex-shrink-0 animate-pulse" />
+              <span>
+                <strong>Cinematic Vault Mode Enabled</strong> • Standard TMDB token unconfigured or expired. Showing high-fidelity pre-compiled stream representations.
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Main Routed Content Area */}
+        <main id="applet-main-body" className="flex-grow z-10">
+          {activeTab === "home" && (
+            <div id="home-view-active" className="animate-[fadeIn_0.5s_ease-out]">
+              {/* Dynamic cinematic Hero backdrop */}
+              <Hero 
+                movie={heroMovie} 
+                onPlay={handleHeroPlay} 
+                onSeeMore={handleMovieSelect}
+                isLoading={isLoading}
+              />
+
+              {/* Rows slider collection */}
+              {isLoading ? (
+                /* Cinematic simple row loader shimmer */
+                <div id="sliders-preloader" className="max-w-7xl mx-auto px-4 md:px-8 py-10 flex flex-col gap-8">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="animate-pulse flex flex-col gap-4">
+                      <div className="h-6 w-48 bg-slate-800 rounded mb-2" />
+                      <div className="flex gap-4 overflow-x-hidden">
+                        {[1, 2, 3, 4, 5].map((j) => (
+                          <div key={j} className="h-48 w-32 bg-slate-800 rounded-xl flex-shrink-0" />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div id="home-sliders-wrapper" className="max-w-7xl mx-auto pb-12 px-4 md:px-8 flex flex-col gap-8">
+                  {/* Row: TOP 10 Today (with large numbers) */}
+                  <MovieSlider 
+                    id="top-10" 
+                    title="TOP 10 Today" 
+                    movies={trending.slice(0, 10)} 
+                    onMovieClick={handleMovieSelect}
+                    isTop10={true}
+                  />
+
+                  {/* Section Divider: Blockbuster Movies */}
+                  <div className="flex items-center gap-4 pt-4 border-t border-purple-500/10">
+                    <h2 className="text-sm md:text-md uppercase font-black tracking-widest text-[#f8fafc] flex items-center gap-2.5">
+                      <div className="w-1.5 h-4 bg-violet-600 rounded-full"></div>
+                      Exclusive Movies
+                    </h2>
+                    <div className="h-[1px] bg-gradient-to-r from-purple-500/10 to-transparent flex-1"></div>
+                  </div>
+
+                  {/* Row: Now Playing inside Bitcine */}
+                  <MovieSlider 
+                    id="now-playing" 
+                    title="Spotlight Streams" 
+                    movies={nowPlaying} 
+                    onMovieClick={handleMovieSelect}
+                  />
+
+                  {/* Row: Upcoming catalog listings */}
+                  <MovieSlider 
+                    id="upcoming" 
+                    title="Anticipated Releases" 
+                    movies={upcoming} 
+                    onMovieClick={handleMovieSelect}
+                  />
+
+                  {/* Row: Top Rated Movies */}
+                  <MovieSlider 
+                    id="top-rated" 
+                    title="All-Time Classics" 
+                    movies={topRated} 
+                    onMovieClick={handleMovieSelect}
+                  />
+
+                  {/* Section Divider: TV Series */}
+                  <div className="flex items-center gap-4 pt-8 border-t border-purple-500/10">
+                    <h2 className="text-sm md:text-md uppercase font-black tracking-widest text-[#f8fafc] flex items-center gap-2.5">
+                      <div className="w-1.5 h-4 bg-fuchsia-500 rounded-full"></div>
+                      Premium TV Series
+                    </h2>
+                    <div className="h-[1px] bg-gradient-to-r from-purple-500/10 to-transparent flex-1"></div>
+                  </div>
+
+                  {/* Row: Trending Series */}
+                  <MovieSlider 
+                    id="trending-tv" 
+                    title="Trending Series" 
+                    movies={trendingTV} 
+                    onMovieClick={handleMovieSelect}
+                  />
+
+                  {/* Row: Popular Series */}
+                  <MovieSlider 
+                    id="popular-tv" 
+                    title="Must-Watch Binge Shows" 
+                    movies={popularTV} 
+                    onMovieClick={handleMovieSelect}
+                  />
+
+                  {/* Row: Top Rated Series */}
+                  <MovieSlider 
+                    id="top-rated-tv" 
+                    title="Acclaimed Television Hits" 
+                    movies={topRatedTV} 
+                    onMovieClick={handleMovieSelect}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "browse" && (
+            <BrowseView onMovieClick={handleMovieSelect} />
+          )}
+
+          {activeTab === "search" && (
+            <SearchView onMovieClick={handleMovieSelect} />
+          )}
+
+          {activeTab === "api" && (
+            <ApiExplorer />
+          )}
+        </main>
+
+        {/* Global footer disclaimer & legal notice with back-to-top widgets */}
+        {activeTab === "home" && <Footer />}
+
+        {/* Global overlay details modal and Simulated movie streaming HUD player */}
+        <MovieDetailsModal
+          movie={selectedMovie}
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onMovieClick={handleMovieSelect}
+          initialPlayState={modalPlayNow}
+        />
+
+        {/* Floating Mobile Bottom Navigation bar (toggled strictly based on screen widths) */}
+        <MobileBottomNav 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+        />
+      </div>
+    </ThemeProvider>
+  );
+}

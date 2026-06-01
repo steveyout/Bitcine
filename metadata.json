@@ -1,0 +1,6 @@
+{
+  "name": "Bitcine Stream",
+  "description": "A premium movie streaming site clone of Bitcine with purplish gradients, using Material UI and the TMDB API.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
