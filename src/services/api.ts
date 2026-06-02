@@ -1,9 +1,19 @@
+import axios, { AxiosError } from "axios";
 import { Movie, Genre, MovieDetails } from "../types";
 
+// Helper for delay in retry functionality
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /**
- * Standalone helper to execute a proxied TMDB endpoint with search queries
+ * Standalone helper to execute a proxied TMDB endpoint with search queries using Axios
+ * and automatic retry with exponential backoff on failed requests.
  */
-async function fetchFromProxy<T>(endpoint: string, params: Record<string, string | number> = {}): Promise<T> {
+async function fetchFromProxy<T>(
+  endpoint: string,
+  params: Record<string, string | number> = {},
+  retries = 3,
+  delayMs = 500
+): Promise<T> {
   const query = new URLSearchParams();
   Object.entries(params).forEach(([key, val]) => {
     if (val !== undefined && val !== null) {
@@ -14,13 +24,30 @@ async function fetchFromProxy<T>(endpoint: string, params: Record<string, string
   const queryString = query.toString();
   const url = `/api/tmdb/${endpoint}${queryString ? `?${queryString}` : ""}`;
 
-  const res = await fetch(url);
-  if (!res.ok) {
-    const errData = await res.json().catch(() => ({}));
-    throw new Error(errData.error || `Proxy error: status ${res.status}`);
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await axios.get<T>(url);
+      return response.data;
+    } catch (error) {
+      const isLastAttempt = attempt === retries;
+      const axiosError = error as AxiosError<{ error?: string }>;
+      const errorMessage = axiosError.response?.data?.error || axiosError.message || String(error);
+
+      console.warn(
+        `[Proxy API] Attempt ${attempt}/${retries} failed for endpoint "${endpoint}". Error: ${errorMessage}. ` +
+        (isLastAttempt ? "No more retries left." : `Retrying in ${delayMs}ms...`)
+      );
+
+      if (isLastAttempt) {
+        throw new Error(errorMessage || `Request failed after ${retries} attempts`);
+      }
+
+      await delay(delayMs);
+      delayMs *= 2; // Exponential backoff
+    }
   }
 
-  return res.json() as Promise<T>;
+  throw new Error("Request failed after max retries");
 }
 
 /**

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { Terminal, Play, Cpu, Server, Code, Copy, Check, Loader2 } from "lucide-react";
 
 interface ApiEndpoint {
@@ -71,28 +72,57 @@ export const ApiExplorer: React.FC = () => {
     const requestUrl = `${finalPath}${qProps.toString() ? `?${qProps.toString()}` : ""}`;
 
     try {
-      const res = await fetch(requestUrl);
-      const data = await res.json();
-      setResponseJson(data);
+      let attempts = 3;
+      let delayMs = 400;
+      let responseData: any = null;
+      let lastError: any = null;
+
+      for (let attempt = 1; attempt <= attempts; attempt++) {
+        try {
+          const res = await axios.get(requestUrl);
+          responseData = res.data;
+          break;
+        } catch (err: any) {
+          lastError = err;
+          if (attempt < attempts) {
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            delayMs *= 1.5;
+          }
+        }
+      }
+
+      if (responseData) {
+        setResponseJson(responseData);
+      } else {
+        throw lastError || new Error(`Request failed after ${attempts} attempts`);
+      }
     } catch (err: any) {
       setResponseJson({
         error: "Failed to resolve proxy tunnel.",
-        details: err.message
+        details: err.response?.data?.error || err.message
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const codeSnippet = `// Quick Node.js proxy call to Bitcine API
-const fetchFromBitcine = async () => {
+  const codeSnippet = `// Quick Node.js proxy call to Bitcine API using Axios with automatic retry
+import axios from "axios";
+
+const fetchFromBitcine = async (retries = 3, delayMs = 500) => {
   const url = "${window.location.origin}${currentEndpoint.path.replace("{movieId}", paramValues.movieId)}${activeEndpoint === "search" ? `?query=${paramValues.query}` : ""}";
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    console.log(data);
-  } catch (err) {
-    console.error("API error:", err);
+  
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await axios.get(url);
+      console.log("Data loaded:", response.data);
+      return response.data;
+    } catch (err) {
+      console.warn(\`Attempt \${attempt} failed: \`, err.message);
+      if (attempt === retries) throw err;
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      delayMs *= 2; // Exponential backoff
+    }
   }
 };
 `;

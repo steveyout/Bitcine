@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import dotenv from "dotenv";
+import axios from "axios";
 import { createServer as createViteServer } from "vite";
 
 // Load environment variables
@@ -8,7 +9,9 @@ dotenv.config();
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.NODE_ENV === "production"
+    ? parseInt(process.env.PORT || "5030")
+    : parseInt(process.env.PORT || "3000");
 
   app.use(express.json());
 
@@ -44,27 +47,63 @@ async function startServer() {
 
       console.log(`[Proxy] Fetching from TMDB: ${targetUrl.replace(token, "[REDACTED]")}`);
 
-      const response = await fetch(targetUrl, {
-        method: req.method,
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-        body: ["POST", "PUT", "PATCH"].includes(req.method) ? JSON.stringify(req.body) : undefined,
-      });
+      // Perform request with Axios and automatic retry
+      let attempts = 3;
+      let delayMs = 500;
+      let responseData: any = null;
+      let responseStatus = 200;
+      let lastError: any = null;
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        return res.status(response.status).json({
-          error: `TMDB API returned error status ${response.status}`,
-          details: errorText,
+      for (let attempt = 1; attempt <= attempts; attempt++) {
+        try {
+          const response = await axios({
+            url: targetUrl,
+            method: req.method,
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+            },
+            data: ["POST", "PUT", "PATCH"].includes(req.method) ? req.body : undefined,
+            timeout: 10000 // 10 second timeout
+          });
+          responseData = response.data;
+          responseStatus = response.status;
+          break;
+        } catch (err: any) {
+          lastError = err;
+          const status = err.response?.status;
+          
+          // Don't retry on 4xx user errors as they are fully client-authoritative
+          const isUserError = status && status >= 400 && status < 500;
+          
+          console.warn(
+            `[Proxy] Attempt ${attempt}/${attempts} to TMDB failed.` +
+            ` Status: ${status || 'Network Error'}. Error: ${err.message}.` +
+            (isUserError ? " Permanent 4xx error. Skipping retries." : "")
+          );
+
+          if (isUserError || attempt === attempts) {
+            break;
+          }
+
+          // Delay before next attempt
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+          delayMs *= 2;
+        }
+      }
+
+      if (responseData) {
+        res.status(responseStatus).json(responseData);
+      } else {
+        const status = lastError.response?.status || 500;
+        const errorData = lastError.response?.data || {};
+        res.status(status).json({
+          error: `TMDB API returned error: ${lastError.message}`,
+          details: typeof errorData === "object" ? errorData : { raw: String(errorData) },
           code: "TMDB_ERROR"
         });
       }
-
-      const data = await response.json();
-      res.json(data);
     } catch (err: any) {
       console.error("[Proxy] TMDB failure:", err);
       res.status(500).json({
@@ -93,11 +132,23 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    console.log("[Server] Serving production static assets...");
+    console.log("[Server] Serving production views output as dynamic EJS template...");
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
+    
+    // Set up EJS view engine with compiler support
+    app.set("view engine", "ejs");
+    app.set("views", distPath);
+
+    // Serve all assets dynamically, but bypass serving index.html as a static asset since we render EJS instead
+    app.use(express.static(distPath, { index: false }));
+    
     app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+      res.render("index", {
+        env: {
+          NODE_ENV: process.env.NODE_ENV,
+          TMDB_CONFIGURED: !!process.env.TMDB_ACCESS_TOKEN
+        }
+      });
     });
   }
 
