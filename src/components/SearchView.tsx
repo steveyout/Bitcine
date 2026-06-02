@@ -40,6 +40,12 @@ export const SearchView: React.FC<SearchViewProps> = ({
         setResults(filtered);
       } finally {
         setIsLoading(false);
+        // Track the successful search query in Google Analytics
+        if (typeof (window as any).gtag === "function") {
+          (window as any).gtag("event", "search", {
+            search_term: query.trim()
+          });
+        }
       }
     }, 450);
 
@@ -62,6 +68,12 @@ export const SearchView: React.FC<SearchViewProps> = ({
       setResults(filtered);
     } finally {
       setIsLoading(false);
+      // Track instant manual search in Google Analytics
+      if (typeof (window as any).gtag === "function") {
+        (window as any).gtag("event", "search", {
+          search_term: query.trim()
+        });
+      }
     }
   };
 

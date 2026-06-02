@@ -21,7 +21,7 @@ import { Footer } from "./components/Footer";
 import { SEOHelmet } from "./components/SEOHelmet";
 
 // Icons 
-import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw } from "lucide-react";
+import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, History } from "lucide-react";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("home");
@@ -37,6 +37,9 @@ export default function App() {
   const [trendingTV, setTrendingTV] = useState<Movie[]>([]);
   const [popularTV, setPopularTV] = useState<Movie[]>([]);
   const [topRatedTV, setTopRatedTV] = useState<Movie[]>([]);
+  
+  // Continue Watching stored state
+  const [continueWatching, setContinueWatching] = useState<Movie[]>([]);
   
   // Detail Overlay control
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
@@ -139,17 +142,45 @@ export default function App() {
     fetchMovieCatalog();
   }, []);
 
+  // Sync Continue Watching list from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("bitcine_continue_watching");
+      if (saved) {
+        setContinueWatching(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.warn("Bitcine client failed to parse Continue Watching logs:", e);
+    }
+  }, []);
+
+  const addToContinueWatching = (movie: Movie) => {
+    setContinueWatching((prev) => {
+      // De-duplicate if the movie was already being tracked, moving it to front priority
+      const filtered = prev.filter((m) => m.id !== movie.id);
+      const updated = [movie, ...filtered].slice(0, 15); // Limit history tracking
+      try {
+        localStorage.setItem("bitcine_continue_watching", JSON.stringify(updated));
+      } catch (e) {
+        console.warn("Storage quota limit exceeded. Could not save session:", e);
+      }
+      return updated;
+    });
+  };
+
   // Set modal hooks for detail viewing or action streams
   const handleMovieSelect = (movie: Movie) => {
     setSelectedMovie(movie);
     setModalPlayNow(false);
     setModalOpen(true);
+    addToContinueWatching(movie);
   };
 
   const handleHeroPlay = (movie: Movie) => {
     setSelectedMovie(movie);
     setModalPlayNow(true);
     setModalOpen(true);
+    addToContinueWatching(movie);
   };
 
   const handleSearchToggle = () => {
@@ -209,98 +240,124 @@ export default function App() {
               />
 
               {/* Rows slider collection */}
-              {isLoading ? (
-                /* Cinematic simple row loader shimmer */
-                <div id="sliders-preloader" className="max-w-7xl mx-auto px-4 md:px-8 py-10 flex flex-col gap-8">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="animate-pulse flex flex-col gap-4">
-                      <div className="h-6 w-48 bg-slate-800 rounded mb-2" />
-                      <div className="flex gap-4 overflow-x-hidden">
-                        {[1, 2, 3, 4, 5].map((j) => (
-                          <div key={j} className="h-48 w-32 bg-slate-800 rounded-xl flex-shrink-0" />
-                        ))}
-                      </div>
+              <div id="home-sliders-wrapper" className="max-w-7xl mx-auto pb-12 px-4 md:px-8 flex flex-col gap-8 mt-6">
+                {/* Row: Continue Watching (only renders if items are present in localStorage history) */}
+                {continueWatching.length > 0 && (
+                  <div key="continue-watching-section" className="animate-[fadeIn_0.4s_ease-out]">
+                    <div className="flex items-center justify-between gap-4 pb-2 border-b border-purple-500/10">
+                      <h2 className="text-sm md:text-md uppercase font-black tracking-widest text-[#f8fafc] flex items-center gap-2.5">
+                        <History className="w-4.5 h-4.5 text-emerald-400 animate-pulse" />
+                        Continue Watching
+                      </h2>
+                      
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setContinueWatching([]);
+                          try {
+                            localStorage.removeItem("bitcine_continue_watching");
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                        className="text-[10px] uppercase font-black tracking-widest text-slate-400 hover:text-emerald-400 cursor-pointer transition-colors px-2.5 py-1 rounded bg-slate-900/60 border border-slate-800 hover:border-emerald-500/20"
+                      >
+                        Clear History
+                      </button>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div id="home-sliders-wrapper" className="max-w-7xl mx-auto pb-12 px-4 md:px-8 flex flex-col gap-8">
-                  {/* Row: TOP 10 Today (with large numbers) */}
-                  <MovieSlider 
-                    id="top-10" 
-                    title="TOP 10 Today" 
-                    movies={trending.slice(0, 10)} 
-                    onMovieClick={handleMovieSelect}
-                    isTop10={true}
-                  />
 
-                  {/* Section Divider: Blockbuster Movies */}
-                  <div className="flex items-center gap-4 pt-4 border-t border-purple-500/10">
-                    <h2 className="text-sm md:text-md uppercase font-black tracking-widest text-[#f8fafc] flex items-center gap-2.5">
-                      <div className="w-1.5 h-4 bg-violet-600 rounded-full"></div>
-                      Exclusive Movies
-                    </h2>
-                    <div className="h-[1px] bg-gradient-to-r from-purple-500/10 to-transparent flex-1"></div>
+                    <MovieSlider 
+                      id="continue-watching" 
+                      title="Recently Viewed Movies" 
+                      movies={continueWatching} 
+                      onMovieClick={handleMovieSelect}
+                      isLoading={isLoading}
+                    />
                   </div>
+                )}
 
-                  {/* Row: Now Playing inside Bitcine */}
-                  <MovieSlider 
-                    id="now-playing" 
-                    title="Spotlight Streams" 
-                    movies={nowPlaying} 
-                    onMovieClick={handleMovieSelect}
-                  />
+                {/* Row: TOP 10 Today (with large numbers) */}
+                <MovieSlider 
+                  id="top-10" 
+                  title="TOP 10 Today" 
+                  movies={trending.slice(0, 10)} 
+                  onMovieClick={handleMovieSelect}
+                  isTop10={true}
+                  isLoading={isLoading}
+                />
 
-                  {/* Row: Upcoming catalog listings */}
-                  <MovieSlider 
-                    id="upcoming" 
-                    title="Anticipated Releases" 
-                    movies={upcoming} 
-                    onMovieClick={handleMovieSelect}
-                  />
-
-                  {/* Row: Top Rated Movies */}
-                  <MovieSlider 
-                    id="top-rated" 
-                    title="All-Time Classics" 
-                    movies={topRated} 
-                    onMovieClick={handleMovieSelect}
-                  />
-
-                  {/* Section Divider: TV Series */}
-                  <div className="flex items-center gap-4 pt-8 border-t border-purple-500/10">
-                    <h2 className="text-sm md:text-md uppercase font-black tracking-widest text-[#f8fafc] flex items-center gap-2.5">
-                      <div className="w-1.5 h-4 bg-fuchsia-500 rounded-full"></div>
-                      Premium TV Series
-                    </h2>
-                    <div className="h-[1px] bg-gradient-to-r from-purple-500/10 to-transparent flex-1"></div>
-                  </div>
-
-                  {/* Row: Trending Series */}
-                  <MovieSlider 
-                    id="trending-tv" 
-                    title="Trending Series" 
-                    movies={trendingTV} 
-                    onMovieClick={handleMovieSelect}
-                  />
-
-                  {/* Row: Popular Series */}
-                  <MovieSlider 
-                    id="popular-tv" 
-                    title="Must-Watch Binge Shows" 
-                    movies={popularTV} 
-                    onMovieClick={handleMovieSelect}
-                  />
-
-                  {/* Row: Top Rated Series */}
-                  <MovieSlider 
-                    id="top-rated-tv" 
-                    title="Acclaimed Television Hits" 
-                    movies={topRatedTV} 
-                    onMovieClick={handleMovieSelect}
-                  />
+                {/* Section Divider: Blockbuster Movies */}
+                <div className="flex items-center gap-4 pt-4 border-t border-purple-500/10">
+                  <h2 className="text-sm md:text-md uppercase font-black tracking-widest text-[#f8fafc] flex items-center gap-2.5">
+                    <div className="w-1.5 h-4 bg-violet-600 rounded-full"></div>
+                    Exclusive Movies
+                  </h2>
+                  <div className="h-[1px] bg-gradient-to-r from-purple-500/10 to-transparent flex-1"></div>
                 </div>
-              )}
+
+                {/* Row: Now Playing inside Bitcine */}
+                <MovieSlider 
+                  id="now-playing" 
+                  title="Spotlight Streams" 
+                  movies={nowPlaying} 
+                  onMovieClick={handleMovieSelect}
+                  isLoading={isLoading}
+                />
+
+                {/* Row: Upcoming catalog listings */}
+                <MovieSlider 
+                  id="upcoming" 
+                  title="Anticipated Releases" 
+                  movies={upcoming} 
+                  onMovieClick={handleMovieSelect}
+                  isLoading={isLoading}
+                />
+
+                {/* Row: Top Rated Movies */}
+                <MovieSlider 
+                  id="top-rated" 
+                  title="All-Time Classics" 
+                  movies={topRated} 
+                  onMovieClick={handleMovieSelect}
+                  isLoading={isLoading}
+                />
+
+                {/* Section Divider: TV Series */}
+                <div className="flex items-center gap-4 pt-8 border-t border-purple-500/10">
+                  <h2 className="text-sm md:text-md uppercase font-black tracking-widest text-[#f8fafc] flex items-center gap-2.5">
+                    <div className="w-1.5 h-4 bg-fuchsia-500 rounded-full"></div>
+                    Premium TV Series
+                  </h2>
+                  <div className="h-[1px] bg-gradient-to-r from-purple-500/10 to-transparent flex-1"></div>
+                </div>
+
+                {/* Row: Trending Series */}
+                <MovieSlider 
+                  id="trending-tv" 
+                  title="Trending Series" 
+                  movies={trendingTV} 
+                  onMovieClick={handleMovieSelect}
+                  isLoading={isLoading}
+                />
+
+                {/* Row: Popular Series */}
+                <MovieSlider 
+                  id="popular-tv" 
+                  title="Must-Watch Binge Shows" 
+                  movies={popularTV} 
+                  onMovieClick={handleMovieSelect}
+                  isLoading={isLoading}
+                />
+
+                {/* Row: Top Rated Series */}
+                <MovieSlider 
+                  id="top-rated-tv" 
+                  title="Acclaimed Television Hits" 
+                  movies={topRatedTV} 
+                  onMovieClick={handleMovieSelect}
+                  isLoading={isLoading}
+                />
+              </div>
             </div>
           )}
 
