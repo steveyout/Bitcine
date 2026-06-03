@@ -19,6 +19,7 @@ import { ApiExplorer } from "./components/ApiExplorer";
 import { SearchView } from "./components/SearchView";
 import { Footer } from "./components/Footer";
 import { SEOHelmet } from "./components/SEOHelmet";
+import { FloatingSocials } from "./components/FloatingSocials";
 
 // Icons 
 import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, History } from "lucide-react";
@@ -385,6 +386,9 @@ export default function App() {
           onMovieClick={handleMovieSelect}
           initialPlayState={modalPlayNow}
         />
+
+        {/* Floating brand social link shortcuts (Discord, Telegram, showing brand-themed buttons) */}
+        <FloatingSocials />
 
         {/* Floating Mobile Bottom Navigation bar (toggled strictly based on screen widths) */}
         <MobileBottomNav 

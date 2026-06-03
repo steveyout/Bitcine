@@ -31,8 +31,8 @@ export const Header: React.FC<HeaderProps> = ({
         onClick={() => setActiveTab("home")}
         className="flex items-center gap-2.5 cursor-pointer group"
       >
-        <div id="bitcine-logo" className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-[0_0_15px_rgba(147,51,234,0.3)] group-hover:scale-105 transition-transform">
-          <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+        <div id="bitcine-logo" className="w-8 h-8 flex items-center justify-center group-hover:scale-105 transition-transform">
+          <img src="/logo.svg" alt="Bitcine Logo" className="w-full h-full object-contain" />
         </div>
         <span id="bitcine-brand-name" className="text-xl font-black bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent tracking-tighter uppercase">
           Bitcine
