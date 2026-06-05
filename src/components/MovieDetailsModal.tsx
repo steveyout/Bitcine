@@ -3,10 +3,11 @@ import { Movie, MovieDetails, Video, CastMember } from "../types";
 import { api } from "../services/api";
 import { 
   X, Play, Star, Clock, Globe, Film, ArrowRight, Sparkles, 
-  Smile, Calendar, Volume2, Maximize, RotateCcw, AlertCircle, Tv, Server
+  Smile, Calendar, Volume2, Maximize, RotateCcw, AlertCircle, Tv, Server, Heart, Share2
 } from "lucide-react";
 import { Dialog, DialogContent, CircularProgress } from "@mui/material";
 import { providers, DEFAULT_PROVIDER_ID, getEmbedUrl } from "../config/providers";
+import { motion } from "motion/react";
 
 interface MovieDetailsModalProps {
   movie: Movie | null;
@@ -14,6 +15,8 @@ interface MovieDetailsModalProps {
   onClose: () => void;
   onMovieClick: (movie: Movie) => void;
   initialPlayState?: boolean;
+  watchlist?: Movie[];
+  onToggleWatchlist?: (movie: Movie) => void;
 }
 
 // Slide up transition for standard premium entrance
@@ -23,6 +26,8 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
   onClose,
   onMovieClick,
   initialPlayState = false,
+  watchlist = [],
+  onToggleWatchlist,
 }) => {
   const [details, setDetails] = useState<MovieDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +47,49 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
   // Detect TV Series
   const isTV = !!(movie && (movie.first_air_date || movie.name || movie.id >= 200));
 
+  // Determine watchlisted state
+  const isWatchlisted = movie ? watchlist.some((m) => m.id === movie.id) : false;
+
   // Keep track of play status from inputs
+  const [shareSuccess, setShareSuccess] = useState(false);
+
+  const handleShare = async () => {
+    const movieTitle = currentMovie?.title || currentMovie?.name || movie?.title || movie?.name || "Movie";
+    const releaseYear = yearText;
+    const movieId = movie?.id;
+    
+    // Fallback shareable link
+    const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/?movie=${movieId}` : "https://bitcine.stream/";
+    const shareText = `Check out "${movieTitle}" (${releaseYear}) on Bitcine Stream! 🍿`;
+    
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: `Bitcine Stream - ${movieTitle}`,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (err) {
+        console.warn("Web Share failed, fallback to clipboard copy", err);
+        copyToClipboard(shareUrl, shareText);
+      }
+    } else {
+      copyToClipboard(shareUrl, shareText);
+    }
+  };
+
+  const copyToClipboard = (url: string, text: string) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        navigator.clipboard.writeText(`${text} ${url}`);
+        setShareSuccess(true);
+        setTimeout(() => setShareSuccess(false), 2500);
+      }
+    } catch (err) {
+      console.error("Clipboard copy failed", err);
+    }
+  };
+
   useEffect(() => {
     if (open) {
       setIsPlaying(initialPlayState);
@@ -149,6 +196,11 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
       maxWidth="md"
       className="z-[99]"
       sx={{
+        "& .MuiBackdrop-root": {
+          backgroundColor: "rgba(5, 1, 16, 0.75)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+        },
         "& .MuiPaper-root": {
           backgroundColor: "#050110",
           borderRadius: "20px",
@@ -159,7 +211,42 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
       }}
     >
       <DialogContent id="modal-content-area" className="p-0 select-none relative scrollbar-thin scrollbar-thumb-purple-900">
-        
+        <motion.div
+          initial={{ opacity: 0, y: 40, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 40, scale: 0.97 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+          className="w-full h-full"
+        >
+          
+          {/* Share Success Toast Indicator */}
+          {shareSuccess && (
+            <div className="absolute top-5 left-1/2 -translate-x-1/2 z-50 bg-[#10b981]/95 text-white text-[11px] font-bold tracking-widest px-4 py-2 rounded-full shadow-xl shadow-emerald-950/40 border border-emerald-400 backdrop-blur-md animate-[fadeIn_0.2s_ease-out] flex items-center gap-1.5 uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+              Link Copied to Clipboard!
+            </div>
+          )}
+
+          {/* Floating Share Button */}
+          <button
+            id="modal-share-floating-btn"
+            onClick={handleShare}
+            aria-label="Share movie"
+            className="absolute top-4 right-28 z-50 bg-[#050110]/80 text-white rounded-full p-2.5 hover:bg-violet-600/90 hover:scale-110 active:scale-95 border border-purple-500/20 cursor-pointer shadow-lg transition-all"
+          >
+            <Share2 className="w-5 h-5 text-white" />
+          </button>
+          
+          {/* Watchlist Toggle Heart Button */}
+        <button
+          id="modal-watchlist-floating-btn"
+          onClick={() => movie && onToggleWatchlist?.(movie)}
+          aria-label={isWatchlisted ? "Remove from Watchlist" : "Add to Watchlist"}
+          className="absolute top-4 right-16 z-50 bg-[#050110]/80 text-white rounded-full p-2.5 hover:bg-rose-600/90 hover:scale-110 active:scale-95 border border-purple-500/20 cursor-pointer shadow-lg transition-all"
+        >
+          <Heart className={`w-5 h-5 transition-colors ${isWatchlisted ? "fill-rose-500 text-rose-500" : "text-white"}`} />
+        </button>
+
         {/* Floating Close Button */}
         <button
           id="modal-close-btn"
@@ -540,6 +627,30 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                 <Play className="w-4 h-4 fill-white" />
                 <span>{isPlaying && playMode === "stream" ? "Reload Active Stream" : "Trigger Stream HD"}</span>
               </button>
+
+              {/* Watchlist secondary button block */}
+              <button
+                id="details-watchlist-btn"
+                onClick={() => movie && onToggleWatchlist?.(movie)}
+                className={`w-full border rounded-xl py-3 px-4 font-bold text-xs uppercase tracking-wider hover:scale-[1.02] active:scale-[0.98] cursor-pointer transition-all flex items-center justify-center gap-2 mt-2 ${
+                  isWatchlisted
+                    ? "bg-rose-950/40 border-rose-500/30 text-rose-400 hover:bg-rose-950/60"
+                    : "bg-[#0b071e]/70 border-purple-500/20 text-slate-300 hover:border-purple-500/40 hover:bg-[#0b071e]"
+                }`}
+              >
+                <Heart className={`w-4 h-4 transition-colors ${isWatchlisted ? "fill-rose-500 text-rose-500" : ""}`} />
+                <span>{isWatchlisted ? "Saved to Watchlist" : "Save to Watchlist"}</span>
+              </button>
+
+              {/* Share secondary button block */}
+              <button
+                id="details-share-btn"
+                onClick={handleShare}
+                className="w-full bg-[#0b071e]/70 border border-purple-500/20 text-slate-300 hover:border-purple-500/40 hover:bg-[#0b071e] rounded-xl py-3 px-4 font-bold text-xs uppercase tracking-wider hover:scale-[1.02] active:scale-[0.98] cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
+              >
+                <Share2 className="w-4 h-4 text-violet-400" />
+                <span>Share Movie</span>
+              </button>
             </div>
           </div>
 
@@ -596,7 +707,8 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
             )}
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </motion.div>
+    </DialogContent>
+  </Dialog>
   );
 };

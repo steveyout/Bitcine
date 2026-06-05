@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Bitcine Streaming Applet Controller
  */
@@ -22,7 +24,7 @@ import { SEOHelmet } from "./components/SEOHelmet";
 import { FloatingSocials } from "./components/FloatingSocials";
 
 // Icons 
-import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, History } from "lucide-react";
+import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, History, Heart } from "lucide-react";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("home");
@@ -41,6 +43,9 @@ export default function App() {
   
   // Continue Watching stored state
   const [continueWatching, setContinueWatching] = useState<Movie[]>([]);
+  
+  // Keep track of user's personal movie watchlist in local state
+  const [watchlist, setWatchlist] = useState<Movie[]>([]);
   
   // Detail Overlay control
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
@@ -143,7 +148,7 @@ export default function App() {
     fetchMovieCatalog();
   }, []);
 
-  // Sync Continue Watching list from localStorage on mount
+  // Sync Continue Watching list and Watchlist from localStorage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem("bitcine_continue_watching");
@@ -153,7 +158,34 @@ export default function App() {
     } catch (e) {
       console.warn("Bitcine client failed to parse Continue Watching logs:", e);
     }
+
+    try {
+      const savedWatchlist = localStorage.getItem("bitcine_watchlist");
+      if (savedWatchlist) {
+        setWatchlist(JSON.parse(savedWatchlist));
+      }
+    } catch (e) {
+      console.warn("Bitcine client failed to parse Watchlist logs:", e);
+    }
   }, []);
+  
+  const toggleWatchlist = (movie: Movie) => {
+    setWatchlist((prev) => {
+      const isSaved = prev.some((m) => m.id === movie.id);
+      let updated;
+      if (isSaved) {
+        updated = prev.filter((m) => m.id !== movie.id);
+      } else {
+        updated = [movie, ...prev];
+      }
+      try {
+        localStorage.setItem("bitcine_watchlist", JSON.stringify(updated));
+      } catch (e) {
+        console.warn("Storage client failed to save watchlist item:", e);
+      }
+      return updated;
+    });
+  };
 
   const addToContinueWatching = (movie: Movie) => {
     setContinueWatching((prev) => {
@@ -242,6 +274,41 @@ export default function App() {
 
               {/* Rows slider collection */}
               <div id="home-sliders-wrapper" className="max-w-7xl mx-auto pb-12 px-4 md:px-8 flex flex-col gap-8 mt-6">
+                {/* Row: My Watchlist (only renders if items are present in localStorage watchlist) */}
+                {watchlist.length > 0 && (
+                  <div key="watchlist-section" className="animate-[fadeIn_0.4s_ease-out]">
+                    <div className="flex items-center justify-between gap-4 pb-2 border-b border-purple-500/10">
+                      <h2 className="text-sm md:text-md uppercase font-black tracking-widest text-[#f8fafc] flex items-center gap-2.5">
+                        <Heart className="w-4.5 h-4.5 text-rose-500 fill-rose-500 animate-pulse" />
+                        My Watchlist
+                      </h2>
+                      
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setWatchlist([]);
+                          try {
+                            localStorage.removeItem("bitcine_watchlist");
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                        className="text-[10px] uppercase font-black tracking-widest text-slate-400 hover:text-rose-400 cursor-pointer transition-colors px-2.5 py-1 rounded bg-slate-900/60 border border-slate-800 hover:border-rose-500/20"
+                      >
+                        Clear Watchlist
+                      </button>
+                    </div>
+
+                    <MovieSlider 
+                      id="my-watchlist" 
+                      title="My Saved Movies & Series" 
+                      movies={watchlist} 
+                      onMovieClick={handleMovieSelect}
+                      isLoading={isLoading}
+                    />
+                  </div>
+                )}
+
                 {/* Row: Continue Watching (only renders if items are present in localStorage history) */}
                 {continueWatching.length > 0 && (
                   <div key="continue-watching-section" className="animate-[fadeIn_0.4s_ease-out]">
@@ -385,6 +452,8 @@ export default function App() {
           onClose={() => setModalOpen(false)}
           onMovieClick={handleMovieSelect}
           initialPlayState={modalPlayNow}
+          watchlist={watchlist}
+          onToggleWatchlist={toggleWatchlist}
         />
 
         {/* Floating brand social link shortcuts (Discord, Telegram, showing brand-themed buttons) */}
