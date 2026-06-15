@@ -22,6 +22,7 @@ import { SearchView } from "./components/SearchView";
 import { Footer } from "./components/Footer";
 import { SEOHelmet } from "./components/SEOHelmet";
 import { FloatingSocials } from "./components/FloatingSocials";
+import { GenreTrendsChart } from "./components/GenreTrendsChart";
 
 // Icons 
 import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, History, Heart } from "lucide-react";
@@ -424,6 +425,25 @@ export default function App() {
                   movies={topRatedTV} 
                   onMovieClick={handleMovieSelect}
                   isLoading={isLoading}
+                />
+
+                {/* Section Divider: Cinema Intelligence */}
+                <div className="flex items-center gap-4 pt-8 border-t border-purple-500/10">
+                  <h2 className="text-sm md:text-md uppercase font-black tracking-widest text-[#f8fafc] flex items-center gap-2.5">
+                    <div className="w-1.5 h-4 bg-purple-500 rounded-full animate-pulse"></div>
+                    Dynamic Analytics
+                  </h2>
+                  <div className="h-[1px] bg-gradient-to-r from-purple-500/10 to-transparent flex-1"></div>
+                </div>
+
+                {/* Interactive Recharts Genre trend visualization */}
+                <GenreTrendsChart 
+                  trending={trending}
+                  nowPlaying={nowPlaying}
+                  topRated={topRated}
+                  upcoming={upcoming}
+                  trendingTV={trendingTV}
+                  popularTV={popularTV}
                 />
               </div>
             </div>
