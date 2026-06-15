@@ -5,4 +5,4 @@ Allow: /search
 Disallow: /api*
 
 # Sitemaps declaration
-Sitemap: https://bitcine.stream/sitemap.xml
+Sitemap: https://bitcine.online/sitemap.xml

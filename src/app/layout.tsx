@@ -3,11 +3,15 @@ import { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://bitcine.online"),
   title: "Bitcine Stream | Watch Movies & TV Series in Premium HD",
   description: "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream. Test APIs, query TMDB proxy databases, and experience next-gen media viewing.",
   keywords: "bitcine, watch movies, stream free, hd video streaming, cinema list, tmdb backend proxy, developer movie dashboard, movie index, latest tv series",
   authors: [{ name: "Bitcine Global Network" }],
   robots: "index, follow",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/logo.svg",
     shortcut: "/logo.svg",
@@ -19,6 +23,7 @@ export const metadata: Metadata = {
     description: "Discover premium movie collections, stream direct action-packed HD series, and monitor TMDB backend proxies on Bitcine's ultimate cinematic hub.",
     images: [{ url: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200&h=630&fit=crop" }],
     siteName: "Bitcine Stream",
+    url: "https://bitcine.online/",
   },
   twitter: {
     card: "summary_large_image",
@@ -73,12 +78,12 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "Bitcine Stream",
-              "url": "https://bitcine.stream/",
+              "url": "https://bitcine.online/",
               "description": "Premium multi-source cinema metadata, TV logs, and developers' sandboxed layout system.",
               "genre": "Cinema & Television Streaming",
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://bitcine.stream/?q={search_term_string}",
+                "target": "https://bitcine.online/?q={search_term_string}",
                 "query-input": "required name=search_term_string"
               }
             })

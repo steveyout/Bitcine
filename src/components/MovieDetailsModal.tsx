@@ -59,7 +59,7 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
     const movieId = movie?.id;
     
     // Fallback shareable link
-    const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/?movie=${movieId}` : "https://bitcine.stream/";
+    const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/?movie=${movieId}` : "https://bitcine.online/";
     const shareText = `Check out "${movieTitle}" (${releaseYear}) on Bitcine Stream! 🍿`;
     
     if (typeof navigator !== "undefined" && navigator.share) {
@@ -197,68 +197,75 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
       className="z-[99]"
       sx={{
         "& .MuiBackdrop-root": {
-          backgroundColor: "rgba(5, 1, 16, 0.75)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
+          backgroundColor: "rgba(3, 1, 10, 0.8)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
         },
         "& .MuiPaper-root": {
           backgroundColor: "#050110",
-          borderRadius: "20px",
-          border: "1px solid rgba(139, 92, 246, 0.15)",
+          borderRadius: { xs: "12px", sm: "24px" },
+          border: "1px solid rgba(139, 92, 246, 0.22)",
           color: "#f8fafc",
           overflowX: "hidden",
+          margin: { xs: "8px", sm: "24px", md: "32px" },
+          width: { xs: "calc(100% - 16px)", sm: "calc(100% - 48px)", md: "calc(100% - 64px)" },
+          maxHeight: { xs: "calc(100% - 16px)", sm: "calc(100% - 48px)", md: "calc(100% - 64px)" },
+          boxShadow: "0 25px 50px -12px rgba(139, 92, 246, 0.3)",
         }
       }}
     >
-      <DialogContent id="modal-content-area" className="p-0 select-none relative scrollbar-thin scrollbar-thumb-purple-900">
+      <DialogContent id="modal-content-area" className="p-0 select-none relative scrollbar-none sm:scrollbar-thin sm:scrollbar-thumb-purple-950">
         <motion.div
-          initial={{ opacity: 0, y: 40, scale: 0.97 }}
+          initial={{ opacity: 0, y: 30, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 40, scale: 0.97 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
+          exit={{ opacity: 0, y: 30, scale: 0.96 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="w-full h-full"
         >
           
           {/* Share Success Toast Indicator */}
           {shareSuccess && (
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 z-50 bg-[#10b981]/95 text-white text-[11px] font-bold tracking-widest px-4 py-2 rounded-full shadow-xl shadow-emerald-950/40 border border-emerald-400 backdrop-blur-md animate-[fadeIn_0.2s_ease-out] flex items-center gap-1.5 uppercase">
+            <div className="absolute top-5 left-1/2 -translate-x-1/2 z-50 bg-emerald-500/95 text-white text-[10px] font-black tracking-widest px-4 py-2 rounded-full shadow-xl shadow-black/50 border border-emerald-400 backdrop-blur-md animate-[fadeIn_0.2s_ease-out] flex items-center gap-1.5 uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-              Link Copied to Clipboard!
+              Copied to Clipboard!
             </div>
           )}
 
-          {/* Floating Share Button */}
-          <button
-            id="modal-share-floating-btn"
-            onClick={handleShare}
-            aria-label="Share movie"
-            className="absolute top-4 right-28 z-50 bg-[#050110]/80 text-white rounded-full p-2.5 hover:bg-violet-600/90 hover:scale-110 active:scale-95 border border-purple-500/20 cursor-pointer shadow-lg transition-all"
-          >
-            <Share2 className="w-5 h-5 text-white" />
-          </button>
-          
-          {/* Watchlist Toggle Heart Button */}
-        <button
-          id="modal-watchlist-floating-btn"
-          onClick={() => movie && onToggleWatchlist?.(movie)}
-          aria-label={isWatchlisted ? "Remove from Watchlist" : "Add to Watchlist"}
-          className="absolute top-4 right-16 z-50 bg-[#050110]/80 text-white rounded-full p-2.5 hover:bg-rose-600/90 hover:scale-110 active:scale-95 border border-purple-500/20 cursor-pointer shadow-lg transition-all"
-        >
-          <Heart className={`w-5 h-5 transition-colors ${isWatchlisted ? "fill-rose-500 text-rose-500" : "text-white"}`} />
-        </button>
+          {/* Floating Action Buttons Row */}
+          <div className="absolute top-3 right-3 md:top-4 md:right-4 z-50 flex items-center gap-2">
+            {/* Share Button */}
+            <button
+              id="modal-share-floating-btn"
+              onClick={handleShare}
+              aria-label="Share movie"
+              className="bg-[#050110]/80 hover:bg-[#100b26] text-white rounded-full p-2 md:p-2.5 hover:scale-110 active:scale-95 border border-purple-500/15 cursor-pointer shadow-lg shadow-black/50 transition-all backdrop-blur-md duration-200"
+            >
+              <Share2 className="w-4 h-4 md:w-5 md:h-5 text-white" />
+            </button>
+            
+            {/* Watchlist Toggle Heart Button */}
+            <button
+              id="modal-watchlist-floating-btn"
+              onClick={() => movie && onToggleWatchlist?.(movie)}
+              aria-label={isWatchlisted ? "Remove from Watchlist" : "Add to Watchlist"}
+              className="bg-[#050110]/80 hover:bg-[#100b26] text-white rounded-full p-2 md:p-2.5 hover:scale-110 active:scale-95 border border-purple-500/15 cursor-pointer shadow-lg shadow-black/50 transition-all backdrop-blur-md duration-200"
+            >
+              <Heart className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${isWatchlisted ? "fill-rose-500 text-rose-550" : "text-white"}`} />
+            </button>
 
-        {/* Floating Close Button */}
-        <button
-          id="modal-close-btn"
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute top-4 right-4 z-50 bg-[#050110]/80 text-white rounded-full p-2.5 hover:bg-violet-600/90 hover:scale-110 active:scale-95 border border-purple-500/20 cursor-pointer shadow-lg transition-all"
-        >
-          <X className="w-5 h-5" />
-        </button>
+            {/* Floating Close Button */}
+            <button
+              id="modal-close-btn"
+              onClick={onClose}
+              aria-label="Close"
+              className="bg-[#050110]/80 hover:bg-[#100b26] text-white rounded-full p-2 md:p-2.5 hover:scale-110 active:scale-95 border border-purple-500/15 cursor-pointer shadow-lg shadow-black/50 transition-all backdrop-blur-md duration-200"
+            >
+              <X className="w-4 h-4 md:w-5 md:h-5" />
+            </button>
+          </div>
 
         {/* --- CINEMATOGRAPHIC PLAYER FRAME (Trailer active OR static backdrop with play overlay) --- */}
-        <div id="modal-upper-player-frame" className="relative w-full aspect-video md:max-h-[480px] bg-black overflow-hidden border-b border-purple-500/20">
+        <div id="modal-upper-player-frame" className="relative w-full aspect-video md:max-h-[480px] bg-black overflow-hidden border-b border-purple-500/15">
           
           {isPlaying ? (
             <div id="active-theatre-player" className="w-full h-full relative bg-black">
@@ -379,7 +386,7 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
         </div>
 
         {/* --- DETAILED INFORMATION WINDOW --- */}
-        <div id="modal-lower-details-frame" className="p-6 md:p-8 flex flex-col gap-8">
+        <div id="modal-lower-details-frame" className="p-4 sm:p-6 md:p-8 flex flex-col gap-6 md:gap-8">
           
           {/* Active Cinema Integration Panel (Only shows when movie is playing) */}
           {isPlaying && (
@@ -495,15 +502,40 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
           )}
 
           {/* Main Title & Tagline Header */}
-          <div className="flex flex-col gap-2">
-            <h1 id="details-movie-title" className="text-3xl md:text-4xl font-extrabold uppercase tracking-tight text-white flex items-center gap-3">
-              {isTV ? <Tv className="w-8 h-8 text-violet-400" /> : <Film className="w-8 h-8 text-violet-400" />}
-              {currentMovie.title || currentMovie.name}
+          <div className="flex flex-col gap-2.5 animate-[fadeIn_0.5s_ease-out]">
+            <h1 id="details-movie-title" className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight text-white flex items-center gap-2 sm:gap-3 leading-tight">
+              {isTV ? <Tv className="w-6 h-6 sm:w-8 sm:h-8 text-violet-400 flex-shrink-0" /> : <Film className="w-6 h-6 sm:w-8 sm:h-8 text-violet-400 flex-shrink-0" />}
+              <span>{currentMovie.title || currentMovie.name}</span>
             </h1>
             {currentMovie.tagline && (
-              <p id="details-movie-tagline" className="text-sm italic text-violet-400 font-medium">
+              <p id="details-movie-tagline" className="text-xs sm:text-sm italic text-violet-450 font-medium border-l-2 border-violet-500/20 pl-2.5">
                 "{currentMovie.tagline}"
               </p>
+            )}
+          </div>
+
+          {/* Inline quick info metrics block (extremely key for mobile before scroll) */}
+          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 font-medium border-b border-purple-500/10 pb-4 md:pb-5">
+            <span className="flex items-center gap-1 text-amber-400 font-extrabold bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              {ratingText}
+            </span>
+            <span className="bg-purple-500/10 border border-purple-500/15 px-2.5 py-1 rounded-lg text-violet-350 font-bold font-mono">
+              {yearText}
+            </span>
+            {currentMovie.runtime && (
+              <span className="flex items-center gap-1 bg-blue-500/10 border border-blue-500/15 px-2.5 py-1 rounded-lg text-blue-300">
+                <Clock className="w-3.5 h-3.5 text-blue-400" />
+                {currentMovie.runtime} min
+              </span>
+            )}
+            <span className="bg-slate-900 border border-slate-800/80 px-2.5 py-1 rounded-lg uppercase text-[10px] font-black tracking-widest text-slate-300">
+              {currentMovie.original_language || "EN"}
+            </span>
+            {isTV && (
+              <span className="bg-fuchsia-500/10 border border-fuchsia-500/15 px-2.5 py-1 rounded-lg text-fuchsia-300 font-black text-[10px] uppercase tracking-wider">
+                TV Series
+              </span>
             )}
           </div>
 
@@ -547,19 +579,19 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                           <div 
                              key={member.id} 
                              id={`cast-card-${member.id}`}
-                             className="bg-purple-950/20 rounded-xl p-2.5 border border-purple-500/5 flex items-center gap-2.5 hover:border-purple-500/25 hover:bg-purple-950/30 transition-all"
+                             className="bg-purple-950/10 rounded-xl p-2.5 border border-purple-500/10 flex items-center gap-2.5 hover:border-purple-500/25 hover:bg-purple-950/20 transition-all duration-350 hover:scale-[1.03] hover:shadow-lg hover:shadow-purple-500/5 cursor-default group"
                            >
                             <img
                               src={avatarVal}
                               alt={member.name}
                               referrerPolicy="no-referrer"
-                              className="w-10 h-10 rounded-lg object-cover bg-slate-800 flex-shrink-0"
+                              className="w-10 h-10 rounded-full object-cover bg-slate-800 flex-shrink-0 border border-purple-500/15 group-hover:border-purple-400 transition-colors"
                             />
                             <div className="min-w-0">
-                              <p className="text-xs font-bold text-white truncate leading-tight">
+                              <p className="text-xs font-black text-[#fafafa] truncate leading-tight group-hover:text-purple-300 transition-colors">
                                 {member.name}
                               </p>
-                              <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                              <p className="text-[9px] md:text-[10px] text-slate-400 truncate mt-0.5">
                                 {member.character}
                               </p>
                             </div>
@@ -681,19 +713,19 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                           setIsPlaying(false);
                           setPlaybackProgress(0);
                         }}
-                        className="group cursor-pointer relative overflow-hidden aspect-video rounded-xl border border-purple-500/5 bg-slate-900 transition-all duration-300 hover:border-violet-500/50 hover:scale-102"
+                        className="group cursor-pointer relative overflow-hidden aspect-video rounded-xl border border-purple-500/10 bg-slate-950 transition-all duration-300 hover:border-violet-500/40 hover:scale-[1.03] hover:shadow-lg hover:shadow-violet-950/20"
                       >
                         <img
                           src={m.backdrop_path ? (m.backdrop_path.startsWith("http") ? m.backdrop_path : `https://image.tmdb.org/t/p/w342${m.backdrop_path}`) : posterVal}
                           alt={m.title || m.name}
                           referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover brightness-75 group-hover:brightness-90 transition-all"
+                          className="w-full h-full object-cover brightness-[0.65] group-hover:brightness-[0.85] group-hover:scale-105 transition-all duration-500"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent flex flex-col justify-end p-2 px-3">
-                          <p className="text-xs font-bold text-white truncate leading-snug">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent flex flex-col justify-end p-2.5 px-3">
+                          <p className="text-xs font-black text-[#fafafa] truncate leading-snug group-hover:text-violet-300 transition-colors">
                             {m.title || m.name}
                           </p>
-                          <span className="text-[10px] text-amber-400 font-bold flex items-center gap-0.5 mt-0.5">
+                          <span className="text-[10px] text-amber-400 font-extrabold flex items-center gap-0.5 mt-0.5">
                             ★ {m.vote_average.toFixed(1)}
                           </span>
                         </div>
