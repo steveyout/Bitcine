@@ -20,6 +20,11 @@ export interface Movie {
   origin_country?: string[];
   popularity?: number;
   vote_count?: number;
+  // Progress tracking details
+  progressSeconds?: number;
+  lastWatchedSeason?: number;
+  lastWatchedEpisode?: number;
+  lastWatchedTime?: number;
 }
 
 export interface Genre {
@@ -65,4 +70,4 @@ export interface MovieDetails extends Movie {
   seasons?: Season[];
 }
 
-export type ActiveTab = 'home' | 'browse' | 'api' | 'search';
+export type ActiveTab = 'home' | 'browse' | 'history' | 'search';

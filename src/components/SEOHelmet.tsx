@@ -55,10 +55,10 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
           }
           keywords = `search movies, query cinema catalog, find titles, actor search, ${brandShort.toLowerCase()}`;
           break;
-        case "api":
-          title = `Developer API Sandbox & TMDB Logs | ${brandName}`;
-          description = `Examine ${brandShort}'s full-stack Express proxies communicating securely with TMDB. Test movie and watch endpoints in real-time, view logs, and discover web architecture.`;
-          keywords = `api schema, developer sandbox, tmdb gateway, watch server proxy, developer documentation, json test suite, ${brandShort.toLowerCase()}`;
+        case "history":
+          title = `Watch History & Continued Streams | ${brandName}`;
+          description = `Examine your active playback logs on ${brandShort}. Resume watching movies and TV series where you left off.`;
+          keywords = `stream history, continue watching, resume playback, watched episodes, movie offsets, ${brandShort.toLowerCase()}`;
           break;
         default:
           break;

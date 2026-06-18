@@ -17,7 +17,7 @@ import { MovieSlider } from "./components/MovieSlider";
 import { MovieDetailsModal } from "./components/MovieDetailsModal";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { BrowseView } from "./components/BrowseView";
-import { ApiExplorer } from "./components/ApiExplorer";
+import { HistoryView } from "./components/HistoryView";
 import { SearchView } from "./components/SearchView";
 import { Footer } from "./components/Footer";
 import { SEOHelmet } from "./components/SEOHelmet";
@@ -202,12 +202,75 @@ export default function App() {
     });
   };
 
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+  };
+
+  // Parse Slug deep links on initial mount
+  useEffect(() => {
+    if (typeof window === "undefined" || isLoading) return;
+    
+    const params = new URLSearchParams(window.location.search);
+    const watchQuery = params.get("watch") || params.get("movie");
+    
+    if (watchQuery) {
+      const tmdbId = parseInt(watchQuery.split("-")[0]);
+      if (!isNaN(tmdbId)) {
+        const allLoaded = [
+          ...trending, 
+          ...nowPlaying, 
+          ...topRated, 
+          ...upcoming,
+          ...trendingTV,
+          ...popularTV,
+          ...topRatedTV
+        ];
+        
+        const found = allLoaded.find(m => m.id === tmdbId);
+        if (found) {
+          setSelectedMovie(found);
+          setModalPlayNow(true);
+          setModalOpen(true);
+        } else {
+          // Fetch from API gateway
+          api.getMovieDetails(tmdbId)
+            .then(full => {
+              if (full) {
+                setSelectedMovie(full);
+                setModalPlayNow(true);
+                setModalOpen(true);
+              }
+            })
+            .catch(() => {
+              api.getTVDetails(tmdbId)
+                .then(full => {
+                  if (full) {
+                    setSelectedMovie(full);
+                    setModalPlayNow(true);
+                    setModalOpen(true);
+                  }
+                })
+                .catch(err => console.warn("Slug failed to parse:", err));
+            });
+        }
+      }
+    }
+  }, [isLoading, trending, nowPlaying, topRated, upcoming, trendingTV, popularTV, topRatedTV]);
+
   // Set modal hooks for detail viewing or action streams
   const handleMovieSelect = (movie: Movie) => {
     setSelectedMovie(movie);
     setModalPlayNow(false);
     setModalOpen(true);
     addToContinueWatching(movie);
+
+    // Push good search-engine visual slugs to Browser History URL
+    const title = movie.title || movie.name || "movie";
+    const slug = `${movie.id}-${slugify(title)}`;
+    window.history.pushState(null, "", `?watch=${slug}`);
   };
 
   const handleHeroPlay = (movie: Movie) => {
@@ -215,6 +278,28 @@ export default function App() {
     setModalPlayNow(true);
     setModalOpen(true);
     addToContinueWatching(movie);
+
+    const title = movie.title || movie.name || "movie";
+    const slug = `${movie.id}-${slugify(title)}`;
+    window.history.pushState(null, "", `?watch=${slug}`);
+  };
+
+  const handlePlayWithProgress = (movie: Movie, season?: number, episode?: number, seconds?: number) => {
+    // Deeply populate matching fields
+    const updatedMovie = {
+      ...movie,
+      lastWatchedSeason: season,
+      lastWatchedEpisode: episode,
+      progressSeconds: seconds
+    };
+    setSelectedMovie(updatedMovie);
+    setModalPlayNow(true);
+    setModalOpen(true);
+    addToContinueWatching(updatedMovie);
+
+    const title = movie.title || movie.name || "movie";
+    const slug = `${movie.id}-${slugify(title)}`;
+    window.history.pushState(null, "", `?watch=${slug}`);
   };
 
   const handleSearchToggle = () => {
@@ -457,8 +542,11 @@ export default function App() {
             <SearchView onMovieClick={handleMovieSelect} />
           )}
 
-          {activeTab === "api" && (
-            <ApiExplorer />
+          {activeTab === "history" && (
+            <HistoryView 
+              onMovieClick={handleMovieSelect} 
+              onPlayWithProgress={handlePlayWithProgress}
+            />
           )}
         </main>
 
@@ -469,7 +557,11 @@ export default function App() {
         <MovieDetailsModal
           movie={selectedMovie}
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={() => {
+            setModalOpen(false);
+            // Clean up Slug in browser URL on modal close
+            window.history.pushState(null, "", window.location.pathname);
+          }}
           onMovieClick={handleMovieSelect}
           initialPlayState={modalPlayNow}
           watchlist={watchlist}
