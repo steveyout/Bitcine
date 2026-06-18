@@ -1,1 +1,113 @@
 @import "tailwindcss";
+
+@theme {
+  /* Cinematic lava reds instead of purple */
+  --color-purple-50: #ffebeb;
+  --color-purple-100: #ffd1d1;
+  --color-purple-200: #ffa1a1;
+  --color-purple-300: #ff6e6e;
+  --color-purple-400: #ff3a3a;
+  --color-purple-500: #e50914; /* Netflix Red signature brand */
+  --color-purple-600: #c10712; 
+  --color-purple-700: #9e050e;
+  --color-purple-800: #7b040a;
+  --color-purple-900: #4a0004; /* Maroon obsidian */
+  --color-purple-950: #250002; /* Extremely dark burgundy wine */
+
+  /* Burning high-contrast rose-reds instead of violet */
+  --color-violet-50: #fff0f1;
+  --color-violet-100: #ffccd4;
+  --color-violet-200: #ff99aa;
+  --color-violet-300: #ff667f;
+  --color-violet-350: #ff4d6a; /* Vibrant middle rose-red */
+  --color-violet-400: #ff1a3c; /* Neon scarlet */
+  --color-violet-450: #e60021;
+  --color-violet-500: #ca001a; 
+  --color-violet-600: #a10014;
+  --color-violet-700: #78000f;
+  --color-violet-800: #4f000a;
+  --color-violet-900: #2c0005; /* Blackish rose core */
+  --color-violet-950: #140002; /* Velvet obsidian */
+
+  /* Neon flame corals instead of indigo as beautiful highlights */
+  --color-indigo-50: #fff5f2;
+  --color-indigo-100: #ffd8cc;
+  --color-indigo-200: #ffb19a;
+  --color-indigo-300: #ff8562;
+  --color-indigo-400: #ff5021; /* High-powered thermal orange-red */
+  --color-indigo-500: #f72514; /* Pure firebrand red */
+  --color-indigo-600: #bf1407;
+  --color-indigo-700: #8c0c03;
+  --color-indigo-800: #590600;
+  --color-indigo-900: #2c0300;
+  --color-indigo-950: #140100;
+
+  /* Custom Reddish Deep Obsidian Gradients and Accents */
+  --color-slate-950: #070001;
+  --color-slate-900: #0f0102;
+  --color-slate-800: #1b0305;
+  --color-slate-700: #2b0609;
+  --color-background: #030000;
+
+  /* Fonts */
+  --font-bebas: var(--font-bebas);
+  --font-sans: var(--font-sans);
+}
+
+/* Make all buttons globally oval pills with elegant transition logic */
+button, 
+input[type="submit"],
+input[type="button"],
+.btn-oval,
+[role="button"] {
+  border-radius: 9999px !important;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Cinematic Font implementation for display headings */
+h1, h2, h3, h4, .font-cinematic {
+  font-family: var(--font-bebas), sans-serif !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 400 !important;
+}
+
+/* Ensure smooth sleek scrolling on standard browsers */
+html {
+  scroll-behavior: smooth;
+  background-color: #030000;
+}
+
+body {
+  font-family: var(--font-sans), sans-serif;
+  background-color: #030000 !important;
+  overflow-x: hidden;
+}
+
+/* Beautiful custom scrollbars mapped to scarlet lava tones */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070001;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7b040a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e50914;
+}
+
+/* Pulse animation utility for highlights */
+@keyframes softPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.animate-soft-pulse {
+  animation: softPulse 4s infinite ease-in-out;
+}

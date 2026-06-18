@@ -10,19 +10,27 @@ interface SEOHelmetProps {
 
 export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: SEOHelmetProps) {
   useEffect(() => {
+    // Determine which brand to use based on the current active hostname
+    const isCineby = typeof window !== "undefined" && (window.location.hostname.includes("cineby") || window.location.hostname.includes("cineby.mom"));
+    const brandName = isCineby ? "Cineby Stream" : "Bitcine Stream";
+    const brandShort = isCineby ? "Cineby" : "Bitcine";
+    const baseKeywords = isCineby 
+      ? "cineby, watch movies, watch tv series, streaming service, movie catalog, free cinema, interactive api helper, HD movies online, cineby.mom"
+      : "bitcine, watch movies, watch tv series, streaming service, movie catalog, free cinema, interactive api helper, HD movies online, bitcine.online";
+
     // 1. Determine Title based on current browsing state
-    let title = "Bitcine Stream | Watch Movies & TV Shows Free in HD";
-    let description = "Watch unlimited movies & TV shows on Bitcine Stream. Enjoy high-fidelity cinema playback, raw JSON analytics API testing, and detailed media indexes with no ads.";
-    let keywords = "bitcine, watch movies, watch tv series, streaming service, movie catalog, free cinema, interactive api helper, HD movies online";
-    let type = "website";
+    let title = `${brandName} | Watch Movies & TV Shows Free in HD`;
+    let description = `Watch unlimited movies & TV shows on ${brandName}. Enjoy high-fidelity cinema playback, raw JSON analytics API testing, and detailed media indexes with no ads.`;
+    let keywords = baseKeywords;
+    let type = "video.movie";
     let ogImage = "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200&h=630&fit=crop"; // Default gorgeous cinematic poster representation
     const canonicalUrl = window.location.origin + (activeTab === "home" ? "" : `/${activeTab}`);
 
     if (modalOpen && selectedMovie) {
       const year = selectedMovie.release_date ? new Date(selectedMovie.release_date).getFullYear() : (selectedMovie.first_air_date ? new Date(selectedMovie.first_air_date).getFullYear() : "");
       const yearStr = year ? ` (${year})` : "";
-      title = `Watch ${selectedMovie.title || selectedMovie.name}${yearStr} Premium HD | Bitcine Stream`;
-      description = selectedMovie.overview || `Stream ${selectedMovie.title || selectedMovie.name} in full high-fidelity cinematic resolution with multi-server playback options on Bitcine.`;
+      title = `Watch ${selectedMovie.title || selectedMovie.name}${yearStr} Premium HD | ${brandName}`;
+      description = selectedMovie.overview || `Stream ${selectedMovie.title || selectedMovie.name} in full high-fidelity cinematic resolution with multi-server playback options on ${brandShort}.`;
       keywords = `${selectedMovie.title || selectedMovie.name}, watch ${selectedMovie.title || selectedMovie.name}, stream online, cast info, release date, download hd movies`;
       type = "video.movie";
       if (selectedMovie.backdrop_path) {
@@ -33,24 +41,24 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
     } else {
       switch (activeTab) {
         case "browse":
-          title = "Browse Movie Categories & TV Shows | Bitcine Stream";
+          title = `Browse Movie Categories & TV Shows | ${brandName}`;
           description = "Discover popular genres, top charts, highly-rated television shows, and experimental sci-fi catalogs sorted dynamically via TMDB data streams.";
-          keywords = "browse movies, genre listing, highly rated cinema, movie discovery, tv shows sorted";
+          keywords = `browse movies, genre listing, highly rated cinema, movie discovery, tv shows sorted, ${brandShort.toLowerCase()}`;
           break;
         case "search":
           if (searchQuery) {
-            title = `Search Results for "${searchQuery}" | Bitcine Stream`;
-            description = `Browse matching streaming titles and details found for "${searchQuery}" on Bitcine Stream search logs.`;
+            title = `Search Results for "${searchQuery}" | ${brandName}`;
+            description = `Browse matching streaming titles and details found for "${searchQuery}" on ${brandName} search logs.`;
           } else {
-            title = "Search Premium Movies & TV Series | Bitcine Stream";
+            title = `Search Premium Movies & TV Series | ${brandName}`;
             description = "Search our complete streaming library instantly. Find actors, directors, movie release years, and cinematic titles with zero latency.";
           }
-          keywords = "search movies, query cinema catalog, find titles, actor search";
+          keywords = `search movies, query cinema catalog, find titles, actor search, ${brandShort.toLowerCase()}`;
           break;
         case "api":
-          title = "Developer API Sandbox & TMDB Logs | Bitcine Stream";
-          description = "Examine Bitcine's full-stack Express proxies communicating securely with TMDB. Test movie and watch endpoints in real-time, view logs, and discover web architecture.";
-          keywords = "api schema, developer sandbox, tmdb gateway, watch server proxy, developer documentation, json test suite";
+          title = `Developer API Sandbox & TMDB Logs | ${brandName}`;
+          description = `Examine ${brandShort}'s full-stack Express proxies communicating securely with TMDB. Test movie and watch endpoints in real-time, view logs, and discover web architecture.`;
+          keywords = `api schema, developer sandbox, tmdb gateway, watch server proxy, developer documentation, json test suite, ${brandShort.toLowerCase()}`;
           break;
         default:
           break;
@@ -81,7 +89,7 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
     updateOrCreateMeta("property", "og:type", type);
     updateOrCreateMeta("property", "og:image", ogImage);
     updateOrCreateMeta("property", "og:url", canonicalUrl);
-    updateOrCreateMeta("property", "og:site_name", "Bitcine Stream");
+    updateOrCreateMeta("property", "og:site_name", brandName);
 
     // Update Twitter Cards formatting
     updateOrCreateMeta("name", "twitter:card", "summary_large_image");
@@ -124,8 +132,8 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
     } : {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "Bitcine Stream",
-      "alternateName": "Bitcine",
+      "name": brandName,
+      "alternateName": brandShort,
       "url": window.location.origin,
       "description": "Premium multi-source cinema metadata, TV logs, and developers' sandboxed layout system.",
       "potentialAction": {
