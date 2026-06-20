@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Movie, MovieDetails, Video, CastMember } from "../types";
+import { Movie, MovieDetails, Video, CastMember, CrewMember } from "../types";
 import { api } from "../services/api";
 import { 
   X, Play, Star, Clock, Globe, Film, ArrowRight, Sparkles, 
@@ -43,9 +43,18 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
   const [playbackProgress, setPlaybackProgress] = useState(0); // in seconds
   const [shareSuccess, setShareSuccess] = useState(false);
   const [brandLabel, setBrandLabel] = useState("Bitcine");
+  const [creditsTab, setCreditsTab] = useState<"cast" | "crew">("cast");
 
   // Detect TV Series
-  const isTV = !!(movie && (movie.first_air_date || movie.name || movie.id >= 200));
+  const isTV = !!(
+    movie && (
+      movie.first_air_date ||
+      (movie.name && !movie.title) ||
+      (movie as any).seasons ||
+      (movie as any).number_of_seasons ||
+      (movie.id >= 201 && movie.id <= 205)
+    )
+  );
 
   // Determine watchlisted state
   const isWatchlisted = movie ? watchlist.some((m) => m.id === movie.id) : false;
@@ -124,6 +133,7 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
       setIsPlaying(initialPlayState);
       setPlayMode("stream");
       setSelectedProvider(DEFAULT_PROVIDER_ID);
+      setCreditsTab("cast");
       
       // Load saved progress state if exists in local continuing watching list!
       try {
@@ -185,6 +195,12 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
               { id: 102, name: "Cillian Murphy", character: "Theoretical Physicist", profile_path: null },
               { id: 103, name: "Zendaya", character: "Chani", profile_path: null },
               { id: 104, name: "Tom Hardy", character: "Mercenary Outlaw", profile_path: null }
+            ],
+            crew: [
+              { id: 201, name: "Christopher Nolan", job: "Director", department: "Directing", profile_path: null },
+              { id: 202, name: "Hans Zimmer", job: "Original Music Composer", department: "Sound", profile_path: null },
+              { id: 203, name: "Emma Thomas", job: "Producer", department: "Production", profile_path: null },
+              { id: 204, name: "Hoyte van Hoytema", job: "Director of Photography", department: "Camera", profile_path: null }
             ]
           },
           similar: { 
@@ -244,30 +260,29 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
       open={open}
       keepMounted={false}
       onClose={onClose}
-      fullWidth
-      maxWidth="md"
+      fullScreen={true}
       className="z-[99]"
       sx={{
         "& .MuiBackdrop-root": {
-          backgroundColor: "rgba(3, 1, 2, 0.85)",
+          backgroundColor: "rgba(3, 1, 2, 0.95)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
         },
         "& .MuiPaper-root": {
           backgroundColor: "#050102",
-          borderRadius: { xs: "0px", sm: "24px" },
-          border: { xs: "none", sm: "1px solid rgba(229, 9, 20, 0.2)" },
           color: "#f8fafc",
           overflowX: "hidden",
-          margin: { xs: "0px", sm: "24px", md: "32px" },
-          width: { xs: "100%", sm: "calc(100% - 48px)", md: "calc(100% - 64px)" },
-          height: { xs: "100%", sm: "auto" },
-          maxHeight: { xs: "100%", sm: "calc(100% - 48px)", md: "calc(100% - 64px)" },
-          boxShadow: "0 25px 50px -12px rgba(229, 9, 20, 0.45)",
+          margin: "0px !important",
+          width: "100% !important",
+          maxWidth: "none !important",
+          height: "100% !important",
+          maxHeight: "none !important",
+          borderRadius: "0px",
+          boxShadow: "none",
         }
       }}
     >
-      <DialogContent id="modal-content-area" className="p-0 select-none relative scrollbar-none sm:scrollbar-thin sm:scrollbar-thumb-red-950">
+      <DialogContent id="modal-content-area" className="p-0 select-none relative scrollbar-none sm:scrollbar-thin sm:scrollbar-thumb-red-950 bg-[#050102]">
         <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -318,7 +333,7 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
           </div>
 
         {/* --- CINEMATOGRAPHIC PLAYER FRAME WITH RED GRADIENT OVERLAYS --- */}
-        <div id="modal-upper-player-frame" className="relative w-full aspect-video md:max-h-[480px] bg-black overflow-hidden border-b border-red-950/30">
+        <div id="modal-upper-player-frame" className="relative w-full aspect-video md:max-h-[640px] bg-black overflow-hidden border-b border-red-950/30">
           
           {isPlaying ? (
             <div id="active-theatre-player" className="w-full h-full relative bg-black animate-[fadeIn_0.5s_ease-out]">
@@ -388,7 +403,7 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
         </div>
 
         {/* --- DETAILED INFORMATION WINDOW --- */}
-        <div id="modal-lower-details-frame" className="p-4 sm:p-6 md:p-8 flex flex-col gap-6 md:gap-8">
+        <div id="modal-lower-details-frame" className="p-4 sm:p-6 md:p-8 flex flex-col gap-6 md:gap-8 max-w-5xl mx-auto w-full">
           
           {/* Active Cinema Integration Panel (Only shows when movie is playing) */}
           {isPlaying && (
@@ -610,43 +625,123 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
 
               {/* Cast/Credits profiles */}
               <div className="flex flex-col gap-4">
-                <h3 className="text-xs uppercase font-extrabold text-[#94a3b8] tracking-wider">
-                  Top Billed Cast
-                </h3>
+                <div className="flex items-center justify-between border-b border-red-500/10 pb-2">
+                  <h3 className="text-xs uppercase font-extrabold text-[#94a3b8] tracking-wider flex items-center gap-1.5">
+                    Cast & Crew
+                  </h3>
+                  
+                  {/* Segmented Tab switches */}
+                  <div className="flex bg-black/50 rounded-xl p-0.5 border border-red-500/10">
+                    <button
+                      type="button"
+                      onClick={() => setCreditsTab("cast")}
+                      className={`px-3 py-1 rounded-lg text-[9px] uppercase font-black tracking-widest transition-all cursor-pointer ${
+                        creditsTab === "cast"
+                          ? "bg-red-650 text-white shadow-sm"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      Cast
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCreditsTab("crew")}
+                      className={`px-3 py-1 rounded-lg text-[9px] uppercase font-black tracking-widest transition-all cursor-pointer ${
+                        creditsTab === "crew"
+                          ? "bg-red-650 text-white shadow-sm"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      Crew
+                    </button>
+                  </div>
+                </div>
+
                 {isLoading ? (
                   <div className="flex items-center gap-2 py-2">
                     <CircularProgress size={16} color="error" />
-                    <span className="text-xs text-slate-400">Loading cast profiles...</span>
+                    <span className="text-xs text-slate-400">Loading credits...</span>
                   </div>
                 ) : (
-                  <div id="cast-list-row" className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {currentMovie.credits?.cast && currentMovie.credits.cast.length > 0 ? (
-                      currentMovie.credits.cast.slice(0, 4).map((member: CastMember) => {
-                        const avatarVal = member.profile_path 
-                          ? (member.profile_path.startsWith("http") 
-                             ? member.profile_path 
-                             : `https://image.tmdb.org/t/p/w185${member.profile_path}`)
-                          : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80";
-                        return (
-                          <div 
-                             key={member.id} 
-                             className="flex flex-col items-center bg-black/45 hover:bg-black p-3.5 rounded-2xl border border-red-500/[0.04] text-center gap-2"
-                          >
-                            <img 
-                              src={avatarVal} 
-                              alt={member.name}
-                              referrerPolicy="no-referrer"
-                              className="w-12 h-12 rounded-full object-cover border border-red-500/20 shadow-md"
-                            />
-                            <div className="min-w-0">
-                              <p className="text-[11px] font-bold text-white leading-tight truncate">{member.name}</p>
-                              <p className="text-[9px] text-slate-500 leading-snug truncate mt-0.5">{member.character}</p>
-                            </div>
-                          </div>
-                        );
-                      })
+                  <div>
+                    {creditsTab === "cast" ? (
+                      <div id="cast-list-row" className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {currentMovie.credits?.cast && currentMovie.credits.cast.length > 0 ? (
+                          currentMovie.credits.cast.slice(0, 4).map((member: CastMember) => {
+                            const avatarVal = member.profile_path 
+                              ? (member.profile_path.startsWith("http") 
+                                 ? member.profile_path 
+                                 : `https://image.tmdb.org/t/p/w185${member.profile_path}`)
+                              : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80";
+                            return (
+                              <div 
+                                 key={`cast-${member.id}`} 
+                                 className="flex flex-col items-center bg-black/45 hover:bg-black p-3.5 rounded-2xl border border-red-500/[0.04] text-center gap-2 relative overflow-hidden transition-all duration-300 hover:border-red-500/25 group/card"
+                              >
+                                <img 
+                                  src={avatarVal} 
+                                  alt={member.name}
+                                  referrerPolicy="no-referrer"
+                                  className="w-12 h-12 rounded-full object-cover border border-red-500/20 shadow-md transition-transform duration-300 group-hover/card:scale-105"
+                                />
+                                <div className="min-w-0 w-full">
+                                  <p className="text-[11px] font-bold text-white leading-tight truncate px-1">{member.name}</p>
+                                  <p className="text-[9px] text-slate-500 leading-snug truncate mt-0.5 px-1">{member.character}</p>
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <span className="text-xs text-slate-500">Cast profiles currently unlogged.</span>
+                        )}
+                      </div>
                     ) : (
-                      <span className="text-xs text-slate-500">Cast profiles currently unlogged.</span>
+                      <div id="crew-list-row" className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-[fadeIn_0.2s_ease-out]">
+                        {currentMovie.credits?.crew && currentMovie.credits.crew.length > 0 ? (
+                          currentMovie.credits.crew
+                            .filter((member, index, self) => 
+                              self.findIndex(m => m.id === member.id && m.job === member.job) === index
+                            )
+                            .sort((a, b) => {
+                              const premiums = ["director", "writer", "screenplay", "producer", "composer"];
+                              const aJob = a.job.toLowerCase();
+                              const bJob = b.job.toLowerCase();
+                              const aPremium = premiums.findIndex(p => aJob.includes(p));
+                              const bPremium = premiums.findIndex(p => bJob.includes(p));
+                              if (aPremium !== -1 && bPremium !== -1) return aPremium - bPremium;
+                              if (aPremium !== -1) return -1;
+                              if (bPremium !== -1) return 1;
+                              return 0;
+                            })
+                            .slice(0, 4)
+                            .map((member: CrewMember, idx: number) => {
+                              const avatarVal = member.profile_path 
+                                ? (member.profile_path.startsWith("http") 
+                                   ? member.profile_path 
+                                   : `https://image.tmdb.org/t/p/w185${member.profile_path}`)
+                                : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80";
+                              return (
+                                <div 
+                                   key={`crew-${member.id}-${idx}`} 
+                                   className="flex flex-col items-center bg-black/45 hover:bg-black p-3.5 rounded-2xl border border-red-500/[0.04] text-center gap-2 relative overflow-hidden transition-all duration-300 hover:border-red-500/25 group/card"
+                                >
+                                  <img 
+                                    src={avatarVal} 
+                                    alt={member.name}
+                                    referrerPolicy="no-referrer"
+                                    className="w-12 h-12 rounded-full object-cover border border-red-500/20 shadow-md transition-transform duration-300 group-hover/card:scale-105"
+                                  />
+                                  <div className="min-w-0 w-full">
+                                    <p className="text-[11px] font-bold text-white leading-tight truncate px-1">{member.name}</p>
+                                    <p className="text-[9.5px] text-red-500 font-extrabold uppercase tracking-wider leading-snug truncate mt-0.5 px-1">{member.job}</p>
+                                  </div>
+                                </div>
+                              );
+                            })
+                        ) : (
+                          <span className="text-xs text-slate-500 col-span-full">Crew credits currently unlogged.</span>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}

@@ -144,7 +144,11 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
 
   // Classify film vs show based on TMDB specifications
   const isTVShow = (movie: Movie) => {
-    return !!(movie.first_air_date || movie.name || movie.id >= 200);
+    return !!(
+      movie.first_air_date ||
+      (movie.name && !movie.title) ||
+      (movie.id >= 201 && movie.id <= 205)
+    );
   };
 
   const filteredHistory = historyList.filter(movie => {
