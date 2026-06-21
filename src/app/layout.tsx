@@ -169,6 +169,16 @@ export default function RootLayout({
             src="https://directoryeditorweep.com/3c072db7f10f10e1e4f120d95f9073c2/invoke.js"
             strategy="lazyOnload"
         />
+
+        {/* --- Ad 3 (Third-party integration) --- */}
+        <Script
+            id="third-party-ad"
+            src="//wi.opinesgallate.com/rkHS3gIUDnusjfvF/141204"
+            strategy="afterInteractive"
+            data-cfasync="false"
+            async
+        />
+
       </body>
     </html>
   );
