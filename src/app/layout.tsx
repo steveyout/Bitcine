@@ -3,6 +3,7 @@ import { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
 import { headers } from "next/headers";
+import Script from "next/script";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -134,6 +135,40 @@ export default function RootLayout({
       <body className="antialiased bg-[#040001] text-[#f8fafc] font-sans">
         {children}
         <GoogleAnalytics gaId="G-4F51F8KKEP" />
+        {/* --- Ad 1 (250x300) --- */}
+        <Script id="at-options-1" strategy="beforeInteractive">
+          {`
+            window.atOptions1 = {
+              'key' : 'e77be7a01f5b1b7367422aae10511e22',
+              'format' : 'iframe',
+              'height' : 250,
+              'width' : 300,
+              'params' : {}
+            };
+          `}
+        </Script>
+        <Script
+            src="https://directoryeditorweep.com/e77be7a01f5b1b7367422aae10511e22/invoke.js"
+            strategy="lazyOnload"
+        />
+        <div id="ad-container-1"></div>
+
+        {/* --- Ad 2 (728x90) --- */}
+        <Script id="at-options-2" strategy="beforeInteractive">
+          {`
+            window.atOptions2 = {
+              'key' : '3c072db7f10f10e1e4f120d95f9073c2',
+              'format' : 'iframe',
+              'height' : 90,
+              'width' : 728,
+              'params' : {}
+            };
+          `}
+        </Script>
+        <Script
+            src="https://directoryeditorweep.com/3c072db7f10f10e1e4f120d95f9073c2/invoke.js"
+            strategy="lazyOnload"
+        />
       </body>
     </html>
   );
