@@ -151,7 +151,6 @@ export default function RootLayout({
             src="https://directoryeditorweep.com/e77be7a01f5b1b7367422aae10511e22/invoke.js"
             strategy="lazyOnload"
         />
-        <div id="ad-container-1"></div>
 
         {/* --- Ad 2 (728x90) --- */}
         <Script id="at-options-2" strategy="beforeInteractive">
