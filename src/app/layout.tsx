@@ -31,10 +31,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteName = isCineby ? "Cineby Stream" : "Bitcine Stream";
   const domainUrl = isCineby ? "https://cineby.mom" : "https://bitcine.online";
   
-  const title = "G3r3f$68Ds"
-  //isCineby
-  //  ? "Cineby Stream | Watch Unlimited Premium Movies & TV Shows in Full HD"
-   // : "Bitcine Stream | Watch Movies & TV Series in Premium HD";
+  const title = isCineby
+    ? "Cineby Stream | Watch Unlimited Premium Movies & TV Shows in Full HD"
+    : "Bitcine Stream | Watch Movies & TV Series in Premium HD";
     
   const description = isCineby
     ? "Explore, browse, and stream hundreds of premium blockbuster movies, popular TV series and classic cinema directly on Cineby Stream. Experience high-fidelity smooth cinematic layouts with zero clutter."
