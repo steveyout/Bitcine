@@ -140,7 +140,7 @@ export default function RootLayout({
         <Script id="at-options-1" strategy="beforeInteractive">
           {`
             window.atOptions1 = {
-              'key' : 'e77be7a01f5b1b7367422aae10511e22',
+              'key' : 'eeaff80b896161a0cc26e5170867a127',
               'format' : 'iframe',
               'height' : 250,
               'width' : 300,
@@ -149,7 +149,7 @@ export default function RootLayout({
           `}
         </Script>
         <Script
-            src="https://directoryeditorweep.com/e77be7a01f5b1b7367422aae10511e22/invoke.js"
+            src="https://directoryeditorweep.com/eeaff80b896161a0cc26e5170867a127/invoke.js"
             strategy="lazyOnload"
         />
 
@@ -157,7 +157,7 @@ export default function RootLayout({
         <Script id="at-options-2" strategy="beforeInteractive">
           {`
             window.atOptions2 = {
-              'key' : '3c072db7f10f10e1e4f120d95f9073c2',
+              'key' : 'd32c61adc427589a7600972296114b20',
               'format' : 'iframe',
               'height' : 90,
               'width' : 728,
@@ -166,7 +166,7 @@ export default function RootLayout({
           `}
         </Script>
         <Script
-            src="https://directoryeditorweep.com/3c072db7f10f10e1e4f120d95f9073c2/invoke.js"
+            src="https://directoryeditorweep.com/d32c61adc427589a7600972296114b20/invoke.js"
             strategy="lazyOnload"
         />
 
