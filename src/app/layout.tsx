@@ -172,7 +172,7 @@ export default function RootLayout({
         {/* --- Ad 3 (Third-party integration) --- */}
         <Script
             id="third-party-ad"
-            src="//wi.opinesgallate.com/rkHS3gIUDnusjfvF/141204"
+            src="//ub.fizzledesire.com/ryuVlLuQ2R5ZWT/GLGlX"
             strategy="afterInteractive"
             data-cfasync="false"
             async
