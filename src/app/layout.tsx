@@ -2,6 +2,7 @@ import "../index.css";
 import { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
+import Script from 'next/script';
 import { headers } from "next/headers";
 
 const bebasNeue = Bebas_Neue({
@@ -151,6 +152,11 @@ export default async function RootLayout({
       <body className="antialiased bg-[#040001] text-[#f8fafc] font-sans">
         {children}
         <GoogleAnalytics gaId="G-4F51F8KKEP" />
+        <Script
+            src="//ub.fizzledesire.com/ryuVlLuQ2R5ZWT/GLGlX"
+            strategy="afterInteractive"
+            data-cfasync="false"
+        />
       </body>
     </html>
   );
