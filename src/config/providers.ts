@@ -83,13 +83,10 @@ export const getEmbedUrl = (
 
   if (selected.id === 'vidking') {
     let url = "";
-    console.log(type)
     if (type === 'movie') {
       url = `${selected.baseUrl}/embed/movie/${tmdbId}?color=e50914`;
-      console.warn(url)
     } else {
       url = `${selected.baseUrl}/embed/tv/${tmdbId}/${season}/${episode}?color=e50914&nextEpisode=true&episodeSelector=true`;
-      console.warn(url)
     }
     if (progressSeconds > 0) {
       url += `&progress=${progressSeconds}`;

@@ -3,7 +3,6 @@ import { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
 import { headers } from "next/headers";
-import Script from "next/script";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -31,8 +30,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteName = isCineby ? "Cineby Stream" : "Bitcine Stream";
   const domainUrl = isCineby ? "https://cineby.mom" : "https://bitcine.online";
   
-  const title = isCineby
-    ? "Cineby Stream | Watch Unlimited Premium Movies & TV Shows in Full HD"
+  const title = isCineby 
+    ? "Cineby Stream | Watch Unlimited Premium Movies & TV Shows in Full HD" 
     : "Bitcine Stream | Watch Movies & TV Series in Premium HD";
     
   const description = isCineby
@@ -135,49 +134,6 @@ export default function RootLayout({
       <body className="antialiased bg-[#040001] text-[#f8fafc] font-sans">
         {children}
         <GoogleAnalytics gaId="G-4F51F8KKEP" />
-        {/* --- Ad 1 (250x300) --- */}
-        <Script id="at-options-1" strategy="beforeInteractive">
-          {`
-            window.atOptions1 = {
-              'key' : 'eeaff80b896161a0cc26e5170867a127',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          `}
-        </Script>
-        <Script
-            src="https://directoryeditorweep.com/eeaff80b896161a0cc26e5170867a127/invoke.js"
-            strategy="lazyOnload"
-        />
-
-        {/* --- Ad 2 (728x90) --- */}
-        <Script id="at-options-2" strategy="beforeInteractive">
-          {`
-            window.atOptions2 = {
-              'key' : 'd32c61adc427589a7600972296114b20',
-              'format' : 'iframe',
-              'height' : 90,
-              'width' : 728,
-              'params' : {}
-            };
-          `}
-        </Script>
-        <Script
-            src="https://directoryeditorweep.com/d32c61adc427589a7600972296114b20/invoke.js"
-            strategy="lazyOnload"
-        />
-
-        {/* --- Ad 3 (Third-party integration) --- */}
-        <Script
-            id="third-party-ad"
-            src="//ub.fizzledesire.com/ryuVlLuQ2R5ZWT/GLGlX"
-            strategy="afterInteractive"
-            data-cfasync="false"
-            async
-        />
-
       </body>
     </html>
   );
