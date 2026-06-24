@@ -1,0 +1,10 @@
+var R=require("../../../../chunks/[turbopack]_runtime.js")("server/app/api/tmdb/[...path]/route.js")
+R.c("server/chunks/src_app_api_tmdb_[___path]_route_ts_114jvp_._.js")
+R.c("server/chunks/16o0_next_1pps6qm._.js")
+R.c("server/chunks/06p0_axios_lib_0g4z-5s._.js")
+R.c("server/chunks/1rf9_mime-db_1v9wyyb._.js")
+R.c("server/chunks/node_modules__pnpm_14jl6xl._.js")
+R.c("server/chunks/[root-of-the-server]__0z88rft._.js")
+R.c("server/chunks/_next-internal_server_app_api_tmdb_[___path]_route_actions_10-af-p.js")
+R.m("[project]/node_modules/.pnpm/next@16.2.9_@babel+core@7.2_1c8ef97cbb3114489432cdfc792e4bc3/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/src/app/api/tmdb/[...path]/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/node_modules/.pnpm/next@16.2.9_@babel+core@7.2_1c8ef97cbb3114489432cdfc792e4bc3/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/src/app/api/tmdb/[...path]/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

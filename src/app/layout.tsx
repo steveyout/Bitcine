@@ -157,6 +157,23 @@ export default async function RootLayout({
             strategy="afterInteractive"
             data-cfasync="false"
         />
+        <script
+            dangerouslySetInnerHTML={{
+              __html: `
+            atOptions = {
+              'key' : 'd32c61adc427589a7600972296114b20',
+              'format' : 'iframe',
+              'height' : 90,
+              'width' : 728,
+              'params' : {}
+            };
+          `,
+            }}
+        />
+        <Script
+            src="https://directoryeditorweep.com/d32c61adc427589a7600972296114b20/invoke.js"
+            strategy="afterInteractive"
+        />
       </body>
     </html>
   );
