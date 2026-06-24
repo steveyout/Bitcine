@@ -1,8 +1,0 @@
-User-agent: *
-Allow: /
-Allow: /browse
-Allow: /search
-Disallow: /api*
-
-# Sitemaps declaration
-Sitemap: https://bitcine.online/sitemap.xml

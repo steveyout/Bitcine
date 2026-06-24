@@ -80,11 +80,40 @@ export const viewport: Viewport = {
   initialScale: 1.0,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  let host = "bitcine.online";
+  try {
+    const headersList = await headers();
+    host = headersList.get("host") || "bitcine.online";
+  } catch (e) {
+    // Fallback for build time
+  }
+
+  const isCineby = host.includes("cineby") || host.includes("cineby.mom");
+  const brandName = isCineby ? "Cineby Stream" : "Bitcine Stream";
+  const domainUrl = isCineby ? "https://cineby.mom" : "https://bitcine.online";
+  const brandDesc = isCineby
+    ? "Explore, browse, and stream hundreds of premium blockbuster movies, popular TV series and classic cinema directly on Cineby Stream."
+    : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream.";
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": brandName,
+    "url": `${domainUrl}/`,
+    "description": brandDesc,
+    "genre": "Cinema & Television Streaming",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${domainUrl}/?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
     <html lang="en" className={`${plusJakartaSans.variable} ${bebasNeue.variable}`}>
       <head>
@@ -115,19 +144,7 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              "name": "Bitcine Stream",
-              "url": "https://bitcine.online/",
-              "description": "Premium multi-source cinema metadata, TV logs, and developers' sandboxed layout system.",
-              "genre": "Cinema & Television Streaming",
-              "potentialAction": {
-                "@type": "SearchAction",
-                "target": "https://bitcine.online/?q={search_term_string}",
-                "query-input": "required name=search_term_string"
-              }
-            })
+            __html: JSON.stringify(structuredData)
           }}
         />
       </head>
