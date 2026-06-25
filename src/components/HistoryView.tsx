@@ -37,7 +37,11 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
 
   // Load history from localStorage on mount and register custom brand naming
   useEffect(() => {
-    const isCineby = typeof window !== "undefined" && (window.location.hostname.includes("cineby") || window.location.hostname.includes("cineby.mom"));
+    const isCineby = typeof window !== "undefined" && (
+      window.location.hostname.includes("cineby") || 
+      window.location.hostname.includes("cineby.mom") ||
+      window.location.hostname.includes("cineby.at")
+    );
     setBrandLabel(isCineby ? "Cineby" : "Bitcine");
 
     loadHistory();

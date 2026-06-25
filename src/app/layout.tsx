@@ -2,7 +2,6 @@ import "../index.css";
 import { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
-import Script from 'next/script';
 import { headers } from "next/headers";
 
 const bebasNeue = Bebas_Neue({
@@ -19,28 +18,30 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  let host = "bitcine.online";
+  let host = "cineby.at";
   try {
     const headersList = await headers();
-    host = headersList.get("host") || "bitcine.online";
+    host = headersList.get("host") || "cineby.at";
   } catch (e) {
     // Graceful fallback for build-time static routes
   }
 
-  const isCineby = host.includes("cineby") || host.includes("cineby.mom");
-  const siteName = isCineby ? "Cineby Stream" : "Bitcine Stream";
-  const domainUrl = isCineby ? "https://cineby.mom" : "https://bitcine.online";
+  const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
+  const siteName = isCineby ? "Cineby" : "Bitcine Stream";
+  const domainUrl = isCineby 
+    ? (host.includes("localhost") || host.includes("run.app") ? "https://cineby.at" : `https://${host}`) 
+    : "https://bitcine.online";
   
   const title = isCineby 
-    ? "Cineby Stream | Watch Unlimited Premium Movies & TV Shows in Full HD" 
+    ? "Cineby - Watch Free Movies & TV Shows Online HD" 
     : "Bitcine Stream | Watch Movies & TV Series in Premium HD";
     
   const description = isCineby
-    ? "Explore, browse, and stream hundreds of premium blockbuster movies, popular TV series and classic cinema directly on Cineby Stream. Experience high-fidelity smooth cinematic layouts with zero clutter."
+    ? "Watch free movies and TV shows online in full HD on Cineby (cineby.at). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
     : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream. Test APIs, query TMDB proxy databases, and experience next-gen media viewing.";
     
   const keywords = isCineby
-    ? "cineby, watch movies online, stream free TV, hd video streaming, cinema list, interactive movie hub, browser cinema index, latest TV series, cineby.mom"
+    ? "cineby, cineby free movies, cineby.at, cineby stream, cineby official, cineby movies, cineby tv shows, cineby.mom, watch movies free online, watch free tv shows, best free streaming sites, cineby alternative, watch movies free on cineby, free online cinema"
     : "bitcine, watch movies, stream free, hd video streaming, cinema list, tmdb backend proxy, developer movie dashboard, movie index, latest tv series, bitcine.online";
 
   return {
@@ -86,19 +87,21 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let host = "bitcine.online";
+  let host = "cineby.at";
   try {
     const headersList = await headers();
-    host = headersList.get("host") || "bitcine.online";
+    host = headersList.get("host") || "cineby.at";
   } catch (e) {
     // Fallback for build time
   }
 
-  const isCineby = host.includes("cineby") || host.includes("cineby.mom");
+  const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
   const brandName = isCineby ? "Cineby Stream" : "Bitcine Stream";
-  const domainUrl = isCineby ? "https://cineby.mom" : "https://bitcine.online";
+  const domainUrl = isCineby 
+    ? (host.includes("localhost") || host.includes("run.app") ? "https://cineby.at" : `https://${host}`) 
+    : "https://bitcine.online";
   const brandDesc = isCineby
-    ? "Explore, browse, and stream hundreds of premium blockbuster movies, popular TV series and classic cinema directly on Cineby Stream."
+    ? "Watch free movies and TV shows online in full HD on Cineby (cineby.at). Fast, high-fidelity buffer-free streaming of blockbusters and series."
     : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream.";
 
   const structuredData = {
@@ -152,11 +155,6 @@ export default async function RootLayout({
       <body className="antialiased bg-[#040001] text-[#f8fafc] font-sans">
         {children}
         <GoogleAnalytics gaId="G-4F51F8KKEP" />
-        <Script
-            src="//ub.fizzledesire.com/ryuVlLuQ2R5ZWT/GLGlX"
-            strategy="afterInteractive"
-            data-cfasync="false"
-        />
       </body>
     </html>
   );

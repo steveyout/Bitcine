@@ -126,7 +126,11 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
 
   // Handle load state and check domain
   useEffect(() => {
-    const isCineby = typeof window !== "undefined" && (window.location.hostname.includes("cineby") || window.location.hostname.includes("cineby.mom"));
+    const isCineby = typeof window !== "undefined" && (
+      window.location.hostname.includes("cineby") || 
+      window.location.hostname.includes("cineby.mom") ||
+      window.location.hostname.includes("cineby.at")
+    );
     setBrandLabel(isCineby ? "Cineby" : "Bitcine");
 
     if (open && movie) {
