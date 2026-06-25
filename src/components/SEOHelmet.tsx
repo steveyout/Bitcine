@@ -11,16 +11,24 @@ interface SEOHelmetProps {
 export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: SEOHelmetProps) {
   useEffect(() => {
     // Determine which brand to use based on the current active hostname
-    const isCineby = typeof window !== "undefined" && (window.location.hostname.includes("cineby") || window.location.hostname.includes("cineby.mom"));
+    const isCineby = typeof window !== "undefined" && (
+      window.location.hostname.includes("cineby") ||
+      window.location.hostname.includes("cineby.mom") ||
+      window.location.hostname.includes("cineby.at")
+    );
     const brandName = isCineby ? "Cineby Stream" : "Bitcine Stream";
     const brandShort = isCineby ? "Cineby" : "Bitcine";
     const baseKeywords = isCineby 
-      ? "cineby, watch movies, watch tv series, streaming service, movie catalog, free cinema, interactive api helper, HD movies online, cineby.mom"
+      ? "cineby, cineby free movies, cineby.at, cineby stream, cineby official, cineby site, cineby movies, cineby tv shows, cineby.mom, watch movies free on cineby, free movies online, watch hd movies, free streaming sites, watch tv series online"
       : "bitcine, watch movies, watch tv series, streaming service, movie catalog, free cinema, interactive api helper, HD movies online, bitcine.online";
 
     // 1. Determine Title based on current browsing state
-    let title = `${brandName} | Watch Movies & TV Shows Free in HD`;
-    let description = `Watch unlimited movies & TV shows on ${brandName}. Enjoy high-fidelity cinema playback, raw JSON analytics API testing, and detailed media indexes with no ads.`;
+    let title = isCineby
+      ? "Cineby - Watch Free Movies & TV Shows Online in HD"
+      : "Bitcine | Watch Movies & TV Shows Free in HD";
+    let description = isCineby
+      ? "Watch unlimited movies & TV shows free on Cineby (cineby.at). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback."
+      : `Watch unlimited movies & TV shows on ${brandName}. Enjoy high-fidelity cinema playback, raw JSON analytics API testing, and detailed media indexes with no ads.`;
     let keywords = baseKeywords;
     let type = "video.movie";
     let ogImage = "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200&h=630&fit=crop"; // Default gorgeous cinematic poster representation
@@ -29,9 +37,14 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
     if (modalOpen && selectedMovie) {
       const year = selectedMovie.release_date ? new Date(selectedMovie.release_date).getFullYear() : (selectedMovie.first_air_date ? new Date(selectedMovie.first_air_date).getFullYear() : "");
       const yearStr = year ? ` (${year})` : "";
-      title = `Watch ${selectedMovie.title || selectedMovie.name}${yearStr} Premium HD | ${brandName}`;
-      description = selectedMovie.overview || `Stream ${selectedMovie.title || selectedMovie.name} in full high-fidelity cinematic resolution with multi-server playback options on ${brandShort}.`;
-      keywords = `${selectedMovie.title || selectedMovie.name}, watch ${selectedMovie.title || selectedMovie.name}, stream online, cast info, release date, download hd movies`;
+      const mediaName = selectedMovie.title || selectedMovie.name;
+      title = isCineby
+        ? `Watch ${mediaName}${yearStr} Free Online on Cineby`
+        : `Watch ${mediaName}${yearStr} Premium HD | ${brandName}`;
+      description = selectedMovie.overview || `Stream ${mediaName} in full high-fidelity cinematic resolution with multi-server playback options on ${brandShort}.`;
+      keywords = isCineby
+        ? `watch ${mediaName} free, watch ${mediaName} online, cineby ${mediaName}, stream ${mediaName} online, watch free ${mediaName} hd, cineby movies, ${mediaName} cast, ${mediaName} download`
+        : `${mediaName}, watch ${mediaName}, stream online, cast info, release date, download hd movies`;
       type = "video.movie";
       if (selectedMovie.backdrop_path) {
         ogImage = `https://image.tmdb.org/t/p/w1280${selectedMovie.backdrop_path}`;
@@ -41,24 +54,45 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
     } else {
       switch (activeTab) {
         case "browse":
-          title = `Browse Movie Categories & TV Shows | ${brandName}`;
-          description = "Discover popular genres, top charts, highly-rated television shows, and experimental sci-fi catalogs sorted dynamically via TMDB data streams.";
-          keywords = `browse movies, genre listing, highly rated cinema, movie discovery, tv shows sorted, ${brandShort.toLowerCase()}`;
+          title = isCineby
+            ? `Cineby - Browse Movies, TV Shows, Trending Genres`
+            : `Browse Movie Categories & TV Shows | ${brandName}`;
+          description = isCineby
+            ? "Discover trending movies, TV shows, action-packed adventures, comedies, and sci-fi on Cineby. Clean, categorized streaming directory sorted dynamically."
+            : "Discover popular genres, top charts, highly-rated television shows, and experimental sci-fi catalogs sorted dynamically via TMDB data streams.";
+          keywords = isCineby
+            ? `cineby browse, movie catalog, free cinema list, discover tv shows on cineby, high rated movies free`
+            : `browse movies, genre listing, highly rated cinema, movie discovery, tv shows sorted, ${brandShort.toLowerCase()}`;
           break;
         case "search":
           if (searchQuery) {
-            title = `Search Results for "${searchQuery}" | ${brandName}`;
-            description = `Browse matching streaming titles and details found for "${searchQuery}" on ${brandName} search logs.`;
+            title = isCineby
+              ? `Watch "${searchQuery}" Free on Cineby - Streaming Results`
+              : `Search Results for "${searchQuery}" | ${brandName}`;
+            description = `Stream and watch your favorite titles matching "${searchQuery}" free in HD on Cineby.`;
+            keywords = isCineby
+              ? `watch ${searchQuery} free, cineby ${searchQuery}, stream ${searchQuery} online`
+              : `search movies, query cinema catalog, find titles, actor search, ${brandShort.toLowerCase()}`;
           } else {
-            title = `Search Premium Movies & TV Series | ${brandName}`;
-            description = "Search our complete streaming library instantly. Find actors, directors, movie release years, and cinematic titles with zero latency.";
+            title = isCineby
+              ? `Search Movies & TV Series - Cineby Free Streaming`
+              : `Search Premium Movies & TV Series | ${brandName}`;
+            description = isCineby
+              ? "Search the complete Cineby library of movies, series, anime, and documentaries. Find your favorite film or show in seconds."
+              : "Search our complete streaming library instantly. Find actors, directors, movie release years, and cinematic titles with zero latency.";
+            keywords = isCineby
+              ? `search free movies, cineby finder, cineby stream search`
+              : `search movies, query cinema catalog, find titles, actor search, ${brandShort.toLowerCase()}`;
           }
-          keywords = `search movies, query cinema catalog, find titles, actor search, ${brandShort.toLowerCase()}`;
           break;
         case "history":
-          title = `Watch History & Continued Streams | ${brandName}`;
-          description = `Examine your active playback logs on ${brandShort}. Resume watching movies and TV series where you left off.`;
-          keywords = `stream history, continue watching, resume playback, watched episodes, movie offsets, ${brandShort.toLowerCase()}`;
+          title = isCineby
+            ? `My Watchlist & Viewing History | Cineby`
+            : `Watch History & Continued Streams | ${brandName}`;
+          description = `Access and resume your watching progress on Cineby. Free personalized queue of movies and series on your active session.`;
+          keywords = isCineby
+            ? `cineby watchlist, cineby watch history, resume movie on cineby`
+            : `stream history, continue watching, resume playback, watched episodes, movie offsets, ${brandShort.toLowerCase()}`;
           break;
         default:
           break;

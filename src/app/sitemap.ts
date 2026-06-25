@@ -10,16 +10,18 @@ const slugify = (text: string) => {
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  let host = "bitcine.online";
+  let host = "cineby.at";
   try {
     const headersList = await headers();
-    host = headersList.get("host") || "bitcine.online";
+    host = headersList.get("host") || "cineby.at";
   } catch (e) {
     // Fallback for static builds
   }
 
-  const isCineby = host.includes("cineby") || host.includes("cineby.mom");
-  const baseUrl = isCineby ? "https://cineby.mom" : "https://bitcine.online";
+  const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
+  const baseUrl = isCineby 
+    ? (host.includes("localhost") || host.includes("run.app") ? "https://cineby.at" : `https://${host}`)
+    : "https://bitcine.online";
 
   // Base routing index entries
   const routes: MetadataRoute.Sitemap = [

@@ -22,7 +22,11 @@ export const Header: React.FC<HeaderProps> = ({
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
-    const isCineby = typeof window !== "undefined" && (window.location.hostname.includes("cineby") || window.location.hostname.includes("cineby.mom"));
+    const isCineby = typeof window !== "undefined" && (
+      window.location.hostname.includes("cineby") || 
+      window.location.hostname.includes("cineby.mom") ||
+      window.location.hostname.includes("cineby.at")
+    );
     setBrandLabel(isCineby ? "Cineby" : "Bitcine");
   }, []);
 

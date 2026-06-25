@@ -1,6 +1,6 @@
 {
-  "name": "Bitcine Stream",
-  "description": "A premium cinematic movie streaming index with responsive blood-red gradients, modern Bebas Neue pairings, host-adaptive metadata, and movie telemetries.",
+  "name": "Cineby Stream",
+  "description": "Cineby is a premium cinematic movie and TV show streaming library. Features fluid responsive layouts, active session playlogs, and dynamic host-adaptive SEO schemas.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
