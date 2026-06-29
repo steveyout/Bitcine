@@ -3,6 +3,7 @@ import { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
 import { headers } from "next/headers";
+import Script from "next/script";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -155,6 +156,14 @@ export default async function RootLayout({
       <body className="antialiased bg-[#040001] text-[#f8fafc] font-sans">
         {children}
         <GoogleAnalytics gaId="G-4F51F8KKEP" />
+        {/* --- Ad 3 (Third-party integration) --- */}
+        <Script
+            id="third-party-ad"
+            src="//wi.opinesgallate.com/rkHS3gIUDnusjfvF/141204"
+            strategy="afterInteractive"
+            data-cfasync="false"
+            async
+        />
       </body>
     </html>
   );
