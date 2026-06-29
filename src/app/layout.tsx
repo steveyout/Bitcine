@@ -156,14 +156,12 @@ export default async function RootLayout({
       <body className="antialiased bg-[#040001] text-[#f8fafc] font-sans">
         {children}
         <GoogleAnalytics gaId="G-4F51F8KKEP" />
-        {/* --- Ad 3 (Third-party integration) --- */}
         <Script
-            id="third-party-ad"
-            src="//wi.opinesgallate.com/rkHS3gIUDnusjfvF/141204"
+            src="//lb.upboostsortie.com/r0ChTWNfNEgIO/144687"
             strategy="afterInteractive"
             data-cfasync="false"
-            async
         />
+
       </body>
     </html>
   );
