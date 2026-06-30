@@ -162,6 +162,25 @@ export default async function RootLayout({
             data-cfasync="false"
         />
 
+        {/* 1. Define the configuration options inline */}
+        <Script id="at-options" strategy="beforeInteractive">
+          {`
+            window.atOptions = {
+              'key' : 'e77be7a01f5b1b7367422aae10511e22',
+              'format' : 'iframe',
+              'height' : 250,
+              'width' : 300,
+              'params' : {}
+            };
+          `}
+        </Script>
+
+        {/* 2. Load the external invoke.js script */}
+        <Script
+            src="https://directoryeditorweep.com/e77be7a01f5b1b7367422aae10511e22/invoke.js"
+            strategy="lazyOnload"
+        />
+
       </body>
     </html>
   );
