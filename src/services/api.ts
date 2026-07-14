@@ -111,7 +111,7 @@ export const api = {
    * Searches for movies/TV shows by keyword query
    */
   async search(query: string, page = 1): Promise<{ results: Movie[] }> {
-    return fetchFromProxy<{ results: Movie[] }>("search/movie", {
+    return fetchFromProxy<{ results: Movie[] }>("search/multi", {
       query,
       page,
     });

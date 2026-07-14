@@ -20,6 +20,7 @@ export interface Movie {
   origin_country?: string[];
   popularity?: number;
   vote_count?: number;
+  media_type?: string;
   // Progress tracking details
   progressSeconds?: number;
   lastWatchedSeason?: number;
