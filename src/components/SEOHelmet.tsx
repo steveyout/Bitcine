@@ -16,35 +16,66 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
       window.location.hostname.includes("cineby.mom") ||
       window.location.hostname.includes("cineby.at")
     );
-    const brandName = isCineby ? "Cineby Stream" : "Bitcine Stream";
-    const brandShort = isCineby ? "Cineby" : "Bitcine";
-    const baseKeywords = isCineby 
-      ? "cineby, cineby free movies, cineby.at, cineby stream, cineby official, cineby site, cineby movies, cineby tv shows, cineby.mom, watch movies free on cineby, free movies online, watch hd movies, free streaming sites, watch tv series online"
-      : "bitcine, watch movies, watch tv series, streaming service, movie catalog, free cinema, interactive api helper, HD movies online, bitcine.online";
+    const isFlixer = typeof window !== "undefined" && (
+      window.location.hostname.includes("flixer") ||
+      window.location.hostname.includes("flixer.ink")
+    );
+    
+    const brandName = isFlixer ? "Flixer Stream" : (isCineby ? "Cineby Stream" : "Bitcine Stream");
+    const brandShort = isFlixer ? "Flixer" : (isCineby ? "Cineby" : "Bitcine");
+    
+    let baseKeywords = "";
+    if (isFlixer) {
+      baseKeywords = "flixer, flixer free movies, flixer.ink, flixer movies, flixer stream, flixer official, flixer site, flixer movies tags, watch movies free on flixer, free movies online, watch hd movies, free streaming sites, watch tv series online";
+    } else if (isCineby) {
+      baseKeywords = "cineby, cineby free movies, cineby.mom, cineby stream, cineby official, cineby site, cineby movies, cineby tv shows, watch movies free on cineby, free movies online, watch hd movies, free streaming sites, watch tv series online";
+    } else {
+      baseKeywords = "bitcine, watch movies, watch tv series, streaming service, movie catalog, free cinema, interactive api helper, HD movies online, bitcine.online";
+    }
 
     // 1. Determine Title based on current browsing state
-    let title = isCineby
-      ? "Cineby - Watch Free Movies & TV Shows Online in HD"
-      : "Bitcine | Watch Movies & TV Shows Free in HD";
-    let description = isCineby
-      ? "Watch unlimited movies & TV shows free on Cineby (cineby.at). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback."
-      : `Watch unlimited movies & TV shows on ${brandName}. Enjoy high-fidelity cinema playback, raw JSON analytics API testing, and detailed media indexes with no ads.`;
+    let title = "";
+    if (isFlixer) {
+      title = "Flixer - Watch Free Movies & TV Shows Online in HD";
+    } else if (isCineby) {
+      title = "Cineby - Watch Free Movies & TV Shows Online in HD";
+    } else {
+      title = "Bitcine | Watch Movies & TV Shows Free in HD";
+    }
+
+    let description = "";
+    if (isFlixer) {
+      description = "Watch unlimited movies & TV shows free on Flixer (flixer.ink). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback.";
+    } else if (isCineby) {
+      description = "Watch unlimited movies & TV shows free on Cineby (cineby.mom). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback.";
+    } else {
+      description = `Watch unlimited movies & TV shows on ${brandName}. Enjoy high-fidelity cinema playback, raw JSON analytics API testing, and detailed media indexes with no ads.`;
+    }
+
+    const brandCanonicalOrigin = isFlixer 
+      ? "https://flixer.ink" 
+      : (isCineby ? "https://cineby.mom" : "https://bitcine.online");
+
     let keywords = baseKeywords;
     let type = "video.movie";
     let ogImage = "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200&h=630&fit=crop"; // Default gorgeous cinematic poster representation
-    const canonicalUrl = window.location.origin + (activeTab === "home" ? "" : `/${activeTab}`);
+    const canonicalUrl = brandCanonicalOrigin + (activeTab === "home" ? "" : `/${activeTab}`);
 
     if (modalOpen && selectedMovie) {
       const year = selectedMovie.release_date ? new Date(selectedMovie.release_date).getFullYear() : (selectedMovie.first_air_date ? new Date(selectedMovie.first_air_date).getFullYear() : "");
       const yearStr = year ? ` (${year})` : "";
       const mediaName = selectedMovie.title || selectedMovie.name;
-      title = isCineby
-        ? `Watch ${mediaName}${yearStr} Free Online on Cineby`
-        : `Watch ${mediaName}${yearStr} Premium HD | ${brandName}`;
+      title = isFlixer
+        ? `Watch ${mediaName}${yearStr} Free Online on Flixer`
+        : (isCineby
+          ? `Watch ${mediaName}${yearStr} Free Online on Cineby`
+          : `Watch ${mediaName}${yearStr} Premium HD | ${brandName}`);
       description = selectedMovie.overview || `Stream ${mediaName} in full high-fidelity cinematic resolution with multi-server playback options on ${brandShort}.`;
-      keywords = isCineby
-        ? `watch ${mediaName} free, watch ${mediaName} online, cineby ${mediaName}, stream ${mediaName} online, watch free ${mediaName} hd, cineby movies, ${mediaName} cast, ${mediaName} download`
-        : `${mediaName}, watch ${mediaName}, stream online, cast info, release date, download hd movies`;
+      keywords = isFlixer
+        ? `watch ${mediaName} free, watch ${mediaName} online, flixer ${mediaName}, flixer movies, stream ${mediaName} online, watch free ${mediaName} hd, flixer movies tags`
+        : (isCineby
+          ? `watch ${mediaName} free, watch ${mediaName} online, cineby ${mediaName}, stream ${mediaName} online, watch free ${mediaName} hd, cineby movies, ${mediaName} cast, ${mediaName} download`
+          : `${mediaName}, watch ${mediaName}, stream online, cast info, release date, download hd movies`);
       type = "video.movie";
       if (selectedMovie.backdrop_path) {
         ogImage = `https://image.tmdb.org/t/p/w1280${selectedMovie.backdrop_path}`;
@@ -54,45 +85,69 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
     } else {
       switch (activeTab) {
         case "browse":
-          title = isCineby
-            ? `Cineby - Browse Movies, TV Shows, Trending Genres`
-            : `Browse Movie Categories & TV Shows | ${brandName}`;
-          description = isCineby
-            ? "Discover trending movies, TV shows, action-packed adventures, comedies, and sci-fi on Cineby. Clean, categorized streaming directory sorted dynamically."
-            : "Discover popular genres, top charts, highly-rated television shows, and experimental sci-fi catalogs sorted dynamically via TMDB data streams.";
-          keywords = isCineby
-            ? `cineby browse, movie catalog, free cinema list, discover tv shows on cineby, high rated movies free`
-            : `browse movies, genre listing, highly rated cinema, movie discovery, tv shows sorted, ${brandShort.toLowerCase()}`;
+          title = isFlixer
+            ? `Flixer - Browse Movies, TV Shows, Trending Genres`
+            : (isCineby
+              ? `Cineby - Browse Movies, TV Shows, Trending Genres`
+              : `Browse Movie Categories & TV Shows | ${brandName}`);
+          description = isFlixer
+            ? "Discover trending movies, TV shows, action-packed adventures, comedies, and sci-fi on Flixer. Clean, categorized streaming directory sorted dynamically."
+            : (isCineby
+              ? "Discover trending movies, TV shows, action-packed adventures, comedies, and sci-fi on Cineby. Clean, categorized streaming directory sorted dynamically."
+              : "Discover popular genres, top charts, highly-rated television shows, and experimental sci-fi catalogs sorted dynamically via TMDB data streams.");
+          keywords = isFlixer
+            ? `flixer browse, flixer movies, free cinema list, discover tv shows on flixer, high rated movies free`
+            : (isCineby
+              ? `cineby browse, movie catalog, free cinema list, discover tv shows on cineby, high rated movies free`
+              : `browse movies, genre listing, highly rated cinema, movie discovery, tv shows sorted, ${brandShort.toLowerCase()}`);
           break;
         case "search":
           if (searchQuery) {
-            title = isCineby
-              ? `Watch "${searchQuery}" Free on Cineby - Streaming Results`
-              : `Search Results for "${searchQuery}" | ${brandName}`;
-            description = `Stream and watch your favorite titles matching "${searchQuery}" free in HD on Cineby.`;
-            keywords = isCineby
-              ? `watch ${searchQuery} free, cineby ${searchQuery}, stream ${searchQuery} online`
-              : `search movies, query cinema catalog, find titles, actor search, ${brandShort.toLowerCase()}`;
+            title = isFlixer
+              ? `Watch "${searchQuery}" Free on Flixer - Streaming Results`
+              : (isCineby
+                ? `Watch "${searchQuery}" Free on Cineby - Streaming Results`
+                : `Search Results for "${searchQuery}" | ${brandName}`);
+            description = isFlixer
+              ? `Stream and watch your favorite titles matching "${searchQuery}" free in HD on Flixer.`
+              : `Stream and watch your favorite titles matching "${searchQuery}" free in HD on Cineby.`;
+            keywords = isFlixer
+              ? `watch ${searchQuery} free, flixer ${searchQuery}, stream ${searchQuery} online, flixer movies`
+              : (isCineby
+                ? `watch ${searchQuery} free, cineby ${searchQuery}, stream ${searchQuery} online`
+                : `search movies, query cinema catalog, find titles, actor search, ${brandShort.toLowerCase()}`);
           } else {
-            title = isCineby
-              ? `Search Movies & TV Series - Cineby Free Streaming`
-              : `Search Premium Movies & TV Series | ${brandName}`;
-            description = isCineby
-              ? "Search the complete Cineby library of movies, series, anime, and documentaries. Find your favorite film or show in seconds."
-              : "Search our complete streaming library instantly. Find actors, directors, movie release years, and cinematic titles with zero latency.";
-            keywords = isCineby
-              ? `search free movies, cineby finder, cineby stream search`
-              : `search movies, query cinema catalog, find titles, actor search, ${brandShort.toLowerCase()}`;
+            title = isFlixer
+              ? `Search Movies & TV Series - Flixer Free Streaming`
+              : (isCineby
+                ? `Search Movies & TV Series - Cineby Free Streaming`
+                : `Search Premium Movies & TV Series | ${brandName}`);
+            description = isFlixer
+              ? "Search the complete Flixer library of movies, series, anime, and documentaries. Find your favorite film or show in seconds."
+              : (isCineby
+                ? "Search the complete Cineby library of movies, series, anime, and documentaries. Find your favorite film or show in seconds."
+                : "Search our complete streaming library instantly. Find actors, directors, movie release years, and cinematic titles with zero latency.");
+            keywords = isFlixer
+              ? `search free movies, flixer finder, flixer stream search, flixer movies`
+              : (isCineby
+                ? `search free movies, cineby finder, cineby stream search`
+                : `search movies, query cinema catalog, find titles, actor search, ${brandShort.toLowerCase()}`);
           }
           break;
         case "history":
-          title = isCineby
-            ? `My Watchlist & Viewing History | Cineby`
-            : `Watch History & Continued Streams | ${brandName}`;
-          description = `Access and resume your watching progress on Cineby. Free personalized queue of movies and series on your active session.`;
-          keywords = isCineby
-            ? `cineby watchlist, cineby watch history, resume movie on cineby`
-            : `stream history, continue watching, resume playback, watched episodes, movie offsets, ${brandShort.toLowerCase()}`;
+          title = isFlixer
+            ? `My Watchlist & Viewing History | Flixer`
+            : (isCineby
+              ? `My Watchlist & Viewing History | Cineby`
+              : `Watch History & Continued Streams | ${brandName}`);
+          description = isFlixer
+            ? `Access and resume your watching progress on Flixer. Free personalized queue of movies and series on your active session.`
+            : `Access and resume your watching progress on Cineby. Free personalized queue of movies and series on your active session.`;
+          keywords = isFlixer
+            ? `flixer watchlist, flixer watch history, resume movie on flixer, flixer movies`
+            : (isCineby
+              ? `cineby watchlist, cineby watch history, resume movie on cineby`
+              : `stream history, continue watching, resume playback, watched episodes, movie offsets, ${brandShort.toLowerCase()}`);
           break;
         default:
           break;
@@ -168,11 +223,11 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
       "@type": "WebSite",
       "name": brandName,
       "alternateName": brandShort,
-      "url": window.location.origin,
+      "url": brandCanonicalOrigin,
       "description": "Premium multi-source cinema metadata, TV logs, and developers' sandboxed layout system.",
       "potentialAction": {
         "@type": "SearchAction",
-        "target": `${window.location.origin}?q={search_term_string}`,
+        "target": `${brandCanonicalOrigin}?q={search_term_string}`,
         "query-input": "required name=search_term_string"
       }
     };

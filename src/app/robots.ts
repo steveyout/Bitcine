@@ -2,18 +2,21 @@ import { MetadataRoute } from "next";
 import { headers } from "next/headers";
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  let host = "cineby.at";
+  let host = "cineby.mom";
   try {
     const headersList = await headers();
-    host = headersList.get("host") || "cineby.at";
+    host = headersList.get("host") || "cineby.mom";
   } catch (e) {
     // Fallback for static builds
   }
 
   const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
-  const baseUrl = isCineby 
-    ? (host.includes("localhost") || host.includes("run.app") ? "https://cineby.at" : `https://${host}`)
-    : "https://bitcine.online";
+  const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+  const baseUrl = isFlixer
+    ? "https://flixer.ink"
+    : (isCineby 
+      ? "https://cineby.mom"
+      : "https://bitcine.online");
 
   return {
     rules: {

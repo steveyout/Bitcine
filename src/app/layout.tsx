@@ -3,7 +3,6 @@ import { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
 import { headers } from "next/headers";
-import Script from "next/script";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -19,38 +18,48 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  let host = "cineby.at";
+  let host = "cineby.mom";
   try {
     const headersList = await headers();
-    host = headersList.get("host") || "cineby.at";
+    host = headersList.get("host") || "cineby.mom";
   } catch (e) {
     // Graceful fallback for build-time static routes
   }
 
   const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
-  const siteName = isCineby ? "Cineby" : "Bitcine Stream";
-  const domainUrl = isCineby 
-    ? (host.includes("localhost") || host.includes("run.app") ? "https://cineby.at" : `https://${host}`) 
-    : "https://bitcine.online";
+  const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
   
-  const title = isCineby 
-    ? "Cineby - Watch Free Movies & TV Shows Online HD" 
-    : "Bitcine Stream | Watch Movies & TV Series in Premium HD";
+  const siteName = isFlixer ? "Flixer" : (isCineby ? "Cineby" : "Bitcine Stream");
+  const domainUrl = isFlixer
+    ? "https://flixer.ink"
+    : (isCineby 
+      ? "https://cineby.mom" 
+      : "https://bitcine.online");
+  
+  const title = isFlixer
+    ? "Flixer - Watch Free Movies & TV Shows Online HD"
+    : (isCineby 
+      ? "Cineby - Watch Free Movies & TV Shows Online HD" 
+      : "Bitcine Stream | Watch Movies & TV Series in Premium HD");
     
-  const description = isCineby
-    ? "Watch free movies and TV shows online in full HD on Cineby (cineby.at). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
-    : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream. Test APIs, query TMDB proxy databases, and experience next-gen media viewing.";
+  const description = isFlixer
+    ? "Watch free movies and TV shows online in full HD on Flixer (flixer.ink). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
+    : (isCineby
+      ? "Watch free movies and TV shows online in full HD on Cineby (cineby.mom). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
+      : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream. Test APIs, query TMDB proxy databases, and experience next-gen media viewing.");
     
-  const keywords = isCineby
-    ? "cineby, cineby free movies, cineby.at, cineby stream, cineby official, cineby movies, cineby tv shows, cineby.mom, watch movies free online, watch free tv shows, best free streaming sites, cineby alternative, watch movies free on cineby, free online cinema"
-    : "bitcine, watch movies, stream free, hd video streaming, cinema list, tmdb backend proxy, developer movie dashboard, movie index, latest tv series, bitcine.online";
+  const keywords = isFlixer
+    ? "flixer, flixer free movies, flixer.ink, flixer movies, flixer stream, flixer official, watch movies free online, watch free tv shows, best free streaming sites, flixer alternative, watch movies free on flixer, free online cinema, flixer movies tags"
+    : (isCineby
+      ? "cineby, cineby free movies, cineby.at, cineby stream, cineby official, cineby movies, cineby tv shows, cineby.mom, watch movies free online, watch free tv shows, best free streaming sites, cineby alternative, watch movies free on cineby, free online cinema"
+      : "bitcine, watch movies, stream free, hd video streaming, cinema list, tmdb backend proxy, developer movie dashboard, movie index, latest tv series, bitcine.online");
 
   return {
     metadataBase: new URL(domainUrl),
     title,
     description,
     keywords,
-    authors: [{ name: isCineby ? "Cineby Global Network" : "Bitcine Global Network" }],
+    authors: [{ name: isFlixer ? "Flixer Global Network" : (isCineby ? "Cineby Global Network" : "Bitcine Global Network") }],
     robots: "index, follow",
     alternates: {
       canonical: "/",
@@ -88,22 +97,27 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let host = "cineby.at";
+  let host = "cineby.mom";
   try {
     const headersList = await headers();
-    host = headersList.get("host") || "cineby.at";
+    host = headersList.get("host") || "cineby.mom";
   } catch (e) {
     // Fallback for build time
   }
 
   const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
-  const brandName = isCineby ? "Cineby Stream" : "Bitcine Stream";
-  const domainUrl = isCineby 
-    ? (host.includes("localhost") || host.includes("run.app") ? "https://cineby.at" : `https://${host}`) 
-    : "https://bitcine.online";
-  const brandDesc = isCineby
-    ? "Watch free movies and TV shows online in full HD on Cineby (cineby.at). Fast, high-fidelity buffer-free streaming of blockbusters and series."
-    : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream.";
+  const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+  const brandName = isFlixer ? "Flixer Stream" : (isCineby ? "Cineby Stream" : "Bitcine Stream");
+  const domainUrl = isFlixer
+    ? "https://flixer.ink"
+    : (isCineby 
+      ? "https://cineby.mom" 
+      : "https://bitcine.online");
+  const brandDesc = isFlixer
+    ? "Watch free movies and TV shows online in full HD on Flixer (flixer.ink). Fast, high-fidelity buffer-free streaming of blockbusters and series."
+    : (isCineby
+      ? "Watch free movies and TV shows online in full HD on Cineby (cineby.mom). Fast, high-fidelity buffer-free streaming of blockbusters and series."
+      : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream.");
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -156,30 +170,6 @@ export default async function RootLayout({
       <body className="antialiased bg-[#040001] text-[#f8fafc] font-sans">
         {children}
         <GoogleAnalytics gaId="G-4F51F8KKEP" />
-        <Script
-            src="//lb.upboostsortie.com/r0ChTWNfNEgIO/144687"
-            strategy="afterInteractive"
-            data-cfasync="false"
-        />
-
-        {/* 1. Define the configuration options inline */}
-        <Script id="at-options" strategy="beforeInteractive">
-          {`
-            window.atOptions = {
-              'key' : 'e77be7a01f5b1b7367422aae10511e22',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          `}
-        </Script>
-
-        {/* 2. Load the external invoke.js script */}
-        <Script
-            src="https://directoryeditorweep.com/e77be7a01f5b1b7367422aae10511e22/invoke.js"
-            strategy="lazyOnload"
-        />
       </body>
     </html>
   );

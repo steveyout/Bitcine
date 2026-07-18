@@ -37,19 +37,31 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
 
   // Load history from localStorage on mount and register custom brand naming
   useEffect(() => {
-    const isCineby = typeof window !== "undefined" && (
-      window.location.hostname.includes("cineby") || 
-      window.location.hostname.includes("cineby.mom") ||
-      window.location.hostname.includes("cineby.at")
-    );
-    setBrandLabel(isCineby ? "Cineby" : "Bitcine");
+    const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+    const isCineby = hostname.includes("cineby") || hostname.includes("cineby.mom") || hostname.includes("cineby.at");
+    const isFlixer = hostname.includes("flixer") || hostname.includes("flixer.ink");
+    
+    if (isFlixer) {
+      setBrandLabel("Flixer");
+    } else if (isCineby) {
+      setBrandLabel("Cineby");
+    } else {
+      setBrandLabel("Bitcine");
+    }
 
     loadHistory();
   }, []);
 
   const loadHistory = () => {
     try {
-      const saved = localStorage.getItem("bitcine_continue_watching");
+      // Check flixer, cineby, then fallback keys to find user data
+      const keys = ["flixer_continue_watching", "cineby_continue_watching", "bitcine_continue_watching"];
+      let saved = null;
+      for (const key of keys) {
+        saved = localStorage.getItem(key);
+        if (saved) break;
+      }
+
       if (saved) {
         const parsed = JSON.parse(saved) as Movie[];
         setHistoryList(parsed);

@@ -6,7 +6,7 @@
 import { useState, useEffect } from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { theme } from "./theme";
+import { getTheme } from "./theme";
 import { Movie, ActiveTab } from "./types";
 import { api } from "./services/api";
 
@@ -30,7 +30,47 @@ import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, Hi
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("home");
   const [heroMovie, setHeroMovie] = useState<Movie | null>(null);
-  
+  const [brandLabel, setBrandLabel] = useState("Cineby");
+  const [initialSearchQuery, setInitialSearchQuery] = useState("");
+
+  const handleTabChange = (tab: ActiveTab) => {
+    setActiveTab(tab);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (tab === "home") {
+        params.delete("tab");
+        params.delete("q");
+        params.delete("search");
+        const queryStr = params.toString();
+        window.history.pushState(null, "", queryStr ? `?${queryStr}` : window.location.pathname);
+      } else {
+        params.set("tab", tab);
+        if (tab !== "search") {
+          params.delete("q");
+          params.delete("search");
+        }
+        window.history.pushState(null, "", `?${params.toString()}`);
+      }
+    }
+  };
+
+  // Determine brand label on client-side mount
+  useEffect(() => {
+    const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+    const isCineby = hostname.includes("cineby") || hostname.includes("cineby.mom") || hostname.includes("cineby.at");
+    const isFlixer = hostname.includes("flixer") || hostname.includes("flixer.ink");
+    
+    if (isFlixer) {
+      setBrandLabel("Flixer");
+    } else if (isCineby) {
+      setBrandLabel("Cineby");
+    } else {
+      setBrandLabel("Bitcine");
+    }
+  }, []);
+
+  const currentTheme = getTheme(brandLabel);
+
   // Categories collections
   const [trending, setTrending] = useState<Movie[]>([]);
   const [nowPlaying, setNowPlaying] = useState<Movie[]>([]);
@@ -151,24 +191,35 @@ export default function App() {
 
   // Sync Continue Watching list and Watchlist from localStorage on mount
   useEffect(() => {
+    if (!brandLabel) return;
     try {
-      const saved = localStorage.getItem("bitcine_continue_watching");
+      const keys = [`${brandLabel.toLowerCase()}_continue_watching`, "flixer_continue_watching", "cineby_continue_watching", "bitcine_continue_watching"];
+      let saved = null;
+      for (const k of keys) {
+        saved = localStorage.getItem(k);
+        if (saved) break;
+      }
       if (saved) {
         setContinueWatching(JSON.parse(saved));
       }
     } catch (e) {
-      console.warn("Bitcine client failed to parse Continue Watching logs:", e);
+      console.warn("Client failed to parse Continue Watching logs:", e);
     }
 
     try {
-      const savedWatchlist = localStorage.getItem("bitcine_watchlist");
+      const keys = [`${brandLabel.toLowerCase()}_watchlist`, "flixer_watchlist", "cineby_watchlist", "bitcine_watchlist"];
+      let savedWatchlist = null;
+      for (const k of keys) {
+        savedWatchlist = localStorage.getItem(k);
+        if (savedWatchlist) break;
+      }
       if (savedWatchlist) {
         setWatchlist(JSON.parse(savedWatchlist));
       }
     } catch (e) {
-      console.warn("Bitcine client failed to parse Watchlist logs:", e);
+      console.warn("Client failed to parse Watchlist logs:", e);
     }
-  }, []);
+  }, [brandLabel]);
   
   const toggleWatchlist = (movie: Movie) => {
     setWatchlist((prev) => {
@@ -180,7 +231,7 @@ export default function App() {
         updated = [movie, ...prev];
       }
       try {
-        localStorage.setItem("bitcine_watchlist", JSON.stringify(updated));
+        localStorage.setItem(`${brandLabel.toLowerCase()}_watchlist`, JSON.stringify(updated));
       } catch (e) {
         console.warn("Storage client failed to save watchlist item:", e);
       }
@@ -194,7 +245,7 @@ export default function App() {
       const filtered = prev.filter((m) => m.id !== movie.id);
       const updated = [movie, ...filtered].slice(0, 15); // Limit history tracking
       try {
-        localStorage.setItem("bitcine_continue_watching", JSON.stringify(updated));
+        localStorage.setItem(`${brandLabel.toLowerCase()}_continue_watching`, JSON.stringify(updated));
       } catch (e) {
         console.warn("Storage quota limit exceeded. Could not save session:", e);
       }
@@ -209,12 +260,23 @@ export default function App() {
       .replace(/(^-|-$)+/g, "");
   };
 
-  // Parse Slug deep links on initial mount
+  // Parse Slug and deep links on initial mount
   useEffect(() => {
     if (typeof window === "undefined" || isLoading) return;
     
     const params = new URLSearchParams(window.location.search);
     const watchQuery = params.get("watch") || params.get("movie");
+    const tabQuery = params.get("tab");
+    const searchQuery = params.get("q") || params.get("search");
+    
+    if (tabQuery && ["home", "browse", "search", "history"].includes(tabQuery)) {
+      setActiveTab(tabQuery as ActiveTab);
+    }
+    
+    if (searchQuery) {
+      setActiveTab("search");
+      setInitialSearchQuery(searchQuery);
+    }
     
     if (watchQuery) {
       const tmdbId = parseInt(watchQuery.split("-")[0]);
@@ -303,11 +365,11 @@ export default function App() {
   };
 
   const handleSearchToggle = () => {
-    setActiveTab(activeTab === "search" ? "home" : "search");
+    handleTabChange(activeTab === "search" ? "home" : "search");
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={currentTheme}>
       <CssBaseline />
       <SEOHelmet 
         activeTab={activeTab} 
@@ -318,16 +380,16 @@ export default function App() {
       {/* Background radial gradient wrapper styled to provide a premium viewing experience */}
       <div 
         id="applet-core-root" 
-        className="min-h-screen bg-[#050110] text-[#f8fafc] font-sans pb-24 md:pb-8 flex flex-col relative"
+        className={`min-h-screen ${brandLabel === "Flixer" || brandLabel === "Cineby" ? "bg-[#030000]" : "bg-[#050110]"} text-[#f8fafc] font-sans pb-24 md:pb-8 flex flex-col relative`}
       >
         {/* Subtle ambient lighting nodes to break template default feel */}
-        <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-purple-900/[0.03] rounded-full filter blur-[150px] pointer-events-none z-0" />
-        <div className="absolute bottom-1/3 left-0 w-[40vw] h-[40vw] bg-indigo-900/[0.03] rounded-full filter blur-[120px] pointer-events-none z-0" />
+        <div className={`absolute top-0 right-0 w-[50vw] h-[50vw] ${brandLabel === "Flixer" || brandLabel === "Cineby" ? "bg-red-950/[0.04]" : "bg-purple-900/[0.03]"} rounded-full filter blur-[150px] pointer-events-none z-0`} />
+        <div className={`absolute bottom-1/3 left-0 w-[40vw] h-[40vw] ${brandLabel === "Flixer" || brandLabel === "Cineby" ? "bg-rose-950/[0.04]" : "bg-indigo-900/[0.03]"} rounded-full filter blur-[120px] pointer-events-none z-0`} />
 
         {/* Global sticky Glassmorphic Header */}
         <Header 
           activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
+          setActiveTab={handleTabChange} 
           onSearchToggle={handleSearchToggle}
         />
 
@@ -374,7 +436,7 @@ export default function App() {
                           e.stopPropagation();
                           setWatchlist([]);
                           try {
-                            localStorage.removeItem("bitcine_watchlist");
+                            localStorage.removeItem(`${brandLabel.toLowerCase()}_watchlist`);
                           } catch (err) {
                             console.error(err);
                           }
@@ -409,7 +471,7 @@ export default function App() {
                           e.stopPropagation();
                           setContinueWatching([]);
                           try {
-                            localStorage.removeItem("bitcine_continue_watching");
+                            localStorage.removeItem(`${brandLabel.toLowerCase()}_continue_watching`);
                           } catch (err) {
                             console.error(err);
                           }
@@ -539,7 +601,21 @@ export default function App() {
           )}
 
           {activeTab === "search" && (
-            <SearchView onMovieClick={handleMovieSelect} />
+            <SearchView 
+              onMovieClick={handleMovieSelect} 
+              initialQuery={initialSearchQuery}
+              onSearchChange={(newQuery) => {
+                if (typeof window !== "undefined") {
+                  const params = new URLSearchParams(window.location.search);
+                  if (newQuery) {
+                    params.set("q", newQuery);
+                  } else {
+                    params.delete("q");
+                  }
+                  window.history.replaceState(null, "", `?${params.toString()}`);
+                }
+              }}
+            />
           )}
 
           {activeTab === "history" && (
@@ -574,7 +650,7 @@ export default function App() {
         {/* Floating Mobile Bottom Navigation bar (toggled strictly based on screen widths) */}
         <MobileBottomNav 
           activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
+          setActiveTab={handleTabChange} 
         />
       </div>
     </ThemeProvider>

@@ -6,13 +6,29 @@ import { Search, Popcorn, Star, Loader2, Compass } from "lucide-react";
 interface SearchViewProps {
   onMovieClick: (movie: Movie) => void;
   initialQuery?: string;
+  onSearchChange?: (newQuery: string) => void;
 }
 
 export const SearchView: React.FC<SearchViewProps> = ({ 
   onMovieClick,
-  initialQuery = "" 
+  initialQuery = "",
+  onSearchChange
 }) => {
   const [query, setQuery] = useState(initialQuery);
+
+  // Sync state if initialQuery changes dynamically
+  useEffect(() => {
+    if (initialQuery && initialQuery !== query) {
+      setQuery(initialQuery);
+    }
+  }, [initialQuery]);
+
+  // Bubble search query updates up for URL synchronization
+  useEffect(() => {
+    if (onSearchChange) {
+      onSearchChange(query);
+    }
+  }, [query, onSearchChange]);
   const [results, setResults] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);

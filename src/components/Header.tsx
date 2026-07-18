@@ -22,12 +22,17 @@ export const Header: React.FC<HeaderProps> = ({
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
-    const isCineby = typeof window !== "undefined" && (
-      window.location.hostname.includes("cineby") || 
-      window.location.hostname.includes("cineby.mom") ||
-      window.location.hostname.includes("cineby.at")
-    );
-    setBrandLabel(isCineby ? "Cineby" : "Bitcine");
+    const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+    const isCineby = hostname.includes("cineby") || hostname.includes("cineby.mom") || hostname.includes("cineby.at");
+    const isFlixer = hostname.includes("flixer") || hostname.includes("flixer.ink");
+    
+    if (isFlixer) {
+      setBrandLabel("Flixer");
+    } else if (isCineby) {
+      setBrandLabel("Cineby");
+    } else {
+      setBrandLabel("Bitcine");
+    }
   }, []);
 
   const handleCopy = (text: string, id: string) => {
