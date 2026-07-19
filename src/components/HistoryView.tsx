@@ -40,11 +40,14 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
     const hostname = typeof window !== "undefined" ? window.location.hostname : "";
     const isCineby = hostname.includes("cineby") || hostname.includes("cineby.mom") || hostname.includes("cineby.at");
     const isFlixer = hostname.includes("flixer") || hostname.includes("flixer.ink");
+    const isCineplay = hostname.includes("cineplay");
     
     if (isFlixer) {
       setBrandLabel("Flixer");
     } else if (isCineby) {
       setBrandLabel("Cineby");
+    } else if (isCineplay) {
+      setBrandLabel("Cineplay");
     } else {
       setBrandLabel("Bitcine");
     }
@@ -54,8 +57,8 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
 
   const loadHistory = () => {
     try {
-      // Check flixer, cineby, then fallback keys to find user data
-      const keys = ["flixer_continue_watching", "cineby_continue_watching", "bitcine_continue_watching"];
+      // Check flixer, cineby, cineplay, then fallback keys to find user data
+      const keys = ["flixer_continue_watching", "cineby_continue_watching", "cineplay_continue_watching", "bitcine_continue_watching"];
       let saved = null;
       for (const key of keys) {
         saved = localStorage.getItem(key);

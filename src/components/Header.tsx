@@ -25,15 +25,27 @@ export const Header: React.FC<HeaderProps> = ({
     const hostname = typeof window !== "undefined" ? window.location.hostname : "";
     const isCineby = hostname.includes("cineby") || hostname.includes("cineby.mom") || hostname.includes("cineby.at");
     const isFlixer = hostname.includes("flixer") || hostname.includes("flixer.ink");
+    const isCineplay = hostname.includes("cineplay");
     
     if (isFlixer) {
       setBrandLabel("Flixer");
     } else if (isCineby) {
       setBrandLabel("Cineby");
+    } else if (isCineplay) {
+      setBrandLabel("Cineplay");
     } else {
       setBrandLabel("Bitcine");
     }
   }, []);
+
+  const isRed = brandLabel === "Flixer" || brandLabel === "Cineby";
+
+  const getActiveTabClass = (isActive: boolean) => {
+    if (!isActive) return "text-slate-400 hover:text-white border border-transparent hover:bg-white/[0.03]";
+    return isRed
+      ? "bg-[#e50914]/15 border border-[#e50914]/30 text-white shadow-[0_0_15px_rgba(229,9,20,0.15)]"
+      : "bg-[#8b5cf6]/15 border border-[#8b5cf6]/30 text-white shadow-[0_0_15px_rgba(139,92,246,0.15)]";
+  };
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -45,9 +57,9 @@ export const Header: React.FC<HeaderProps> = ({
     <>
       <header 
         id="bitcine-header" 
-        className="fixed top-0 left-0 right-0 z-50 h-16 bg-[#040102]/85 backdrop-blur-2xl border-b border-red-950/20 px-4 md:px-10 flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.6)]"
+        className={`fixed top-0 left-0 right-0 z-50 h-16 bg-[#040102]/85 backdrop-blur-2xl border-b ${isRed ? "border-red-950/20" : "border-violet-950/20"} px-4 md:px-10 flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.6)]`}
       >
-        {/* Brand Logo - Styled precisely like the Cineby red play badge in screenshot */}
+        {/* Brand Logo - Styled precisely like the Cineby red/purple play badge in screenshot */}
         <div 
           id="bitcine-logo-container" 
           onClick={() => {
@@ -56,10 +68,10 @@ export const Header: React.FC<HeaderProps> = ({
           }}
           className="flex items-center gap-2.5 cursor-pointer group"
         >
-          {/* Circular Red Play icon */}
+          {/* Circular Play icon with dynamic color scheme */}
           <div 
             id="bitcine-logo" 
-            className="w-8 h-8 rounded-full bg-gradient-to-br from-[#e50914] to-[#af0810] flex items-center justify-center shadow-[0_0_15px_rgba(229,9,20,0.4)] transform group-hover:scale-105 group-hover:rotate-6 transition-all duration-300"
+            className={`w-8 h-8 rounded-full bg-gradient-to-br ${isRed ? "from-[#e50914] to-[#af0810] shadow-[0_0_15px_rgba(229,9,20,0.4)]" : "from-[#8b5cf6] to-[#6d28d9] shadow-[0_0_15px_rgba(139,92,246,0.4)]"} flex items-center justify-center transform group-hover:scale-105 group-hover:rotate-6 transition-all duration-300`}
           >
             <Play className="w-3.5 h-3.5 text-white fill-white ml-0.5" />
           </div>
@@ -82,9 +94,7 @@ export const Header: React.FC<HeaderProps> = ({
               setApiModalOpen(false);
             }}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-[10px] items-center font-black uppercase tracking-widest transition-all duration-200 cursor-pointer ${
-              activeTab === "home" && !apiModalOpen
-                ? "bg-[#e50914]/15 border border-[#e50914]/30 text-white shadow-[0_0_15px_rgba(229,9,20,0.15)]"
-                : "text-slate-400 hover:text-white border border-transparent hover:bg-white/[0.03]"
+              getActiveTabClass(activeTab === "home" && !apiModalOpen)
             }`}
           >
             <HomeIcon className="w-3.5 h-3.5" />
@@ -97,9 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={() => setApiModalOpen(true)}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-[10px] items-center font-black uppercase tracking-widest transition-all duration-200 cursor-pointer ${
-              apiModalOpen
-                ? "bg-[#e50914]/15 border border-[#e50914]/30 text-white shadow-[0_0_15px_rgba(229,9,20,0.15)]"
-                : "text-slate-400 hover:text-white border border-transparent hover:bg-white/[0.03]"
+              getActiveTabClass(apiModalOpen)
             }`}
           >
             <Code className="w-3.5 h-3.5" />
@@ -115,9 +123,7 @@ export const Header: React.FC<HeaderProps> = ({
               setApiModalOpen(false);
             }}
             className={`flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-[10px] items-center font-black uppercase tracking-widest transition-all duration-200 cursor-pointer ${
-              activeTab === "browse" && !apiModalOpen
-                ? "bg-[#e50914]/15 border border-[#e50914]/30 text-white shadow-[0_0_15px_rgba(229,9,20,0.15)]"
-                : "text-slate-400 hover:text-white border border-transparent hover:bg-white/[0.03]"
+              getActiveTabClass(activeTab === "browse" && !apiModalOpen)
             }`}
           >
             <Compass className="w-3.5 h-3.5 mr-0.5" />
@@ -134,9 +140,7 @@ export const Header: React.FC<HeaderProps> = ({
               setApiModalOpen(false);
             }}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-[10px] items-center font-black uppercase tracking-widest transition-all duration-200 cursor-pointer ${
-              activeTab === "history" && !apiModalOpen
-                ? "bg-[#e50914]/15 border border-[#e50914]/30 text-white shadow-[0_0_15px_rgba(229,9,20,0.15)]"
-                : "text-slate-400 hover:text-white border border-transparent hover:bg-white/[0.03]"
+              getActiveTabClass(activeTab === "history" && !apiModalOpen)
             }`}
           >
             <HistoryIcon className="w-3.5 h-3.5" />
@@ -156,7 +160,9 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="Search movies"
             className={`p-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 border ${
               activeTab === 'search' && !apiModalOpen
-                ? 'bg-[#e50914]/15 text-red-400 border-red-500/35 shadow-[0_0_12px_rgba(239,68,68,0.15)]' 
+                ? (isRed 
+                    ? 'bg-[#e50914]/15 text-red-400 border-red-500/35 shadow-[0_0_12px_rgba(239,68,68,0.15)]' 
+                    : 'bg-[#8b5cf6]/15 text-violet-400 border-violet-500/35 shadow-[0_0_12px_rgba(139,92,246,0.15)]')
                 : 'hover:bg-white/5 border-transparent text-slate-300 hover:text-white'
             }`}
           >

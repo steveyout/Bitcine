@@ -12,11 +12,14 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 
   const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
   const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+  const isCineplay = host.includes("cineplay");
   const baseUrl = isFlixer
     ? "https://flixer.ink"
-    : (isCineby 
-      ? "https://cineby.mom"
-      : "https://bitcine.online");
+    : (isCineplay
+      ? "https://cineplay.online"
+      : (isCineby 
+        ? "https://cineby.mom"
+        : "https://bitcine.online"));
 
   return {
     rules: {

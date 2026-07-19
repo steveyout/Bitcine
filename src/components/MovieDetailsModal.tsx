@@ -100,11 +100,25 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
     }
   };
 
+  const getActiveKey = () => {
+    const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+    const isCineby = hostname.includes("cineby") || hostname.includes("cineby.mom") || hostname.includes("cineby.at");
+    const isFlixer = hostname.includes("flixer") || hostname.includes("flixer.ink");
+    const isCineplay = hostname.includes("cineplay");
+    return isFlixer 
+      ? "flixer_continue_watching" 
+      : (isCineby 
+        ? "cineby_continue_watching" 
+        : (isCineplay 
+          ? "cineplay_continue_watching" 
+          : "bitcine_continue_watching"));
+  };
+
   // Helper inside modal: save current progression locally
   const saveCurrentProgressLocally = (sec: number, sNum: number = selectedSeason, eNum: number = selectedEpisode) => {
     if (!movie) return;
     try {
-      const saved = localStorage.getItem("bitcine_continue_watching");
+      const saved = localStorage.getItem(getActiveKey());
       let list: Movie[] = saved ? JSON.parse(saved) : [];
       
       const filtered = list.filter(m => m.id !== movie.id);
@@ -118,7 +132,7 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
       };
       
       list = [updatedItem, ...filtered].slice(0, 15);
-      localStorage.setItem("bitcine_continue_watching", JSON.stringify(list));
+      localStorage.setItem(getActiveKey(), JSON.stringify(list));
     } catch (err) {
       console.warn("MDU: Local storage sync error:", err);
     }
@@ -131,7 +145,14 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
       window.location.hostname.includes("cineby.mom") ||
       window.location.hostname.includes("cineby.at")
     );
-    setBrandLabel(isCineby ? "Cineby" : "Bitcine");
+    const isFlixer = typeof window !== "undefined" && (
+      window.location.hostname.includes("flixer") ||
+      window.location.hostname.includes("flixer.ink")
+    );
+    const isCineplay = typeof window !== "undefined" && (
+      window.location.hostname.includes("cineplay")
+    );
+    setBrandLabel(isFlixer ? "Flixer" : (isCineby ? "Cineby" : (isCineplay ? "Cineplay" : "Bitcine")));
 
     if (open && movie) {
       setIsPlaying(initialPlayState);
@@ -141,7 +162,7 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
       
       // Load saved progress state if exists in local continuing watching list!
       try {
-        const saved = localStorage.getItem("bitcine_continue_watching");
+        const saved = localStorage.getItem(getActiveKey());
         if (saved) {
           const list = JSON.parse(saved) as Movie[];
           const found = list.find(m => m.id === movie.id);

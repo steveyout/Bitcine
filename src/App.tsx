@@ -27,11 +27,18 @@ import { GenreTrendsChart } from "./components/GenreTrendsChart";
 // Icons 
 import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, History, Heart } from "lucide-react";
 
-export default function App() {
+interface AppProps {
+  initialWatchId?: number;
+  initialWatchType?: "movie" | "tv";
+}
+
+export default function App({ initialWatchId, initialWatchType }: AppProps = {}) {
   const [activeTab, setActiveTab] = useState<ActiveTab>("home");
   const [heroMovie, setHeroMovie] = useState<Movie | null>(null);
   const [brandLabel, setBrandLabel] = useState("Cineby");
   const [initialSearchQuery, setInitialSearchQuery] = useState("");
+  const [promoOpen, setPromoOpen] = useState(false);
+  const [promoUrl, setPromoUrl] = useState("");
 
   const handleTabChange = (tab: ActiveTab) => {
     setActiveTab(tab);
@@ -54,19 +61,45 @@ export default function App() {
     }
   };
 
-  // Determine brand label on client-side mount
+  // Determine brand label on client-side mount & load SEO Promotion Mirror link
   useEffect(() => {
     const hostname = typeof window !== "undefined" ? window.location.hostname : "";
     const isCineby = hostname.includes("cineby") || hostname.includes("cineby.mom") || hostname.includes("cineby.at");
     const isFlixer = hostname.includes("flixer") || hostname.includes("flixer.ink");
+    const isCineplay = hostname.includes("cineplay");
     
     if (isFlixer) {
       setBrandLabel("Flixer");
     } else if (isCineby) {
       setBrandLabel("Cineby");
+    } else if (isCineplay) {
+      setBrandLabel("Cineplay");
     } else {
       setBrandLabel("Bitcine");
     }
+
+    // Dynamic high-value target URLs under requested SEO domains to boost search catalog index depth
+    const promoTargets = [
+      "https://cineby.rest",
+      "https://cineby.works",
+      "https://cineby.rest/browse",
+      "https://cineby.works/browse",
+      "https://cineby.rest/search?q=trending",
+      "https://cineby.works/search?q=blockbuster",
+      "https://series.cineby.rest",
+      "https://movies.cineby.works"
+    ];
+    const randomUrl = promoTargets[Math.floor(Math.random() * promoTargets.length)];
+    setPromoUrl(randomUrl);
+
+    const timer = setTimeout(() => {
+      const hasSeenPromo = sessionStorage.getItem("seen_seo_promo");
+      if (!hasSeenPromo) {
+        setPromoOpen(true);
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const currentTheme = getTheme(brandLabel);
@@ -263,42 +296,57 @@ export default function App() {
   // Parse Slug and deep links on initial mount
   useEffect(() => {
     if (typeof window === "undefined" || isLoading) return;
-    
+
     const params = new URLSearchParams(window.location.search);
-    const watchQuery = params.get("watch") || params.get("movie");
     const tabQuery = params.get("tab");
     const searchQuery = params.get("q") || params.get("search");
-    
+
     if (tabQuery && ["home", "browse", "search", "history"].includes(tabQuery)) {
       setActiveTab(tabQuery as ActiveTab);
     }
-    
+
     if (searchQuery) {
       setActiveTab("search");
       setInitialSearchQuery(searchQuery);
     }
-    
-    if (watchQuery) {
-      const tmdbId = parseInt(watchQuery.split("-")[0]);
-      if (!isNaN(tmdbId)) {
-        const allLoaded = [
-          ...trending, 
-          ...nowPlaying, 
-          ...topRated, 
-          ...upcoming,
-          ...trendingTV,
-          ...popularTV,
-          ...topRatedTV
-        ];
-        
-        const found = allLoaded.find(m => m.id === tmdbId);
-        if (found) {
-          setSelectedMovie(found);
-          setModalPlayNow(true);
-          setModalOpen(true);
-        } else {
-          // Fetch from API gateway
-          api.getMovieDetails(tmdbId)
+
+    // Determine the ID and type either from Next.js server-side parameters or dynamic pathname parsing
+    let targetId = initialWatchId;
+    let targetType: "movie" | "tv" | null = initialWatchType || null;
+
+    const pathname = window.location.pathname;
+    const pathMatch = pathname.match(/^\/(movie|tv)\/(\d+)/);
+    if (!targetId && pathMatch) {
+      targetType = pathMatch[1] as "movie" | "tv";
+      targetId = parseInt(pathMatch[2]);
+    }
+
+    // Also fallback to older "?watch=" query parameters if present for backward compatibility
+    const watchQuery = params.get("watch") || params.get("movie");
+    if (!targetId && watchQuery) {
+      targetId = parseInt(watchQuery.split("-")[0]);
+    }
+
+    if (targetId && !isNaN(targetId)) {
+      const allLoaded = [
+        ...trending,
+        ...nowPlaying,
+        ...topRated,
+        ...upcoming,
+        ...trendingTV,
+        ...popularTV,
+        ...topRatedTV
+      ];
+
+      const found = allLoaded.find(m => m.id === targetId);
+      if (found) {
+        setSelectedMovie(found);
+        setModalPlayNow(true);
+        setModalOpen(true);
+      } else {
+        // Fetch from API gateway depending on target type
+        if (targetType === "tv") {
+          api.getTVDetails(targetId)
             .then(full => {
               if (full) {
                 setSelectedMovie(full);
@@ -307,7 +355,8 @@ export default function App() {
               }
             })
             .catch(() => {
-              api.getTVDetails(tmdbId)
+              // Try movie as fallback
+              api.getMovieDetails(targetId!)
                 .then(full => {
                   if (full) {
                     setSelectedMovie(full);
@@ -315,12 +364,33 @@ export default function App() {
                     setModalOpen(true);
                   }
                 })
-                .catch(err => console.warn("Slug failed to parse:", err));
+                .catch(err => console.warn("TV fallback details lookup failed:", err));
+            });
+        } else {
+          api.getMovieDetails(targetId)
+            .then(full => {
+              if (full) {
+                setSelectedMovie(full);
+                setModalPlayNow(true);
+                setModalOpen(true);
+              }
+            })
+            .catch(() => {
+              // Try TV details as fallback
+              api.getTVDetails(targetId!)
+                .then(full => {
+                  if (full) {
+                    setSelectedMovie(full);
+                    setModalPlayNow(true);
+                    setModalOpen(true);
+                  }
+                })
+                .catch(err => console.warn("Movie fallback details lookup failed:", err));
             });
         }
       }
     }
-  }, [isLoading, trending, nowPlaying, topRated, upcoming, trendingTV, popularTV, topRatedTV]);
+  }, [isLoading, initialWatchId, initialWatchType, trending, nowPlaying, topRated, upcoming, trendingTV, popularTV, topRatedTV]);
 
   // Set modal hooks for detail viewing or action streams
   const handleMovieSelect = (movie: Movie) => {
@@ -332,7 +402,9 @@ export default function App() {
     // Push good search-engine visual slugs to Browser History URL
     const title = movie.title || movie.name || "movie";
     const slug = `${movie.id}-${slugify(title)}`;
-    window.history.pushState(null, "", `?watch=${slug}`);
+    const isTv = movie.first_air_date !== undefined || movie.name !== undefined;
+    const path = isTv ? `/tv/${slug}` : `/movie/${slug}`;
+    window.history.pushState(null, "", path);
   };
 
   const handleHeroPlay = (movie: Movie) => {
@@ -343,7 +415,9 @@ export default function App() {
 
     const title = movie.title || movie.name || "movie";
     const slug = `${movie.id}-${slugify(title)}`;
-    window.history.pushState(null, "", `?watch=${slug}`);
+    const isTv = movie.first_air_date !== undefined || movie.name !== undefined;
+    const path = isTv ? `/tv/${slug}` : `/movie/${slug}`;
+    window.history.pushState(null, "", path);
   };
 
   const handlePlayWithProgress = (movie: Movie, season?: number, episode?: number, seconds?: number) => {
@@ -361,7 +435,9 @@ export default function App() {
 
     const title = movie.title || movie.name || "movie";
     const slug = `${movie.id}-${slugify(title)}`;
-    window.history.pushState(null, "", `?watch=${slug}`);
+    const isTv = movie.first_air_date !== undefined || movie.name !== undefined;
+    const path = isTv ? `/tv/${slug}` : `/movie/${slug}`;
+    window.history.pushState(null, "", path);
   };
 
   const handleSearchToggle = () => {
@@ -636,7 +712,12 @@ export default function App() {
           onClose={() => {
             setModalOpen(false);
             // Clean up Slug in browser URL on modal close
-            window.history.pushState(null, "", window.location.pathname);
+            const path = window.location.pathname;
+            if (path.startsWith("/movie/") || path.startsWith("/tv/")) {
+              window.history.pushState(null, "", "/");
+            } else {
+              window.history.pushState(null, "", path);
+            }
           }}
           onMovieClick={handleMovieSelect}
           initialPlayState={modalPlayNow}
@@ -652,6 +733,67 @@ export default function App() {
           activeTab={activeTab} 
           setActiveTab={handleTabChange} 
         />
+
+        {/* SEO Sister-Site Promotion Modal */}
+        {promoOpen && (
+          <div 
+            id="seo-promo-overlay"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-[fadeIn_0.3s_ease-out]"
+          >
+            <div 
+              id="seo-promo-card"
+              className={`relative max-w-md w-full rounded-3xl border ${brandLabel === "Cineplay" || brandLabel === "Bitcine" ? "border-violet-500/20 bg-[#0c0712]" : "border-red-500/20 bg-[#0d0406]"} p-6 md:p-8 shadow-2xl shadow-black/80 flex flex-col items-center text-center`}
+            >
+              {/* Dynamic decorative icon */}
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-5 ${brandLabel === "Cineplay" || brandLabel === "Bitcine" ? "bg-violet-500/10 text-violet-400" : "bg-red-500/10 text-red-500"}`}>
+                <Sparkles className="w-8 h-8 animate-pulse" />
+              </div>
+
+              <h3 className="text-xl md:text-2xl font-black text-white tracking-tight mb-2">
+                Sister Network Spotlight
+              </h3>
+              
+              <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-6">
+                Looking for more servers, exclusive cinematic gems, or alternative streaming mirrors? 
+                Experience our partner network site, completely free and optimized for ultra-fast speeds!
+              </p>
+
+              {/* Bot-friendly search discoverable links */}
+              <div className="w-full flex flex-col gap-3 mb-6">
+                <a
+                  href={promoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    sessionStorage.setItem("seen_seo_promo", "true");
+                    setPromoOpen(false);
+                  }}
+                  className={`w-full py-3.5 rounded-xl text-center text-xs font-black tracking-wider uppercase transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-white ${
+                    brandLabel === "Cineplay" || brandLabel === "Bitcine"
+                      ? "bg-gradient-to-r from-[#8b5cf6] to-[#6d28d9] shadow-lg shadow-violet-500/25"
+                      : "bg-gradient-to-r from-[#e50914] to-[#b91c1c] shadow-lg shadow-red-500/25"
+                  }`}
+                >
+                  Visit Sister Stream Mirror
+                </a>
+                
+                <span className="text-[10px] text-slate-500 font-mono tracking-wider">
+                  Partner Node: <span className="text-slate-300 select-all">{promoUrl}</span>
+                </span>
+              </div>
+
+              <button
+                onClick={() => {
+                  sessionStorage.setItem("seen_seo_promo", "true");
+                  setPromoOpen(false);
+                }}
+                className="text-xs text-slate-500 hover:text-slate-300 transition-colors uppercase font-bold tracking-widest cursor-pointer"
+              >
+                Continue Watching Here
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </ThemeProvider>
   );

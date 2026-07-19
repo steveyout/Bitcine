@@ -20,11 +20,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
   const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+  const isCineplay = host.includes("cineplay");
   const baseUrl = isFlixer
     ? "https://flixer.ink"
-    : (isCineby 
-      ? "https://cineby.mom"
-      : "https://bitcine.online");
+    : (isCineplay
+      ? "https://cineplay.online"
+      : (isCineby 
+        ? "https://cineby.mom"
+        : "https://bitcine.online"));
 
   // Base routing index entries
   const routes: MetadataRoute.Sitemap = [
