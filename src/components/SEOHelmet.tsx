@@ -54,7 +54,7 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
     if (isFlixer) {
       description = "Watch unlimited movies & TV shows free on Flixer (flixer.ink). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback.";
     } else if (isCineby) {
-      description = "Watch unlimited movies & TV shows free on Cineby (cineby.mom). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback.";
+      description = "Stream full HD movies and TV series for free on Cineby CC. Enjoy top cinema, seriados, and shows with subtitles or dubbing";
     } else if (isCineplay) {
       description = "Watch unlimited movies & TV shows free on Cineplay (cineplay.online). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback.";
     } else {

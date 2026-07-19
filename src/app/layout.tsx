@@ -3,7 +3,6 @@ import { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
 import { headers } from "next/headers";
-import Script from "next/script";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -51,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = isFlixer
     ? "Watch free movies and TV shows online in full HD on Flixer (flixer.ink). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
     : (isCineby
-      ? "Watch free movies and TV shows online in full HD on Cineby (cineby.mom). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
+      ? "Stream full HD movies and TV series for free on Cineby CC. Enjoy top cinema, seriados, and shows with subtitles or dubbing"
       : (isCineplay
         ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.online). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
         : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream. Test APIs, query TMDB proxy databases, and experience next-gen media viewing."));
@@ -75,9 +74,13 @@ export async function generateMetadata(): Promise<Metadata> {
       canonical: "/",
     },
     icons: {
-      icon: "/logo.svg",
-      shortcut: "/logo.svg",
-      apple: "/logo.svg",
+      icon: [
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/icon.png", type: "image/png", sizes: "32x32" },
+        { url: "/logo.svg", type: "image/svg+xml" }
+      ],
+      shortcut: "/favicon.ico",
+      apple: "/apple-icon.png",
     },
     openGraph: {
       type: "website",
@@ -129,7 +132,7 @@ export default async function RootLayout({
   const brandDesc = isFlixer
     ? "Watch free movies and TV shows online in full HD on Flixer (flixer.ink). Fast, high-fidelity buffer-free streaming of blockbusters and series."
     : (isCineby
-      ? "Watch free movies and TV shows online in full HD on Cineby (cineby.mom). Fast, high-fidelity buffer-free streaming of blockbusters and series."
+      ? "Stream full HD movies and TV series for free on Cineby CC. Enjoy top cinema, seriados, and shows with subtitles or dubbing"
       : (isCineplay
         ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.online). Fast, high-fidelity buffer-free streaming of blockbusters and series."
         : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream."));
@@ -185,30 +188,6 @@ export default async function RootLayout({
       <body className="antialiased bg-[#040001] text-[#f8fafc] font-sans">
         {children}
         <GoogleAnalytics gaId="G-4F51F8KKEP" />
-        <Script
-            src="//lb.upboostsortie.com/r0ChTWNfNEgIO/144687"
-            strategy="afterInteractive"
-            data-cfasync="false"
-        />
-
-        {/* 1. Define the configuration options inline */}
-        <Script id="at-options" strategy="beforeInteractive">
-          {`
-            window.atOptions = {
-              'key' : 'e77be7a01f5b1b7367422aae10511e22',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          `}
-        </Script>
-
-        {/* 2. Load the external invoke.js script */}
-        <Script
-            src="https://directoryeditorweep.com/e77be7a01f5b1b7367422aae10511e22/invoke.js"
-            strategy="lazyOnload"
-        />
       </body>
     </html>
   );
