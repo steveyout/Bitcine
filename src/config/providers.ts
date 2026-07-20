@@ -62,6 +62,18 @@ export const providers: Provider[] = [
     baseUrl: 'https://rivestream.org/embed',
     enabled: true,
   },
+  {
+    id: 'cinemaos',
+    name: 'Server 10 (CinemaOS)',
+    baseUrl: 'https://cinemaos.tech',
+    enabled: true,
+  },
+  {
+    id: 'vidcore',
+    name: 'Server 11 (VidCore)',
+    baseUrl: 'https://vidcore.org',
+    enabled: true,
+  },
 ];
 
 export const DEFAULT_PROVIDER_ID = 'vidking';
@@ -92,6 +104,18 @@ export const getEmbedUrl = (
       url += `&progress=${progressSeconds}`;
     }
     return url;
+  }
+
+  if (selected.id === 'cinemaos') {
+    return type === 'movie'
+      ? `${selected.baseUrl}/embed/movie/${tmdbId}`
+      : `${selected.baseUrl}/embed/tv/${tmdbId}/${season}/${episode}`;
+  }
+
+  if (selected.id === 'vidcore') {
+    return type === 'movie'
+      ? `${selected.baseUrl}/embed/movie/${tmdbId}`
+      : `${selected.baseUrl}/embed/tv/${tmdbId}/${season}/${episode}`;
   }
 
   // Fallbacks for other servers
