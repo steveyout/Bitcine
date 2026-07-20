@@ -26,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     : (isCineplay
       ? "https://cineplay.online"
       : (isCineby 
-        ? "https://cineby.mom"
+        ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
         : "https://bitcine.online"));
 
   // Base routing index entries

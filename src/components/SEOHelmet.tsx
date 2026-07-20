@@ -11,18 +11,10 @@ interface SEOHelmetProps {
 export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: SEOHelmetProps) {
   useEffect(() => {
     // Determine which brand to use based on the current active hostname
-    const isCineby = typeof window !== "undefined" && (
-      window.location.hostname.includes("cineby") ||
-      window.location.hostname.includes("cineby.mom") ||
-      window.location.hostname.includes("cineby.at")
-    );
-    const isFlixer = typeof window !== "undefined" && (
-      window.location.hostname.includes("flixer") ||
-      window.location.hostname.includes("flixer.ink")
-    );
-    const isCineplay = typeof window !== "undefined" && (
-      window.location.hostname.includes("cineplay")
-    );
+    const host = typeof window !== "undefined" ? window.location.hostname : "";
+    const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
+    const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+    const isCineplay = host.includes("cineplay");
     
     const brandName = isFlixer ? "Flixer Stream" : (isCineby ? "Cineby Stream" : (isCineplay ? "Cineplay Stream" : "Bitcine Stream"));
     const brandShort = isFlixer ? "Flixer" : (isCineby ? "Cineby" : (isCineplay ? "Cineplay" : "Bitcine"));
@@ -31,7 +23,7 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
     if (isFlixer) {
       baseKeywords = "flixer, flixer free movies, flixer.ink, flixer movies, flixer stream, flixer official, flixer site, flixer movies tags, watch movies free on flixer, free movies online, watch hd movies, free streaming sites, watch tv series online";
     } else if (isCineby) {
-      baseKeywords = "cineby, cineby free movies, cineby.mom, cineby stream, cineby official, cineby site, cineby movies, cineby tv shows, watch movies free on cineby, free movies online, watch hd movies, free streaming sites, watch tv series online";
+      baseKeywords = "cineby, cineby.at, movies, free movies, streamex, cineby stremio, stremio, obsession, movie sites, cine, tubi, classico, cinevibe, cineby at tv, rive, cineby net, cinebyte, cineverse, coreflix, cineby free movies, cineby.mom, cineby stream, cineby official, cineby site, cineby movies, cineby tv shows, watch movies free on cineby, free movies online, watch hd movies, free streaming sites, watch tv series online";
     } else if (isCineplay) {
       baseKeywords = "cineplay, cineplay free movies, cineplay.online, cineplay stream, cineplay official, cineplay site, cineplay movies, cineplay tv shows, watch movies free on cineplay, free movies online, watch hd movies, free streaming sites, watch tv series online";
     } else {
@@ -54,7 +46,7 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
     if (isFlixer) {
       description = "Watch unlimited movies & TV shows free on Flixer (flixer.ink). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback.";
     } else if (isCineby) {
-      description = "Stream full HD movies and TV series for free on Cineby CC. Enjoy top cinema, seriados, and shows with subtitles or dubbing";
+      description = "Stream full HD movies and TV series for free on Cineby.at (Cineby CC). Enjoy top cinema, seriados, and shows with subtitles or dubbing";
     } else if (isCineplay) {
       description = "Watch unlimited movies & TV shows free on Cineplay (cineplay.online). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback.";
     } else {
@@ -63,7 +55,7 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
 
     const brandCanonicalOrigin = isFlixer 
       ? "https://flixer.ink" 
-      : (isCineplay ? "https://cineplay.online" : (isCineby ? "https://cineby.mom" : "https://bitcine.online"));
+      : (isCineplay ? "https://cineplay.online" : (isCineby ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom") : "https://bitcine.online"));
 
     let keywords = baseKeywords;
     let type = "video.movie";

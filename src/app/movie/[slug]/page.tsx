@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const brandCanonicalOrigin = isFlixer 
     ? "https://flixer.ink" 
-    : (isCineplay ? "https://cineplay.online" : (isCineby ? "https://cineby.mom" : "https://bitcine.online"));
+    : (isCineplay ? "https://cineplay.online" : (isCineby ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom") : "https://bitcine.online"));
 
   const canonicalUrl = `${brandCanonicalOrigin}/movie/${slug}`;
 

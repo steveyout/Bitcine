@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
     : (isCineplay
       ? "https://cineplay.online"
       : (isCineby 
-        ? "https://cineby.mom" 
+        ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
         : "https://bitcine.online"));
   
   const title = isFlixer
@@ -50,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = isFlixer
     ? "Watch free movies and TV shows online in full HD on Flixer (flixer.ink). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
     : (isCineby
-      ? "Stream full HD movies and TV series for free on Cineby CC. Enjoy top cinema, seriados, and shows with subtitles or dubbing"
+      ? "Stream full HD movies and TV series for free on Cineby.at (Cineby CC). Enjoy top cinema, seriados, and shows with subtitles or dubbing"
       : (isCineplay
         ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.online). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
         : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream. Test APIs, query TMDB proxy databases, and experience next-gen media viewing."));
@@ -58,7 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const keywords = isFlixer
     ? "flixer, flixer free movies, flixer.ink, flixer movies, flixer stream, flixer official, watch movies free online, watch free tv shows, best free streaming sites, flixer alternative, watch movies free on flixer, free online cinema, flixer movies tags"
     : (isCineby
-      ? "cineby, cineby free movies, cineby.at, cineby stream, cineby official, cineby movies, cineby tv shows, cineby.mom, watch movies free online, watch free tv shows, best free streaming sites, cineby alternative, watch movies free on cineby, free online cinema"
+      ? "cineby, cineby.at, movies, free movies, streamex, cineby stremio, stremio, obsession, movie sites, cine, tubi, classico, cinevibe, cineby at tv, rive, cineby net, cinebyte, cineverse, coreflix, cineby free movies, cineby stream, cineby official, cineby movies, cineby tv shows, cineby.mom, watch movies free online, watch free tv shows, best free streaming sites, cineby alternative, watch movies free on cineby, free online cinema"
       : (isCineplay
         ? "cineplay, cineplay free movies, cineplay.online, cineplay stream, cineplay official, cineplay movies, cineplay tv shows, watch movies free online, watch free tv shows, best free streaming sites, cineplay alternative, watch movies free on cineplay, free online cinema"
         : "bitcine, watch movies, stream free, hd video streaming, cinema list, tmdb backend proxy, developer movie dashboard, movie index, latest tv series, bitcine.online"));
@@ -127,12 +127,12 @@ export default async function RootLayout({
     : (isCineplay
       ? "https://cineplay.online"
       : (isCineby 
-        ? "https://cineby.mom" 
+        ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
         : "https://bitcine.online"));
   const brandDesc = isFlixer
     ? "Watch free movies and TV shows online in full HD on Flixer (flixer.ink). Fast, high-fidelity buffer-free streaming of blockbusters and series."
     : (isCineby
-      ? "Stream full HD movies and TV series for free on Cineby CC. Enjoy top cinema, seriados, and shows with subtitles or dubbing"
+      ? "Stream full HD movies and TV series for free on Cineby.at (Cineby CC). Enjoy top cinema, seriados, and shows with subtitles or dubbing"
       : (isCineplay
         ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.online). Fast, high-fidelity buffer-free streaming of blockbusters and series."
         : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream."));
@@ -154,6 +154,8 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${plusJakartaSans.variable} ${bebasNeue.variable}`}>
       <head>
+        <link rel="preconnect" href="https://image.tmdb.org" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://image.tmdb.org" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

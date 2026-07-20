@@ -35,7 +35,7 @@ export const Hero: React.FC<HeroProps> = ({
   const backdropUrl = movie.backdrop_path 
     ? (movie.backdrop_path.startsWith("http") 
        ? movie.backdrop_path 
-       : `https://image.tmdb.org/t/p/original${movie.backdrop_path}`)
+       : `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`)
     : "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=1600";
 
   // Get release year safely
@@ -68,6 +68,8 @@ export const Hero: React.FC<HeroProps> = ({
           src={backdropUrl}
           alt={titleText}
           referrerPolicy="no-referrer"
+          fetchPriority="high"
+          loading="eager"
           className="w-full h-full object-cover object-center scale-105 filter brightness-90 animate-[fadeIn_0.5s_ease-out]"
         />
         {/* Dark vignettes & purplish ambient glows to match premium Bitcine style */}

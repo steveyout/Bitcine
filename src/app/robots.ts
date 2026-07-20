@@ -18,7 +18,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     : (isCineplay
       ? "https://cineplay.online"
       : (isCineby 
-        ? "https://cineby.mom"
+        ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
         : "https://bitcine.online"));
 
   return {
