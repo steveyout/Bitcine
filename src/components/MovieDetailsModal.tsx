@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { Movie, MovieDetails, Video, CastMember, CrewMember } from "../types";
 import { api } from "../services/api";
 import { 
@@ -405,13 +406,15 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
           ) : (
             /* Backdrop with high gradient and Red Play Triangle overlay launcher */
             <div id="theatre-splash-backdrop" className="relative w-full h-full">
-              <img
+              <Image
                 src={currentMovie.backdrop_path 
                   ? (currentMovie.backdrop_path.startsWith("http") ? currentMovie.backdrop_path : `https://image.tmdb.org/t/p/w1280${currentMovie.backdrop_path}`)
                   : "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280"}
                 alt={currentMovie.title || currentMovie.name}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover opacity-65"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px"
+                className="object-cover opacity-65"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#050102] via-[#050102]/40 to-black/35" />
               <div className="absolute inset-0 bg-gradient-to-r from-red-950/20 via-transparent to-transparent" />
@@ -703,11 +706,13 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                                  key={`cast-${member.id}`} 
                                  className="flex flex-col items-center bg-black/45 hover:bg-black p-3.5 rounded-2xl border border-red-500/[0.04] text-center gap-2 relative overflow-hidden transition-all duration-300 hover:border-red-500/25 group/card"
                               >
-                                <img 
+                                <Image 
                                   src={avatarVal} 
                                   alt={member.name}
                                   referrerPolicy="no-referrer"
-                                  className="w-12 h-12 rounded-full object-cover border border-red-500/20 shadow-md transition-transform duration-300 group-hover/card:scale-105"
+                                  width={48}
+                                  height={48}
+                                  className="rounded-full object-cover border border-red-500/20 shadow-md transition-transform duration-300 group-hover/card:scale-105"
                                 />
                                 <div className="min-w-0 w-full">
                                   <p className="text-[11px] font-bold text-white leading-tight truncate px-1">{member.name}</p>

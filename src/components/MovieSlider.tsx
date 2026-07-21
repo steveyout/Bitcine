@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import Image from "next/image";
 import { Movie } from "../types";
 import { ChevronLeft, ChevronRight, Star, Heart } from "lucide-react";
 
@@ -39,9 +40,13 @@ export const MovieSlider: React.FC<MovieSliderProps> = ({
     return null;
   }
 
-  // Get poster/backdrop url safely
-  const getImageUrl = (path: string | null, size: "w500" | "original" = "w500") => {
-    if (!path) return "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=500";
+  // Get poster/backdrop url safely with optimized dimensions
+  const getImageUrl = (path: string | null, size: "w342" | "w780" | "original" = "w342") => {
+    if (!path) {
+      return size === "w780" 
+        ? "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=780"
+        : "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=342";
+    }
     if (path.startsWith("http")) return path;
     return `https://image.tmdb.org/t/p/${size}${path}`;
   };
@@ -190,13 +195,14 @@ export const MovieSlider: React.FC<MovieSliderProps> = ({
 
                   {/* Card Wrap (pushed to the right slightly to accommodate the number) */}
                   <div className="w-[85%] ml-auto h-full relative rounded-xl overflow-hidden border border-purple-500/10 shadow-lg group-hover:border-violet-500/50 group-hover:shadow-violet-500/10 group-hover:scale-102 transition-all duration-300">
-                    <img
+                    <Image
                       id={`top10-img-${movie.id}`}
-                      src={getImageUrl(movie.backdrop_path)}
+                      src={getImageUrl(movie.backdrop_path, "w780")}
                       alt={movie.title || movie.name}
                       referrerPolicy="no-referrer"
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      sizes="(max-width: 768px) 218px, 272px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {/* Bottom Vignette */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#050110] via-transparent to-transparent z-1" />
@@ -233,13 +239,14 @@ export const MovieSlider: React.FC<MovieSliderProps> = ({
               >
                 {/* Card wrapper */}
                 <div className="relative w-full aspect-[2/3] rounded-2xl overflow-hidden border border-purple-500/5 shadow-md group-hover:border-violet-500/50 group-hover:scale-105 group-hover:shadow-violet-500/15 group-hover:-translate-y-1.5 transition-all duration-300">
-                  <img
+                  <Image
                     id={`slider-card-img-${movie.id}`}
-                    src={getImageUrl(movie.poster_path)}
+                    src={getImageUrl(movie.poster_path, "w342")}
                     alt={movie.title || movie.name}
                     referrerPolicy="no-referrer"
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500"
+                    fill
+                    sizes="(max-width: 640px) 144px, (max-width: 768px) 176px, 208px"
+                    className="object-cover transition-transform duration-500"
                   />
                   
                   {/* Hover overlay details */}

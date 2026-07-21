@@ -498,6 +498,16 @@ export default function App({ initialWatchId, initialWatchType }: AppProps = {})
 
               {/* Rows slider collection */}
               <div id="home-sliders-wrapper" className="max-w-7xl mx-auto pb-12 px-4 md:px-8 flex flex-col gap-8 mt-6">
+                {/* Row: TOP 10 Today (with large numbers) - Placed first for maximum layout stability */}
+                <MovieSlider 
+                  id="top-10" 
+                  title="TOP 10 Today" 
+                  movies={trending.slice(0, 10)} 
+                  onMovieClick={handleMovieSelect}
+                  isTop10={true}
+                  isLoading={isLoading}
+                />
+
                 {/* Row: My Watchlist (only renders if items are present in localStorage watchlist) */}
                 {watchlist.length > 0 && (
                   <div key="watchlist-section" className="animate-[fadeIn_0.4s_ease-out]">
@@ -567,16 +577,6 @@ export default function App({ initialWatchId, initialWatchType }: AppProps = {})
                     />
                   </div>
                 )}
-
-                {/* Row: TOP 10 Today (with large numbers) */}
-                <MovieSlider 
-                  id="top-10" 
-                  title="TOP 10 Today" 
-                  movies={trending.slice(0, 10)} 
-                  onMovieClick={handleMovieSelect}
-                  isTop10={true}
-                  isLoading={isLoading}
-                />
 
                 {/* Section Divider: Blockbuster Movies */}
                 <div className="flex items-center gap-4 pt-4 border-t border-purple-500/10">

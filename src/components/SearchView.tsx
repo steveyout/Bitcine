@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { Movie } from "../types";
 import { api } from "../services/api";
 import { Search, Popcorn, Star, Loader2, Compass } from "lucide-react";
@@ -215,12 +216,13 @@ export const SearchView: React.FC<SearchViewProps> = ({
                     className="group cursor-pointer flex flex-col gap-2 rounded-2xl overflow-hidden border border-purple-500/5 hover:border-violet-500/50 hover:bg-[#120e2a] transition-all duration-300"
                   >
                     <div className="relative aspect-[2/3] overflow-hidden rounded-xl">
-                      <img
+                      <Image
                         src={imgUrl}
                         alt={m.title || m.name}
                         referrerPolicy="no-referrer"
-                        loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       
                       {/* Dark gradient overlap card */}

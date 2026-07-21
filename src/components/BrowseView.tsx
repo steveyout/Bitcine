@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { Movie, Genre } from "../types";
 import { api } from "../services/api";
 import { Compass, Film, Star, Loader2, AlertCircle } from "lucide-react";
@@ -151,12 +152,13 @@ export const BrowseView: React.FC<BrowseViewProps> = ({ onMovieClick }) => {
               >
                 {/* Media frame */}
                 <div className="relative aspect-[2/3] overflow-hidden rounded-xl">
-                  <img
+                  <Image
                     src={posterUrl}
                     alt={m.title || m.name}
                     referrerPolicy="no-referrer"
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   {/* Hover dark details layer */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050110] via-transparent to-transparent opacity-60 z-1" />

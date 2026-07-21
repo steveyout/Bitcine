@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { Movie } from "../types";
 import { Play, Info, Star } from "lucide-react";
 
@@ -19,13 +20,13 @@ export const Hero: React.FC<HeroProps> = ({
     return (
       <div 
         id="hero-skeleton" 
-        className="relative h-[85vh] w-full bg-[#06040d] flex items-center justify-center animate-pulse"
+        className="relative h-[75vh] md:h-[82vh] lg:h-[88vh] w-full bg-[#06040d] flex items-center justify-center animate-pulse"
       >
         <div className="absolute inset-0 bg-gradient-to-t from-[#06040d] via-transparent to-transparent z-10" />
-        <div className="text-center z-20">
+        <div className="text-center z-20 px-6">
           <div className="h-8 w-48 bg-slate-800 rounded-full mx-auto mb-4" />
-          <div className="h-4 w-96 bg-slate-800 rounded-full mx-auto mb-2" />
-          <div className="h-4 w-64 bg-slate-800 rounded-full mx-auto" />
+          <div className="h-4 w-96 max-w-full bg-slate-800 rounded-full mx-auto mb-2" />
+          <div className="h-4 w-64 max-w-full bg-slate-800 rounded-full mx-auto" />
         </div>
       </div>
     );
@@ -63,14 +64,15 @@ export const Hero: React.FC<HeroProps> = ({
     >
       {/* Background Image with Bitcine custom gradient blending */}
       <div className="absolute inset-0 z-0">
-        <img
+        <Image
           id={`hero-backdrop-img-${movie.id}`}
           src={backdropUrl}
           alt={titleText}
           referrerPolicy="no-referrer"
-          fetchPriority="high"
-          loading="eager"
-          className="w-full h-full object-cover object-center scale-105 filter brightness-90 animate-[fadeIn_0.5s_ease-out]"
+          priority
+          fill
+          sizes="100vw"
+          className="object-cover object-center scale-105 filter brightness-90 animate-[fadeIn_0.5s_ease-out]"
         />
         {/* Dark vignettes & purplish ambient glows to match premium Bitcine style */}
         <div id="hero-backdrop-vignette-top" className="absolute inset-0 bg-gradient-to-b from-[#050110]/95 via-transparent to-[#050110]/30 z-1" />

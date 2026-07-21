@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { Movie } from "../types";
 import { 
   History, 
@@ -273,13 +274,15 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
               >
                 {/* Upper banner content */}
                 <div className="relative aspect-[16/10] bg-zinc-950 overflow-hidden">
-                  <img
+                  <Image
                     src={movie.backdrop_path 
                       ? (movie.backdrop_path.startsWith("http") ? movie.backdrop_path : `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`)
                       : (movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500")}
                     alt={title}
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-60"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-500 opacity-60"
                   />
 
                   {/* Gradient Overlay for backdrop details */}
