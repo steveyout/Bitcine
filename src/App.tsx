@@ -30,10 +30,11 @@ import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, Hi
 interface AppProps {
   initialWatchId?: number;
   initialWatchType?: "movie" | "tv";
+  initialTab?: ActiveTab;
 }
 
-export default function App({ initialWatchId, initialWatchType }: AppProps = {}) {
-  const [activeTab, setActiveTab] = useState<ActiveTab>("home");
+export default function App({ initialWatchId, initialWatchType, initialTab }: AppProps = {}) {
+  const [activeTab, setActiveTab] = useState<ActiveTab>(initialTab || "home");
   const [heroMovie, setHeroMovie] = useState<Movie | null>(null);
   const [brandLabel, setBrandLabel] = useState("Cineby");
   const [initialSearchQuery, setInitialSearchQuery] = useState("");

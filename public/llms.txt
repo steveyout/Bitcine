@@ -1,0 +1,22 @@
+# Cineby / Bitcine Stream
+
+> Cineby is a modern high-definition streaming platform offering fast, accessible metadata, trailers, and viewing experience for movies and TV series worldwide.
+
+## Core Features
+- **Movie Catalogue**: Detailed information, release years, TMDB ratings, cast members, and high-fidelity trailers for thousands of top movies.
+- **TV Series Catalogue**: Episode guides, season details, and streaming options for popular series.
+- **Browse & Search**: Filter by genres (Action, Sci-Fi, Drama, Comedy, Horror, Animation) or search instantly by title.
+- **Watch History & Watchlist**: Local saving for offline-first personal lists.
+
+## Public API Endpoints
+- GET `/api/tmdb/movie/:id` - Fetch movie details, credits, and videos.
+- GET `/api/tmdb/tv/:id` - Fetch TV show details, credits, and videos.
+- GET `/api/tmdb/trending/all/day` - Fetch daily trending movies and TV shows.
+- GET `/api/tmdb/search/multi` - Multi-query search for movies and TV series.
+
+## Canonical Domains
+- https://cineby.at
+- https://cineby.mom
+- https://cineplay.online
+- https://flixer.ink
+- https://bitcine.online

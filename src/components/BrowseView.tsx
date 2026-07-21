@@ -8,6 +8,13 @@ interface BrowseViewProps {
   onMovieClick: (movie: Movie) => void;
 }
 
+const slugify = (text: string) => {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+};
+
 export const BrowseView: React.FC<BrowseViewProps> = ({ onMovieClick }) => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [activeGenreId, setActiveGenreId] = useState<number | null>(null);
@@ -80,7 +87,7 @@ export const BrowseView: React.FC<BrowseViewProps> = ({ onMovieClick }) => {
   }
 
   return (
-    <div id="browse-view-container" className="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto animate-[fadeIn_0.4s_ease-out]">
+    <section id="browse-view-container" aria-label="Browse Categories" className="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto animate-[fadeIn_0.4s_ease-out]">
       
       {/* Title block */}
       <div className="flex flex-col gap-1 mb-8">
@@ -94,8 +101,9 @@ export const BrowseView: React.FC<BrowseViewProps> = ({ onMovieClick }) => {
       </div>
 
       {/* Genres pill list buttons */}
-      <div 
+      <nav 
         id="genres-scroll-container" 
+        aria-label="Genre Filters"
         className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-4 border-b border-purple-500/10 mb-8"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
@@ -116,7 +124,7 @@ export const BrowseView: React.FC<BrowseViewProps> = ({ onMovieClick }) => {
             </button>
           );
         })}
-      </div>
+      </nav>
 
       {/* Movie Results Grid */}
       {isLoadingMovies ? (
@@ -143,46 +151,59 @@ export const BrowseView: React.FC<BrowseViewProps> = ({ onMovieClick }) => {
                  : `https://image.tmdb.org/t/p/w342${m.poster_path}`)
               : "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=342";
 
+            const mediaType = m.name ? "tv" : "movie";
+            const titleText = m.title || m.name || "media";
+            const slug = `${m.id}-${slugify(titleText)}`;
+            const href = `/${mediaType}/${slug}`;
+
             return (
-              <div
+              <article
                 key={m.id}
                 id={`browse-grid-movie-${m.id}`}
-                onClick={() => onMovieClick(m)}
-                className="group cursor-pointer flex flex-col gap-2 bg-[#0d0a1b]/40 rounded-2xl overflow-hidden border border-purple-500/5 hover:border-violet-500/50 hover:bg-purple-950/20 transition-all duration-300"
+                className="group cursor-pointer flex flex-col bg-[#0d0a1b]/40 rounded-2xl overflow-hidden border border-purple-500/5 hover:border-violet-500/50 hover:bg-purple-950/20 transition-all duration-300"
               >
-                {/* Media frame */}
-                <div className="relative aspect-[2/3] overflow-hidden rounded-xl">
-                  <Image
-                    src={posterUrl}
-                    alt={m.title || m.name}
-                    referrerPolicy="no-referrer"
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {/* Hover dark details layer */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#050110] via-transparent to-transparent opacity-60 z-1" />
-                  
-                  {/* Rating badge */}
-                  <div className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-md text-[10px] font-bold bg-black/75 backdrop-blur-sm border border-stone-800 text-amber-400 flex items-center gap-0.5">
-                    ★ {m.vote_average.toFixed(1)}
+                <a
+                  href={href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onMovieClick(m);
+                  }}
+                  className="flex flex-col gap-2 w-full h-full block cursor-pointer"
+                >
+                  {/* Media frame */}
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl">
+                    <Image
+                      src={posterUrl}
+                      alt={titleText}
+                      referrerPolicy="no-referrer"
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {/* Hover dark details layer */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#050110] via-transparent to-transparent opacity-60 z-1" />
+                    
+                    {/* Rating badge */}
+                    <div className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-md text-[10px] font-bold bg-black/75 backdrop-blur-sm border border-stone-800 text-amber-400 flex items-center gap-0.5">
+                      ★ {m.vote_average.toFixed(1)}
+                    </div>
                   </div>
-                </div>
 
-                {/* Meta details */}
-                <div className="p-3 pt-1">
-                  <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-violet-400 transition-colors truncate">
-                    {m.title || m.name}
-                  </h3>
-                  <p className="text-[10px] text-slate-500 font-medium mt-1 uppercase font-mono">
-                    Air Year: {yearVal}
-                  </p>
-                </div>
-              </div>
+                  {/* Meta details */}
+                  <div className="p-3 pt-1">
+                    <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-violet-400 transition-colors truncate">
+                      {titleText}
+                    </h3>
+                    <p className="text-[10px] text-slate-500 font-medium mt-1 uppercase font-mono">
+                      Air Year: {yearVal}
+                    </p>
+                  </div>
+                </a>
+              </article>
             );
           })}
         </div>
       )}
-    </div>
+    </section>
   );
 };

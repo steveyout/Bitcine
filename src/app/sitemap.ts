@@ -41,7 +41,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/browse`,
       lastModified: new Date(),
       changeFrequency: "weekly",
-      priority: 0.8,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/movies`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/series`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/search`,
@@ -57,7 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Try parsing mock film assets for direct search engine landing indices
+  // Try parsing film assets for direct search engine landing indices
   try {
     const fallbackMovies = api.getFallbackMovies();
     const fallbackTV = api.getFallbackSeries();
@@ -65,20 +77,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fallbackMovies.forEach((movie) => {
       const slug = `${movie.id}-${slugify(movie.title || "movie")}`;
       routes.push({
-        url: `${baseUrl}/?watch=${slug}`,
+        url: `${baseUrl}/movie/${slug}`,
         lastModified: new Date(),
         changeFrequency: "weekly",
-        priority: 0.7,
+        priority: 0.8,
       });
     });
 
     fallbackTV.forEach((show) => {
       const slug = `${show.id}-${slugify(show.name || "show")}`;
       routes.push({
-        url: `${baseUrl}/?watch=${slug}`,
+        url: `${baseUrl}/tv/${slug}`,
         lastModified: new Date(),
         changeFrequency: "weekly",
-        priority: 0.7,
+        priority: 0.8,
       });
     });
   } catch (e) {

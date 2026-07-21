@@ -26,6 +26,13 @@ interface HistoryViewProps {
   onPlayWithProgress?: (movie: Movie, season?: number, episode?: number, seconds?: number) => void;
 }
 
+const slugify = (text: string) => {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+};
+
 export const HistoryView: React.FC<HistoryViewProps> = ({ 
   onMovieClick,
   onPlayWithProgress
@@ -179,7 +186,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
   });
 
   return (
-    <div id="history-view-panel" className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pt-24 pb-12 select-none animate-[fadeIn_0.5s_ease-out]">
+    <section id="history-view-panel" aria-label="Watch History and Watchlist" className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pt-24 pb-12 select-none animate-[fadeIn_0.5s_ease-out]">
       
       {/* Dynamic Ambient Blur Backgrounds */}
       <div className="absolute top-12 left-1/4 w-80 h-80 bg-red-600/[0.03] filter blur-[120px] rounded-full pointer-events-none" />
@@ -214,7 +221,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           )}
 
           {/* Sub category filter tabs */}
-          <div className="bg-slate-950/90 border border-red-950/30 p-1 rounded-xl flex">
+          <nav aria-label="History Filters" className="bg-slate-950/90 border border-red-950/30 p-1 rounded-xl flex">
             {(["all", "movies", "shows"] as const).map((mode) => (
               <button
                 key={mode}
@@ -228,7 +235,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                 {mode}
               </button>
             ))}
-          </div>
+          </nav>
         </div>
       </div>
 
@@ -260,134 +267,146 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
             const duration = movie.runtime ? movie.runtime * 60 : 7200; // fallback default 2h
             const progSec = movie.progressSeconds || 0;
             const percentage = Math.min(100, Math.max(0, (progSec / duration) * 100));
-            const fontMono = "font-mono text-[10px]";
 
             const progressDisplay = progSec > 0
               ? `${Math.floor(progSec / 60)}m ${Math.floor(progSec % 60)}s`
               : "0m";
 
+            const mediaType = isTV ? "tv" : "movie";
+            const slug = `${movie.id}-${slugify(title)}`;
+            const href = `/${mediaType}/${slug}`;
+
             return (
-              <div
+              <article
                 key={movie.id}
-                onClick={() => handlePlayItem(movie)}
                 className="group relative bg-[#090102] border border-red-500/[0.04] hover:border-red-500/30 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.02] cursor-pointer flex flex-col justify-between"
               >
-                {/* Upper banner content */}
-                <div className="relative aspect-[16/10] bg-zinc-950 overflow-hidden">
-                  <Image
-                    src={movie.backdrop_path 
-                      ? (movie.backdrop_path.startsWith("http") ? movie.backdrop_path : `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`)
-                      : (movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500")}
-                    alt={title}
-                    referrerPolicy="no-referrer"
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-110 transition-transform duration-500 opacity-60"
-                  />
+                <a
+                  href={href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePlayItem(movie);
+                  }}
+                  className="flex flex-col justify-between h-full w-full block cursor-pointer"
+                >
+                  {/* Upper banner content */}
+                  <div className="relative aspect-[16/10] bg-zinc-950 overflow-hidden">
+                    <Image
+                      src={movie.backdrop_path 
+                        ? (movie.backdrop_path.startsWith("http") ? movie.backdrop_path : `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`)
+                        : (movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500")}
+                      alt={title}
+                      referrerPolicy="no-referrer"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-110 transition-transform duration-500 opacity-60"
+                    />
 
-                  {/* Gradient Overlay for backdrop details */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#090102] to-transparent" />
+                    {/* Gradient Overlay for backdrop details */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#090102] to-transparent" />
 
-                  {/* Quick Metadata Pill badges */}
-                  <div className="absolute top-3 left-3 flex gap-1.5">
-                    {isTV ? (
-                      <span className="bg-red-500 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <Tv className="w-2.5 h-2.5" />
-                        TV series
-                      </span>
-                    ) : (
-                      <span className="bg-slate-900 border border-white/10 text-slate-300 text-[9px] font-black uppercase px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <Film className="w-2.5 h-2.5" />
-                        Movie
-                      </span>
-                    )}
-
-                    {progSec > 0 && (
-                      <span className="bg-black/80 backdrop-blur-md border border-red-500/20 text-red-400 text-[9px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <Clock className="w-2.5 h-2.5 text-red-500" />
-                        {progressDisplay}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Trash Hover overlay trigger */}
-                  <button
-                    onClick={(e) => handleRemoveItem(movie.id, e)}
-                    className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/70 hover:bg-red-600 hover:text-white text-slate-400 border border-white/5 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-250 hover:scale-105"
-                    title="Remove from continuing list"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-
-                  {/* Centered Large Play Overlay Icon */}
-                  <div className="absolute inset-x-0 bottom-4 text-center">
-                    <div className="inline-flex w-10 h-10 rounded-full bg-red-600 text-white items-center justify-center shadow-lg shadow-red-950 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-300">
-                      <Play className="w-4 h-4 fill-white text-white ml-0.5" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Lower metadata context */}
-                <div className="p-4 flex flex-col gap-3">
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-black text-white group-hover:text-red-400 uppercase tracking-wide truncate transition-colors leading-tight">
-                      {title}
-                    </h3>
-
-                    {/* Show episode labels and custom actions */}
-                    {isTV && (
-                      <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold mt-1 bg-red-950/15 border border-red-500/5 px-2 py-1 rounded-md">
-                        <span className="text-[10px] text-red-300">
-                          S{curSeason} : Episode {curEpisode}
+                    {/* Quick Metadata Pill badges */}
+                    <div className="absolute top-3 left-3 flex gap-1.5 z-10">
+                      {isTV ? (
+                        <span className="bg-red-500 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <Tv className="w-2.5 h-2.5" />
+                          TV series
                         </span>
-                        
-                        {/* Next Episode Direct Trigger! */}
-                        <button
-                          onClick={(e) => handleNextEpisode(movie, e)}
-                          className="text-[9px] uppercase font-black text-red-400 hover:text-white flex items-center gap-0.5 border border-red-500/10 hover:border-red-500/30 bg-black/40 px-2 py-0.5 rounded cursor-pointer transform hover:scale-[1.03]"
-                          title="Skip to next episode"
-                        >
-                          Next Ep <ChevronRight className="w-3 h-3 text-red-500" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                      ) : (
+                        <span className="bg-slate-900 border border-white/10 text-slate-300 text-[9px] font-black uppercase px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <Film className="w-2.5 h-2.5" />
+                          Movie
+                        </span>
+                      )}
 
-                  {/* Progress sliding controller block */}
-                  <div className="flex flex-col gap-1.5 border-t border-red-950/20 pt-2 text-slate-500 font-medium text-[10px]">
-                    <div className="flex justify-between items-center text-[10px]">
-                      <span className="flex items-center gap-1">
-                        <Sliders className="w-3 h-3 text-red-500/40" />
-                        Watched Offset
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowProgressModal(movie.id);
-                        }}
-                        className="text-[9px] text-[#ff4d6a] hover:underline cursor-pointer"
-                      >
-                        Adjust
-                      </button>
-                    </div>
-
-                    {/* Visual Progress bar inside history bento box list */}
-                    <div className="w-full h-1.5 bg-slate-900/80 rounded-full overflow-hidden relative">
-                      <div 
-                        className="h-full bg-gradient-to-r from-red-600 via-rose-500 to-red-600 rounded-full"
-                        style={{ width: `${percentage || 0}%` }}
-                      />
-                    </div>
-                    <div className="flex justify-between items-center text-[9px] text-slate-500 uppercase tracking-widest leading-none mt-0.5">
-                      <span>{percentage.toFixed(0)}% watched</span>
-                      {movie.lastWatchedTime && (
-                        <span>
-                          {new Date(movie.lastWatchedTime).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      {progSec > 0 && (
+                        <span className="bg-black/80 backdrop-blur-md border border-red-500/20 text-red-400 text-[9px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <Clock className="w-2.5 h-2.5 text-red-500" />
+                          {progressDisplay}
                         </span>
                       )}
                     </div>
+
+                    {/* Trash Hover overlay trigger */}
+                    <button
+                      onClick={(e) => handleRemoveItem(movie.id, e)}
+                      className="absolute top-2.5 right-2.5 z-20 w-7 h-7 rounded-full bg-black/70 hover:bg-red-600 hover:text-white text-slate-400 border border-white/5 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-250 hover:scale-105"
+                      title="Remove from continuing list"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Centered Large Play Overlay Icon */}
+                    <div className="absolute inset-x-0 bottom-4 text-center z-10">
+                      <div className="inline-flex w-10 h-10 rounded-full bg-red-600 text-white items-center justify-center shadow-lg shadow-red-950 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-300">
+                        <Play className="w-4 h-4 fill-white text-white ml-0.5" />
+                      </div>
+                    </div>
                   </div>
-                </div>
+
+                  {/* Lower metadata context */}
+                  <div className="p-4 flex flex-col gap-3">
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-black text-white group-hover:text-red-400 uppercase tracking-wide truncate transition-colors leading-tight">
+                        {title}
+                      </h3>
+
+                      {/* Show episode labels and custom actions */}
+                      {isTV && (
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold mt-1 bg-red-950/15 border border-red-500/5 px-2 py-1 rounded-md">
+                          <span className="text-[10px] text-red-300">
+                            S{curSeason} : Episode {curEpisode}
+                          </span>
+                          
+                          {/* Next Episode Direct Trigger! */}
+                          <button
+                            onClick={(e) => handleNextEpisode(movie, e)}
+                            className="text-[9px] uppercase font-black text-red-400 hover:text-white flex items-center gap-0.5 border border-red-500/10 hover:border-red-500/30 bg-black/40 px-2 py-0.5 rounded cursor-pointer transform hover:scale-[1.03]"
+                            title="Skip to next episode"
+                          >
+                            Next Ep <ChevronRight className="w-3 h-3 text-red-500" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Progress sliding controller block */}
+                    <div className="flex flex-col gap-1.5 border-t border-red-950/20 pt-2 text-slate-500 font-medium text-[10px]">
+                      <div className="flex justify-between items-center text-[10px]">
+                        <span className="flex items-center gap-1">
+                          <Sliders className="w-3 h-3 text-red-500/40" />
+                          Watched Offset
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowProgressModal(movie.id);
+                          }}
+                          className="text-[9px] text-[#ff4d6a] hover:underline cursor-pointer"
+                        >
+                          Adjust
+                        </button>
+                      </div>
+
+                      {/* Visual Progress bar inside history bento box list */}
+                      <div className="w-full h-1.5 bg-slate-900/80 rounded-full overflow-hidden relative">
+                        <div 
+                          className="h-full bg-gradient-to-r from-red-600 via-rose-500 to-red-600 rounded-full"
+                          style={{ width: `${percentage || 0}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between items-center text-[9px] text-slate-500 uppercase tracking-widest leading-none mt-0.5">
+                        <span>{percentage.toFixed(0)}% watched</span>
+                        {movie.lastWatchedTime && (
+                          <span>
+                            {new Date(movie.lastWatchedTime).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </a>
 
                 {/* Inlines adjustment dropdown panel inside card */}
                 {showProgressModal === movie.id && (
@@ -443,11 +462,11 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                     </div>
                   </div>
                 )}
-              </div>
+              </article>
             );
           })}
         </div>
       )}
-    </div>
+    </section>
   );
 };

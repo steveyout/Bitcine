@@ -10,6 +10,13 @@ interface SearchViewProps {
   onSearchChange?: (newQuery: string) => void;
 }
 
+const slugify = (text: string) => {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+};
+
 export const SearchView: React.FC<SearchViewProps> = ({ 
   onMovieClick,
   initialQuery = "",
@@ -32,7 +39,6 @@ export const SearchView: React.FC<SearchViewProps> = ({
   }, [query, onSearchChange]);
   const [results, setResults] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
   const [filterType, setFilterType] = useState<"all" | "movie" | "tv">("all");
 
   // Trigger search with small debounce delay
@@ -114,7 +120,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
   });
 
   return (
-    <div id="search-view-panel" className="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto animate-[fadeIn_0.4s_ease-out]">
+    <section id="search-view-panel" aria-label="Search Movies and Series" className="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto animate-[fadeIn_0.4s_ease-out]">
       
       {/* Search Input HUD box */}
       <div className="bg-[#0f0a1f] p-6 rounded-2xl border border-purple-500/10 mb-8 max-w-3xl mx-auto flex flex-col gap-4">
@@ -207,51 +213,60 @@ export const SearchView: React.FC<SearchViewProps> = ({
                   : "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=342";
 
                 const isTVItem = m.media_type === "tv" || !!m.first_air_date || (!!m.name && !m.title);
+                const mediaType = isTVItem ? "tv" : "movie";
+                const titleText = m.title || m.name || "media";
+                const slug = `${m.id}-${slugify(titleText)}`;
+                const href = `/${mediaType}/${slug}`;
 
                 return (
-                  <div
+                  <article
                     key={m.id}
                     id={`search-grid-item-${m.id}`}
-                    onClick={() => onMovieClick(m)}
-                    className="group cursor-pointer flex flex-col gap-2 rounded-2xl overflow-hidden border border-purple-500/5 hover:border-violet-500/50 hover:bg-[#120e2a] transition-all duration-300"
+                    className="group cursor-pointer flex flex-col rounded-2xl overflow-hidden border border-purple-500/5 hover:border-violet-500/50 hover:bg-[#120e2a] transition-all duration-300"
                   >
-                    <div className="relative aspect-[2/3] overflow-hidden rounded-xl">
-                      <Image
-                        src={imgUrl}
-                        alt={m.title || m.name}
-                        referrerPolicy="no-referrer"
-                        fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      
-                      {/* Dark gradient overlap card */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#050110] via-transparent to-transparent opacity-60 z-1" />
+                    <a
+                      href={href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onMovieClick(m);
+                      }}
+                      className="flex flex-col gap-2 w-full h-full block cursor-pointer"
+                    >
+                      <div className="relative aspect-[2/3] overflow-hidden rounded-xl">
+                        <Image
+                          src={imgUrl}
+                          alt={titleText}
+                          referrerPolicy="no-referrer"
+                          fill
+                          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#050110] via-transparent to-transparent opacity-60 z-1" />
 
-                      {/* Rating sticker */}
-                      <span className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-md text-[10px] font-bold bg-black/80 backdrop-blur-sm border border-stone-800 text-amber-400 flex items-center gap-0.5">
-                        ★ {rating}
-                      </span>
+                        <span className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-md text-[10px] font-bold bg-black/80 backdrop-blur-sm border border-stone-800 text-amber-400 flex items-center gap-0.5">
+                          ★ {rating}
+                        </span>
 
-                      {/* Badge for TV Series vs Movie */}
-                      <span className={`absolute bottom-2.5 left-2.5 z-10 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider ${
-                        isTVItem 
-                          ? "bg-fuchsia-950/90 text-fuchsia-300 border border-fuchsia-500/30" 
-                          : "bg-violet-950/90 text-violet-300 border border-violet-500/30"
-                      }`}>
-                        {isTVItem ? "TV Show" : "Movie"}
-                      </span>
-                    </div>
+                        <span className={`absolute bottom-2.5 left-2.5 z-10 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider ${
+                          isTVItem 
+                            ? "bg-fuchsia-950/90 text-fuchsia-300 border border-fuchsia-500/30" 
+                            : "bg-violet-950/90 text-violet-300 border border-violet-500/30"
+                        }`}>
+                          {isTVItem ? "TV Show" : "Movie"}
+                        </span>
+                      </div>
 
-                    <div className="p-3 pt-1">
-                      <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-violet-400 truncate leading-tight transition-colors">
-                        {m.title || m.name}
-                      </h3>
-                      <p className="text-[10px] text-slate-500 font-mono uppercase mt-1">
-                        Year: {releaseYear}
-                      </p>
-                    </div>
-                  </div>
+                      <div className="p-3 pt-1">
+                        <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-violet-400 truncate leading-tight transition-colors">
+                          {titleText}
+                        </h3>
+                        <p className="text-[10px] text-slate-500 font-mono uppercase mt-1">
+                          Year: {releaseYear}
+                        </p>
+                      </div>
+                    </a>
+                  </article>
                 );
               })}
             </div>
@@ -284,6 +299,6 @@ export const SearchView: React.FC<SearchViewProps> = ({
           <span className="text-xs text-slate-500 max-w-sm">Type any key term inside the cinematic database search above. Direct access is mapped completely across TMDB.</span>
         </div>
       )}
-    </div>
+    </section>
   );
 };

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { MovieDetails } from "../types";
 import { api } from "./api";
 
@@ -5,11 +6,12 @@ import { api } from "./api";
  * Server-only utility to fetch details for a movie or TV show.
  * First queries the live TMDB database if TMDB_ACCESS_TOKEN is configured,
  * otherwise falls back to the local high-fidelity fallback catalogs.
+ * Wrapped in React cache to prevent duplicate fetches across metadata and page render.
  */
-export async function getMediaDetailsServer(
+export const getMediaDetailsServer = cache(async (
   id: number,
   type: "movie" | "tv"
-): Promise<MovieDetails | null> {
+): Promise<MovieDetails | null> => {
   const token = process.env.TMDB_ACCESS_TOKEN;
   const baseUrl = process.env.TMDB_BASE_URL || "https://api.themoviedb.org/3";
 
@@ -21,7 +23,8 @@ export async function getMediaDetailsServer(
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
         },
-        next: { revalidate: 3600 }, // cache for 1 hour
+        signal: AbortSignal.timeout(2500),
+        next: { revalidate: 86400 }, // cache for 24 hours
       });
 
       if (res.ok) {
@@ -63,4 +66,5 @@ export async function getMediaDetailsServer(
   }
 
   return null;
-}
+});
+
