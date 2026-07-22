@@ -1,4 +1,5 @@
 export type TMDBImageSize = "w92" | "w154" | "w185" | "w342" | "w500" | "w780" | "w1280" | "original" | (string & {});
+export type TMDBFallbackType = "poster" | "backdrop" | "profile" | (string & {});
 
 /**
  * Safely constructs a valid TMDB image URL with fallback protection.
@@ -7,7 +8,7 @@ export type TMDBImageSize = "w92" | "w154" | "w185" | "w342" | "w500" | "w780" |
 export function getTMDBImageUrl(
   path: string | null | undefined,
   size: TMDBImageSize = "w342",
-  fallbackType: "poster" | "backdrop" | "profile" = "poster"
+  fallbackType: TMDBFallbackType = "poster"
 ): string {
   const defaultPoster = "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=500";
   const defaultBackdrop = "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200";
