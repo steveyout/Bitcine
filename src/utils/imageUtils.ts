@@ -1,10 +1,12 @@
+export type TMDBImageSize = "w92" | "w154" | "w185" | "w342" | "w500" | "w780" | "w1280" | "original" | (string & {});
+
 /**
  * Safely constructs a valid TMDB image URL with fallback protection.
  * Handles missing paths, missing leading slashes, "null" strings, and external URLs.
  */
 export function getTMDBImageUrl(
   path: string | null | undefined,
-  size: "w185" | "w342" | "w500" | "w780" | "w1280" | "original" = "w342",
+  size: TMDBImageSize = "w342",
   fallbackType: "poster" | "backdrop" | "profile" = "poster"
 ): string {
   const defaultPoster = "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=500";

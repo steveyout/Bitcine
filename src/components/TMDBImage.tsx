@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Image, { ImageProps } from "next/image";
-import { getTMDBImageUrl } from "../utils/imageUtils";
+import { getTMDBImageUrl, TMDBImageSize } from "../utils/imageUtils";
 
 export interface TMDBImageProps extends Omit<ImageProps, "src"> {
   imagePath: string | null | undefined;
-  imageSize?: "w185" | "w342" | "w500" | "w780" | "w1280" | "original";
+  imageSize?: TMDBImageSize;
   fallbackType?: "poster" | "backdrop" | "profile";
   fallbackSrc?: string;
 }
