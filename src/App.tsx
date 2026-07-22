@@ -143,31 +143,38 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
   const [popularTV, setPopularTV] = useState<Movie[]>([]);
   const [topRatedTV, setTopRatedTV] = useState<Movie[]>([]);
   
-  // Continue Watching stored state initialized synchronously to avoid layout shift
-  const [continueWatching, setContinueWatching] = useState<Movie[]>(() => {
-    if (typeof window === "undefined") return [];
+  // Local stored states initialized consistently to [] to prevent SSR/hydration mismatch (Error #418)
+  const [continueWatching, setContinueWatching] = useState<Movie[]>([]);
+  const [watchlist, setWatchlist] = useState<Movie[]>([]);
+
+  // Sync Continue Watching & Watchlist from localStorage on client mount
+  useEffect(() => {
     try {
-      const keys = ["cineby_continue_watching", "flixer_continue_watching", "bitcine_continue_watching", "cineplay_continue_watching"];
-      for (const k of keys) {
+      const cwKeys = ["cineby_continue_watching", "flixer_continue_watching", "bitcine_continue_watching", "cineplay_continue_watching"];
+      for (const k of cwKeys) {
         const saved = localStorage.getItem(k);
-        if (saved) return JSON.parse(saved);
+        if (saved) {
+          setContinueWatching(JSON.parse(saved));
+          break;
+        }
       }
-    } catch (e) {}
-    return [];
-  });
-  
-  // Keep track of user's personal movie watchlist initialized synchronously
-  const [watchlist, setWatchlist] = useState<Movie[]>(() => {
-    if (typeof window === "undefined") return [];
+    } catch (e) {
+      console.warn("Client failed to parse Continue Watching logs:", e);
+    }
+
     try {
-      const keys = ["cineby_watchlist", "flixer_watchlist", "bitcine_watchlist", "cineplay_watchlist"];
-      for (const k of keys) {
+      const wlKeys = ["cineby_watchlist", "flixer_watchlist", "bitcine_watchlist", "cineplay_watchlist"];
+      for (const k of wlKeys) {
         const saved = localStorage.getItem(k);
-        if (saved) return JSON.parse(saved);
+        if (saved) {
+          setWatchlist(JSON.parse(saved));
+          break;
+        }
       }
-    } catch (e) {}
-    return [];
-  });
+    } catch (e) {
+      console.warn("Client failed to parse Watchlist logs:", e);
+    }
+  }, []);
   
   // Detail Overlay control
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);

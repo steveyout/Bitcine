@@ -22,11 +22,17 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         : "https://bitcine.online"));
 
   return {
-    rules: {
-      userAgent: "*",
-      allow: ["/", "/browse", "/search"],
-      disallow: ["/api/"],
-    },
+    rules: [
+      {
+        userAgent: "*",
+        allow: ["/", "/browse", "/search", "/movies", "/series", "/movie/*", "/tv/*"],
+        disallow: [],
+      },
+      {
+        userAgent: ["GPTBot", "ChatGPT-User", "ClaudeBot", "Google-Extended", "PerplexityBot", "Anthropic-ai", "Cohere-ai", "Applebot-Extended"],
+        allow: ["/", "/browse", "/search", "/movies", "/series", "/movie/*", "/tv/*"],
+      }
+    ],
     sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
