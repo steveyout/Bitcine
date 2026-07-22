@@ -4,7 +4,7 @@ import { api } from "../services/api";
 import { Search, Popcorn, Star, Loader2, Compass } from "lucide-react";
 import { TMDBImage } from "./TMDBImage";
 
-interface SearchViewProps {
+export interface SearchViewProps {
   onMovieClick: (movie: Movie) => void;
   initialQuery?: string;
   onSearchChange?: (newQuery: string) => void;

@@ -4,7 +4,7 @@ import { api } from "../services/api";
 import { Compass, Film, Star, Loader2, AlertCircle } from "lucide-react";
 import { TMDBImage } from "./TMDBImage";
 
-interface BrowseViewProps {
+export interface BrowseViewProps {
   onMovieClick: (movie: Movie) => void;
 }
 

@@ -21,7 +21,7 @@ import {
   HelpCircle
 } from "lucide-react";
 
-interface HistoryViewProps {
+export interface HistoryViewProps {
   onMovieClick: (movie: Movie) => void;
   onPlayWithProgress?: (movie: Movie, season?: number, episode?: number, seconds?: number) => void;
 }

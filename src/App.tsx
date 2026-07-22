@@ -14,28 +14,33 @@ import { Hero } from "./components/Hero";
 import { MovieSlider } from "./components/MovieSlider";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { SEOHelmet } from "./components/SEOHelmet";
+import type { MovieDetailsModalProps } from "./components/MovieDetailsModal";
+import type { GenreTrendsChartProps } from "./components/GenreTrendsChart";
+import type { BrowseViewProps } from "./components/BrowseView";
+import type { HistoryViewProps } from "./components/HistoryView";
+import type { SearchViewProps } from "./components/SearchView";
 
 // Dynamic sub-components (split into separate lightweight bundles for fast initial paint)
-const MovieDetailsModal = dynamic(() => import("./components/MovieDetailsModal").then(mod => mod.MovieDetailsModal), {
+const MovieDetailsModal = dynamic<MovieDetailsModalProps>(() => import("./components/MovieDetailsModal").then(mod => mod.MovieDetailsModal), {
   ssr: false
 });
 
-const GenreTrendsChart = dynamic(() => import("./components/GenreTrendsChart").then(mod => mod.GenreTrendsChart), {
+const GenreTrendsChart = dynamic<GenreTrendsChartProps>(() => import("./components/GenreTrendsChart").then(mod => mod.GenreTrendsChart), {
   ssr: false,
   loading: () => <div className="w-full h-[330px] md:h-[380px] bg-[#03010b]/60 border border-purple-500/10 rounded-2xl animate-pulse" />
 });
 
-const BrowseView = dynamic(() => import("./components/BrowseView").then(mod => mod.BrowseView), {
+const BrowseView = dynamic<BrowseViewProps>(() => import("./components/BrowseView").then(mod => mod.BrowseView), {
   ssr: false,
   loading: () => <div className="min-h-[600px] w-full animate-pulse bg-slate-900/10 rounded-2xl" />
 });
 
-const HistoryView = dynamic(() => import("./components/HistoryView").then(mod => mod.HistoryView), {
+const HistoryView = dynamic<HistoryViewProps>(() => import("./components/HistoryView").then(mod => mod.HistoryView), {
   ssr: false,
   loading: () => <div className="min-h-[600px] w-full animate-pulse bg-slate-900/10 rounded-2xl" />
 });
 
-const SearchView = dynamic(() => import("./components/SearchView").then(mod => mod.SearchView), {
+const SearchView = dynamic<SearchViewProps>(() => import("./components/SearchView").then(mod => mod.SearchView), {
   ssr: false,
   loading: () => <div className="min-h-[600px] w-full animate-pulse bg-slate-900/10 rounded-2xl" />
 });

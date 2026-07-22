@@ -10,7 +10,7 @@ import {
 import { providers, DEFAULT_PROVIDER_ID, getEmbedUrl } from "../config/providers";
 import { motion } from "motion/react";
 
-interface MovieDetailsModalProps {
+export interface MovieDetailsModalProps {
   movie: Movie | null;
   open: boolean;
   onClose: () => void;

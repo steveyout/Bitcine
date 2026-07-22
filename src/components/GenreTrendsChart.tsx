@@ -69,7 +69,7 @@ const GENRE_STYLING: Record<string, { color: string; ring: string }> = {
 
 const DEFAULT_STYLE = { color: "#64748b", ring: "ring-slate-500/20" };
 
-interface GenreTrendsChartProps {
+export interface GenreTrendsChartProps {
   trending: Movie[];
   nowPlaying: Movie[];
   topRated: Movie[];
