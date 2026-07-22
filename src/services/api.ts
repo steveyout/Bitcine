@@ -29,17 +29,20 @@ async function fetchFromProxy<T>(
       const response = await axios.get<T>(url);
       return response.data;
     } catch (error) {
-      const isLastAttempt = attempt === retries;
       const axiosError = error as AxiosError<{ error?: string }>;
-      const errorMessage = axiosError.response?.data?.error || axiosError.message || String(error);
+      const status = axiosError.response?.status;
+      const isClientError = status && status >= 400 && status < 500;
+      const isLastAttempt = attempt === retries || isClientError;
+      const axiosErrorData = axiosError.response?.data;
+      const errorMessage = (typeof axiosErrorData === "object" && axiosErrorData?.error) || axiosError.message || String(error);
 
       console.warn(
         `[Proxy API] Attempt ${attempt}/${retries} failed for endpoint "${endpoint}". Error: ${errorMessage}. ` +
-        (isLastAttempt ? "No more retries left." : `Retrying in ${delayMs}ms...`)
+        (isLastAttempt ? "Skipping retries." : `Retrying in ${delayMs}ms...`)
       );
 
       if (isLastAttempt) {
-        throw new Error(errorMessage || `Request failed after ${retries} attempts`);
+        throw new Error(errorMessage || `Request failed for ${endpoint}`);
       }
 
       await delay(delayMs);

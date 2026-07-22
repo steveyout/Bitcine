@@ -7,7 +7,6 @@ import {
   X, Play, Star, Clock, Globe, Film, ArrowRight, Sparkles, 
   Smile, Calendar, Volume2, Maximize, RotateCcw, AlertCircle, Tv, Server, Heart, Share2, Sliders, CheckCircle
 } from "lucide-react";
-import { Dialog, DialogContent, CircularProgress } from "@mui/material";
 import { providers, DEFAULT_PROVIDER_ID, getEmbedUrl } from "../config/providers";
 import { motion } from "motion/react";
 
@@ -281,35 +280,14 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
     saveCurrentProgressLocally(0, selectedSeason, nextEp);
   };
 
+  if (!open || !movie) return null;
+
   return (
-    <Dialog
+    <div
       id={`movie-details-dialog-${movie.id}`}
-      open={open}
-      keepMounted={false}
-      onClose={onClose}
-      fullScreen={true}
-      className="z-[99]"
-      sx={{
-        "& .MuiBackdrop-root": {
-          backgroundColor: "rgba(3, 1, 2, 0.95)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-        },
-        "& .MuiPaper-root": {
-          backgroundColor: "#050102",
-          color: "#f8fafc",
-          overflowX: "hidden",
-          margin: "0px !important",
-          width: "100% !important",
-          maxWidth: "none !important",
-          height: "100% !important",
-          maxHeight: "none !important",
-          borderRadius: "0px",
-          boxShadow: "none",
-        }
-      }}
+      className="fixed inset-0 z-[9999] overflow-y-auto bg-[#030102]/95 backdrop-blur-xl text-[#f8fafc] select-none"
     >
-      <DialogContent id="modal-content-area" className="p-0 select-none relative scrollbar-none sm:scrollbar-thin sm:scrollbar-thumb-red-950 bg-[#050102]">
+      <div id="modal-content-area" className="w-full min-h-screen p-0 relative bg-[#050102]">
         <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -687,7 +665,7 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
 
                 {isLoading ? (
                   <div className="flex items-center gap-2 py-2">
-                    <CircularProgress size={16} color="error" />
+                    <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin flex-shrink-0" />
                     <span className="text-xs text-slate-400">Loading credits...</span>
                   </div>
                 ) : (
@@ -874,9 +852,8 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
           </div>
 
         </div>
-
       </motion.div>
-      </DialogContent>
-    </Dialog>
-  );
+    </div>
+  </div>
+);
 };

@@ -4,25 +4,49 @@
  * Bitcine Streaming Applet Controller
  */
 import { useState, useEffect } from "react";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import { getTheme } from "./theme";
+import dynamic from "next/dynamic";
 import { Movie, ActiveTab } from "./types";
 import { api } from "./services/api";
 
-// Sub-components
+// Sub-components (critical above-the-fold components loaded synchronously)
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { MovieSlider } from "./components/MovieSlider";
-import { MovieDetailsModal } from "./components/MovieDetailsModal";
 import { MobileBottomNav } from "./components/MobileBottomNav";
-import { BrowseView } from "./components/BrowseView";
-import { HistoryView } from "./components/HistoryView";
-import { SearchView } from "./components/SearchView";
-import { Footer } from "./components/Footer";
 import { SEOHelmet } from "./components/SEOHelmet";
-import { FloatingSocials } from "./components/FloatingSocials";
-import { GenreTrendsChart } from "./components/GenreTrendsChart";
+
+// Dynamic sub-components (split into separate lightweight bundles for fast initial paint)
+const MovieDetailsModal = dynamic(() => import("./components/MovieDetailsModal").then(mod => mod.MovieDetailsModal), {
+  ssr: false
+});
+
+const GenreTrendsChart = dynamic(() => import("./components/GenreTrendsChart").then(mod => mod.GenreTrendsChart), {
+  ssr: false,
+  loading: () => <div className="w-full h-[330px] md:h-[380px] bg-[#03010b]/60 border border-purple-500/10 rounded-2xl animate-pulse" />
+});
+
+const BrowseView = dynamic(() => import("./components/BrowseView").then(mod => mod.BrowseView), {
+  ssr: false,
+  loading: () => <div className="min-h-[600px] w-full animate-pulse bg-slate-900/10 rounded-2xl" />
+});
+
+const HistoryView = dynamic(() => import("./components/HistoryView").then(mod => mod.HistoryView), {
+  ssr: false,
+  loading: () => <div className="min-h-[600px] w-full animate-pulse bg-slate-900/10 rounded-2xl" />
+});
+
+const SearchView = dynamic(() => import("./components/SearchView").then(mod => mod.SearchView), {
+  ssr: false,
+  loading: () => <div className="min-h-[600px] w-full animate-pulse bg-slate-900/10 rounded-2xl" />
+});
+
+const FloatingSocials = dynamic(() => import("./components/FloatingSocials").then(mod => mod.FloatingSocials), {
+  ssr: false
+});
+
+const Footer = dynamic(() => import("./components/Footer").then(mod => mod.Footer), {
+  ssr: false
+});
 
 // Icons 
 import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, History, Heart } from "lucide-react";
@@ -103,8 +127,6 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
     return () => clearTimeout(timer);
   }, []);
 
-  const currentTheme = getTheme(brandLabel);
-
   // Categories collections
   const [trending, setTrending] = useState<Movie[]>([]);
   const [nowPlaying, setNowPlaying] = useState<Movie[]>([]);
@@ -116,11 +138,31 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
   const [popularTV, setPopularTV] = useState<Movie[]>([]);
   const [topRatedTV, setTopRatedTV] = useState<Movie[]>([]);
   
-  // Continue Watching stored state
-  const [continueWatching, setContinueWatching] = useState<Movie[]>([]);
+  // Continue Watching stored state initialized synchronously to avoid layout shift
+  const [continueWatching, setContinueWatching] = useState<Movie[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const keys = ["cineby_continue_watching", "flixer_continue_watching", "bitcine_continue_watching", "cineplay_continue_watching"];
+      for (const k of keys) {
+        const saved = localStorage.getItem(k);
+        if (saved) return JSON.parse(saved);
+      }
+    } catch (e) {}
+    return [];
+  });
   
-  // Keep track of user's personal movie watchlist in local state
-  const [watchlist, setWatchlist] = useState<Movie[]>([]);
+  // Keep track of user's personal movie watchlist initialized synchronously
+  const [watchlist, setWatchlist] = useState<Movie[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const keys = ["cineby_watchlist", "flixer_watchlist", "bitcine_watchlist", "cineplay_watchlist"];
+      for (const k of keys) {
+        const saved = localStorage.getItem(k);
+        if (saved) return JSON.parse(saved);
+      }
+    } catch (e) {}
+    return [];
+  });
   
   // Detail Overlay control
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
@@ -134,59 +176,27 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
     reason?: string;
   }>({ ok: true });
 
-  // Fetch collections on startup
+  // Fetch collections on startup using 2-stage prioritized batching for instant paint
   useEffect(() => {
     const fetchMovieCatalog = async () => {
       setIsLoading(true);
       try {
-        // Concurrently query proxied endpoints
-        const [
-          trendingRes, 
-          nowPlayingRes, 
-          topRatedRes, 
-          upcomingRes,
-          trendingTVRes,
-          popularTVRes,
-          topRatedTVRes
-        ] = await Promise.all([
+        // Stage 1: Above-the-fold critical rows for fast LCP & low TBT
+        const [trendingRes, nowPlayingRes] = await Promise.all([
           api.getTrending().catch(() => ({ results: [] })),
-          api.getNowPlaying().catch(() => ({ results: [] })),
-          api.getTopRated().catch(() => ({ results: [] })),
-          api.getUpcoming().catch(() => ({ results: [] })),
-          api.getTrendingTV().catch(() => ({ results: [] })),
-          api.getPopularTV().catch(() => ({ results: [] })),
-          api.getTopRatedTV().catch(() => ({ results: [] }))
+          api.getNowPlaying().catch(() => ({ results: [] }))
         ]);
 
         const trendingList = trendingRes.results || [];
         const nowPlayingList = nowPlayingRes.results || [];
-        const topRatedList = topRatedRes.results || [];
-        const upcomingList = upcomingRes.results || [];
-        const trendingTVList = trendingTVRes.results || [];
-        const popularTVList = popularTVRes.results || [];
-        const topRatedTVList = topRatedTVRes.results || [];
 
-        // Check if all endpoints returned empty arrays (implies TMDB unconfigured or token invalid)
-        if (
-          trendingList.length === 0 &&
-          nowPlayingList.length === 0 &&
-          topRatedList.length === 0 &&
-          upcomingList.length === 0 &&
-          trendingTVList.length === 0
-        ) {
-          throw new Error("No data returned from TMDB gateway. Activating fallback content.");
+        if (trendingList.length === 0 && nowPlayingList.length === 0) {
+          throw new Error("No primary data returned from TMDB gateway. Activating fallback content.");
         }
 
         setTrending(trendingList);
         setNowPlaying(nowPlayingList);
-        setTopRated(topRatedList);
-        setUpcoming(upcomingList);
 
-        setTrendingTV(trendingTVList);
-        setPopularTV(popularTVList);
-        setTopRatedTV(topRatedTVList);
-
-        // Pick the top trending movie or any movie for the Hero
         if (trendingList.length > 0) {
           setHeroMovie(trendingList[0]);
         } else if (nowPlayingList.length > 0) {
@@ -194,10 +204,26 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
         }
 
         setApiStatus({ ok: true });
+        setIsLoading(false); // First viewport ready immediately!
+
+        // Stage 2: Secondary rows fetched in non-blocking background task
+        Promise.all([
+          api.getTopRated().catch(() => ({ results: [] })),
+          api.getUpcoming().catch(() => ({ results: [] })),
+          api.getTrendingTV().catch(() => ({ results: [] })),
+          api.getPopularTV().catch(() => ({ results: [] })),
+          api.getTopRatedTV().catch(() => ({ results: [] }))
+        ]).then(([topRatedRes, upcomingRes, trendingTVRes, popularTVRes, topRatedTVRes]) => {
+          setTopRated(topRatedRes.results || []);
+          setUpcoming(upcomingRes.results || []);
+          setTrendingTV(trendingTVRes.results || []);
+          setPopularTV(popularTVRes.results || []);
+          setTopRatedTV(topRatedTVRes.results || []);
+        }).catch(err => console.warn("Secondary catalog load error:", err));
+
       } catch (err: any) {
         console.warn("Bitcine Gateway Alert: Using high-fidelity fallback catalog. Reason:", err.message);
         
-        // Populate gorgeous fallback offline portfolio
         const fallbacks = api.getFallbackMovies();
         const fallbackSeriesList = api.getFallbackSeries();
 
@@ -210,50 +236,17 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
         setPopularTV(fallbackSeriesList.slice().reverse());
         setTopRatedTV(fallbackSeriesList.filter(m => m.vote_average >= 8.2));
         
-        setHeroMovie(fallbacks[0]); // Celestial Echoes
+        setHeroMovie(fallbacks[0]);
         setApiStatus({
           ok: false,
           reason: "TMDB API Access Token unconfigured. Loading offline premium film vault."
         });
-      } finally {
         setIsLoading(false);
       }
     };
 
     fetchMovieCatalog();
   }, []);
-
-  // Sync Continue Watching list and Watchlist from localStorage on mount
-  useEffect(() => {
-    if (!brandLabel) return;
-    try {
-      const keys = [`${brandLabel.toLowerCase()}_continue_watching`, "flixer_continue_watching", "cineby_continue_watching", "bitcine_continue_watching"];
-      let saved = null;
-      for (const k of keys) {
-        saved = localStorage.getItem(k);
-        if (saved) break;
-      }
-      if (saved) {
-        setContinueWatching(JSON.parse(saved));
-      }
-    } catch (e) {
-      console.warn("Client failed to parse Continue Watching logs:", e);
-    }
-
-    try {
-      const keys = [`${brandLabel.toLowerCase()}_watchlist`, "flixer_watchlist", "cineby_watchlist", "bitcine_watchlist"];
-      let savedWatchlist = null;
-      for (const k of keys) {
-        savedWatchlist = localStorage.getItem(k);
-        if (savedWatchlist) break;
-      }
-      if (savedWatchlist) {
-        setWatchlist(JSON.parse(savedWatchlist));
-      }
-    } catch (e) {
-      console.warn("Client failed to parse Watchlist logs:", e);
-    }
-  }, [brandLabel]);
   
   const toggleWatchlist = (movie: Movie) => {
     setWatchlist((prev) => {
@@ -446,8 +439,7 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
   };
 
   return (
-    <ThemeProvider theme={currentTheme}>
-      <CssBaseline />
+    <>
       <SEOHelmet 
         activeTab={activeTab} 
         selectedMovie={selectedMovie} 
@@ -796,6 +788,6 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
           </div>
         )}
       </div>
-    </ThemeProvider>
+    </>
   );
 }

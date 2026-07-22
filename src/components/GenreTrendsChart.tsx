@@ -371,7 +371,7 @@ export const GenreTrendsChart: React.FC<GenreTrendsChartProps> = ({
 
       {/* Main Plot Stage Area */}
       <div className="w-full h-[330px] md:h-[380px] bg-[#03010b]/60 border border-purple-500/10 rounded-2xl p-2.5 md:p-4 relative">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <LineChart
             data={timelineData}
             margin={{ top: 15, right: 15, left: -20, bottom: 5 }}
