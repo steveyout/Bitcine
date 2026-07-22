@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Movie, ActiveTab } from "../types";
+import { getTMDBImageUrl } from "../utils/imageUtils";
 
 interface SEOHelmetProps {
   activeTab: ActiveTab;
@@ -82,11 +83,7 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
             ? `watch ${mediaName} free, watch ${mediaName} online, cineplay ${mediaName}, stream ${mediaName} online, watch free ${mediaName} hd, cineplay movies, ${mediaName} cast, ${mediaName} download`
             : `${mediaName}, watch ${mediaName}, stream online, cast info, release date, download hd movies`));
       type = "video.movie";
-      if (selectedMovie.backdrop_path) {
-        ogImage = `https://image.tmdb.org/t/p/w1280${selectedMovie.backdrop_path}`;
-      } else if (selectedMovie.poster_path) {
-        ogImage = `https://image.tmdb.org/t/p/w780${selectedMovie.poster_path}`;
-      }
+      ogImage = getTMDBImageUrl(selectedMovie.backdrop_path || selectedMovie.poster_path, "w1280", "backdrop");
     } else {
       switch (activeTab) {
         case "browse":

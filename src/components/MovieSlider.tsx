@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
-import Image from "next/image";
 import { Movie } from "../types";
-import { ChevronLeft, ChevronRight, Star, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { TMDBImage } from "./TMDBImage";
 
 interface MovieSliderProps {
   id: string;
@@ -195,11 +195,12 @@ export const MovieSlider: React.FC<MovieSliderProps> = ({
                     }}
                     className="w-[85%] ml-auto h-full relative rounded-xl overflow-hidden border border-purple-500/10 shadow-lg group-hover:border-violet-500/50 group-hover:shadow-violet-500/10 group-hover:scale-102 transition-all duration-300 block cursor-pointer"
                   >
-                    <Image
+                    <TMDBImage
                       id={`top10-img-${movie.id}`}
-                      src={getImageUrl(movie.backdrop_path, "w780")}
+                      imagePath={movie.backdrop_path || movie.poster_path}
+                      imageSize="w780"
+                      fallbackType="backdrop"
                       alt={titleText}
-                      referrerPolicy="no-referrer"
                       fill
                       sizes="(max-width: 768px) 218px, 272px"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -216,7 +217,7 @@ export const MovieSlider: React.FC<MovieSliderProps> = ({
                       <div className="flex items-center gap-2 text-xs text-slate-400 mt-1 font-medium">
                         <span className="flex items-center gap-0.5 text-amber-400">
                           <Star className="w-3.5 h-3.5 fill-amber-400" />
-                          {movie.vote_average.toFixed(1)}
+                          {movie.vote_average ? movie.vote_average.toFixed(1) : "7.0"}
                         </span>
                         <span>•</span>
                         <span>{year}</span>
@@ -239,13 +240,14 @@ export const MovieSlider: React.FC<MovieSliderProps> = ({
                     e.preventDefault();
                     onMovieClick(movie);
                   }}
-                  className="relative w-full aspect-[2/3] rounded-2xl overflow-hidden border border-purple-500/5 shadow-md group-hover:border-violet-500/50 group-hover:scale-105 group-hover:shadow-violet-500/15 group-hover:-translate-y-1.5 transition-all duration-300 block cursor-pointer"
+                  className="relative w-full aspect-[2/3] rounded-2xl overflow-hidden border border-purple-500/5 shadow-md group-hover:border-violet-500/50 group-hover:scale-105 group-hover:shadow-violet-500/15 group-hover:-translate-y-1.5 transition-all duration-300 block cursor-pointer bg-[#0f0720]"
                 >
-                  <Image
+                  <TMDBImage
                     id={`slider-card-img-${movie.id}`}
-                    src={getImageUrl(movie.poster_path, "w342")}
+                    imagePath={movie.poster_path || movie.backdrop_path}
+                    imageSize="w342"
+                    fallbackType="poster"
                     alt={titleText}
-                    referrerPolicy="no-referrer"
                     fill
                     sizes="(max-width: 640px) 144px, (max-width: 768px) 176px, 208px"
                     className="object-cover transition-transform duration-500"

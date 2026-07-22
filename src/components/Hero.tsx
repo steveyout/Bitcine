@@ -1,7 +1,7 @@
 import React from "react";
-import Image from "next/image";
 import { Movie } from "../types";
 import { Play, Info, Star } from "lucide-react";
+import { TMDBImage } from "./TMDBImage";
 
 interface HeroProps {
   movie: Movie | null;
@@ -20,24 +20,17 @@ export const Hero: React.FC<HeroProps> = ({
     return (
       <div 
         id="hero-skeleton" 
-        className="relative h-[75vh] md:h-[82vh] lg:h-[88vh] w-full bg-[#06040d] flex items-center justify-center animate-pulse"
+        className="relative h-[75vh] md:h-[82vh] lg:h-[88vh] min-h-[500px] w-full bg-[#06040d] flex items-center justify-center animate-pulse"
       >
         <div className="absolute inset-0 bg-gradient-to-t from-[#06040d] via-transparent to-transparent z-10" />
         <div className="text-center z-20 px-6">
-          <div className="h-8 w-48 bg-slate-800 rounded-full mx-auto mb-4" />
-          <div className="h-4 w-96 max-w-full bg-slate-800 rounded-full mx-auto mb-2" />
-          <div className="h-4 w-64 max-w-full bg-slate-800 rounded-full mx-auto" />
+          <div className="h-8 w-48 bg-slate-800/80 rounded-full mx-auto mb-4" />
+          <div className="h-4 w-96 max-w-full bg-slate-800/60 rounded-full mx-auto mb-2" />
+          <div className="h-4 w-64 max-w-full bg-slate-800/60 rounded-full mx-auto" />
         </div>
       </div>
     );
   }
-
-  // Get image backdrop url safely
-  const backdropUrl = movie.backdrop_path 
-    ? (movie.backdrop_path.startsWith("http") 
-       ? movie.backdrop_path 
-       : `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`)
-    : "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=1600";
 
   // Get release year safely
   const yearText = movie.release_date 
@@ -60,21 +53,23 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <div 
       id={`hero-movie-${movie.id}`} 
-      className="relative h-[75vh] md:h-[82vh] lg:h-[88vh] w-full bg-[#050110] overflow-hidden flex items-end"
+      className="relative h-[75vh] md:h-[82vh] lg:h-[88vh] min-h-[500px] w-full bg-[#050110] overflow-hidden flex items-end"
     >
-      {/* Background Image with Bitcine custom gradient blending */}
+      {/* Background Image with Bitcine custom gradient blending & high priority LCP */}
       <div className="absolute inset-0 z-0">
-        <Image
+        <TMDBImage
           id={`hero-backdrop-img-${movie.id}`}
-          src={backdropUrl}
+          imagePath={movie.backdrop_path || movie.poster_path}
+          imageSize="w1280"
+          fallbackType="backdrop"
           alt={titleText}
-          referrerPolicy="no-referrer"
           priority
+          sizes="(max-width: 640px) 100vw, (max-width: 1200px) 100vw, 1280px"
+          quality={80}
           fill
-          sizes="100vw"
           className="object-cover object-center scale-105 filter brightness-90 animate-[fadeIn_0.5s_ease-out]"
         />
-        {/* Dark vignettes & purplish ambient glows to match premium Bitcine style */}
+        {/* Dark vignettes & purplish ambient glows */}
         <div id="hero-backdrop-vignette-top" className="absolute inset-0 bg-gradient-to-b from-[#050110]/95 via-transparent to-[#050110]/30 z-1" />
         <div id="hero-backdrop-vignette-bottom" className="absolute inset-0 bg-gradient-to-t from-[#050110] via-[#050110]/40 to-transparent z-1" />
         <div id="hero-backdrop-vignette-left" className="absolute inset-0 bg-gradient-to-r from-[#050110]/90 via-transparent to-transparent z-1 hidden md:block" />

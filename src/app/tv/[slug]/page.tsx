@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { headers } from "next/headers";
 import { getMediaDetailsServer } from "../../../services/serverApi";
 import App from "../../../App";
+import { getTMDBImageUrl } from "../../../utils/imageUtils";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -55,12 +56,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         ? `watch ${tv.name} free, watch ${tv.name} online, cineplay ${tv.name}, stream ${tv.name} online, watch free ${tv.name} hd, cineplay movies, ${tv.name} cast, ${tv.name} download`
         : `${tv.name}, watch ${tv.name}, stream online, cast info, release date, download hd movies`));
 
-  let ogImage = "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&q=80&w=1200";
-  if (tv.backdrop_path) {
-    ogImage = tv.backdrop_path.startsWith("http") ? tv.backdrop_path : `https://image.tmdb.org/t/p/w1280${tv.backdrop_path}`;
-  } else if (tv.poster_path) {
-    ogImage = tv.poster_path.startsWith("http") ? tv.poster_path : `https://image.tmdb.org/t/p/w780${tv.poster_path}`;
-  }
+  let ogImage = getTMDBImageUrl(tv.backdrop_path || tv.poster_path, "w1280", "backdrop");
 
   const brandCanonicalOrigin = isFlixer 
     ? "https://flixer.ink" 

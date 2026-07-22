@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { Movie, MovieDetails, Video, CastMember, CrewMember } from "../types";
 import { api } from "../services/api";
+import { TMDBImage } from "./TMDBImage";
+import { getTMDBImageUrl } from "../utils/imageUtils";
 import { 
   X, Play, Star, Clock, Globe, Film, ArrowRight, Sparkles, 
   Smile, Calendar, Volume2, Maximize, RotateCcw, AlertCircle, Tv, Server, Heart, Share2, Sliders, CheckCircle
@@ -406,12 +407,11 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
           ) : (
             /* Backdrop with high gradient and Red Play Triangle overlay launcher */
             <div id="theatre-splash-backdrop" className="relative w-full h-full">
-              <Image
-                src={currentMovie.backdrop_path 
-                  ? (currentMovie.backdrop_path.startsWith("http") ? currentMovie.backdrop_path : `https://image.tmdb.org/t/p/w1280${currentMovie.backdrop_path}`)
-                  : "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280"}
-                alt={currentMovie.title || currentMovie.name}
-                referrerPolicy="no-referrer"
+              <TMDBImage
+                imagePath={currentMovie.backdrop_path || currentMovie.poster_path}
+                imageSize="w1280"
+                fallbackType="backdrop"
+                alt={currentMovie.title || currentMovie.name || "Media"}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px"
                 className="object-cover opacity-65"
@@ -706,14 +706,16 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                                  key={`cast-${member.id}`} 
                                  className="flex flex-col items-center bg-black/45 hover:bg-black p-3.5 rounded-2xl border border-red-500/[0.04] text-center gap-2 relative overflow-hidden transition-all duration-300 hover:border-red-500/25 group/card"
                               >
-                                <Image 
-                                  src={avatarVal} 
-                                  alt={member.name}
-                                  referrerPolicy="no-referrer"
-                                  width={48}
-                                  height={48}
-                                  className="rounded-full object-cover border border-red-500/20 shadow-md transition-transform duration-300 group-hover/card:scale-105"
-                                />
+                                <div className="w-12 h-12 rounded-full overflow-hidden relative border border-red-500/20 shadow-md">
+                                  <TMDBImage 
+                                    imagePath={member.profile_path}
+                                    imageSize="w185"
+                                    fallbackType="profile"
+                                    alt={member.name}
+                                    fill
+                                    className="object-cover transition-transform duration-300 group-hover/card:scale-105"
+                                  />
+                                </div>
                                 <div className="min-w-0 w-full">
                                   <p className="text-[11px] font-bold text-white leading-tight truncate px-1">{member.name}</p>
                                   <p className="text-[9px] text-slate-500 leading-snug truncate mt-0.5 px-1">{member.character}</p>
@@ -745,22 +747,21 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                             })
                             .slice(0, 4)
                             .map((member: CrewMember, idx: number) => {
-                              const avatarVal = member.profile_path 
-                                ? (member.profile_path.startsWith("http") 
-                                   ? member.profile_path 
-                                   : `https://image.tmdb.org/t/p/w185${member.profile_path}`)
-                                : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80";
                               return (
                                 <div 
                                    key={`crew-${member.id}-${idx}`} 
                                    className="flex flex-col items-center bg-black/45 hover:bg-black p-3.5 rounded-2xl border border-red-500/[0.04] text-center gap-2 relative overflow-hidden transition-all duration-300 hover:border-red-500/25 group/card"
                                 >
-                                  <img 
-                                    src={avatarVal} 
-                                    alt={member.name}
-                                    referrerPolicy="no-referrer"
-                                    className="w-12 h-12 rounded-full object-cover border border-red-500/20 shadow-md transition-transform duration-300 group-hover/card:scale-105"
-                                  />
+                                  <div className="w-12 h-12 rounded-full overflow-hidden relative border border-red-500/20 shadow-md">
+                                    <TMDBImage 
+                                      imagePath={member.profile_path}
+                                      imageSize="w185"
+                                      fallbackType="profile"
+                                      alt={member.name}
+                                      fill
+                                      className="object-cover transition-transform duration-300 group-hover/card:scale-105"
+                                    />
+                                  </div>
                                   <div className="min-w-0 w-full">
                                     <p className="text-[11px] font-bold text-white leading-tight truncate px-1">{member.name}</p>
                                     <p className="text-[9.5px] text-red-500 font-extrabold uppercase tracking-wider leading-snug truncate mt-0.5 px-1">{member.job}</p>
@@ -838,23 +839,23 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {currentMovie.similar?.results && currentMovie.similar.results.length > 0 ? (
                 currentMovie.similar.results.slice(0, 4).map((m: Movie) => {
-                  const posterSrc = m.poster_path 
-                    ? (m.poster_path.startsWith("http") ? m.poster_path : `https://image.tmdb.org/t/p/w342${m.poster_path}`)
-                    : "https://images.unsplash.com/photo-1542204172-e70528091b50?w=300";
                   return (
                     <div 
                       key={m.id}
                       onClick={() => onMovieClick(m)}
                       className="group flex flex-col gap-2 rounded-xl overflow-hidden cursor-pointer"
                     >
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden border border-red-500/[0.04]">
-                        <img 
-                          src={posterSrc} 
-                          alt={m.title || m.name}
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden border border-red-500/[0.04] bg-[#0e0720]">
+                        <TMDBImage 
+                          imagePath={m.poster_path || m.backdrop_path}
+                          imageSize="w342"
+                          fallbackType="poster"
+                          alt={m.title || m.name || "Media"}
+                          fill
+                          sizes="(max-width: 640px) 50vw, 20vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2 pb-3 justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2 pb-3 justify-center z-10">
                           <span className="bg-red-600 text-white text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded shadow-md">
                             Details
                           </span>

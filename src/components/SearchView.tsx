@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { Movie } from "../types";
 import { api } from "../services/api";
 import { Search, Popcorn, Star, Loader2, Compass } from "lucide-react";
+import { TMDBImage } from "./TMDBImage";
 
 interface SearchViewProps {
   onMovieClick: (movie: Movie) => void;
@@ -232,11 +232,12 @@ export const SearchView: React.FC<SearchViewProps> = ({
                       }}
                       className="flex flex-col gap-2 w-full h-full block cursor-pointer"
                     >
-                      <div className="relative aspect-[2/3] overflow-hidden rounded-xl">
-                        <Image
-                          src={imgUrl}
+                      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-[#0e0720]">
+                        <TMDBImage
+                          imagePath={m.poster_path || m.backdrop_path}
+                          imageSize="w342"
+                          fallbackType="poster"
                           alt={titleText}
-                          referrerPolicy="no-referrer"
                           fill
                           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
