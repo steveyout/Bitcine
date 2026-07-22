@@ -1,0 +1,43 @@
+# Cineby / Bitcine Stream - Agentic Browsing & Documentation
+
+> Cineby / Bitcine is a web application providing movie and TV series metadata, trailers, analytics, and embed stream players.
+
+## Application Architecture & Data Structures
+
+### Movie & TV Series Object Model
+```json
+{
+  "id": 12345,
+  "title": "Movie Title",
+  "name": "TV Show Name (if TV series)",
+  "overview": "Detailed synopsis of the title...",
+  "poster_path": "/poster.jpg",
+  "backdrop_path": "/backdrop.jpg",
+  "vote_average": 8.4,
+  "vote_count": 1520,
+  "release_date": "2024-05-15",
+  "first_air_date": "2024-01-10",
+  "genre_ids": [28, 12, 878],
+  "media_type": "movie"
+}
+```
+
+## Navigation Routes
+- `/`: Home view featuring Hero highlight, Trending Movies, Now Playing, Top Rated, and Popular TV Series rows.
+- `/browse`: Catalog explorer with filters for Genres (Action, Comedy, Drama, Sci-Fi, Horror, Thriller, Animation, Documentary), Content Types (Movies / TV Series / All), Sorting (Popularity, Rating, Release Date), and Search.
+- `/search?q={query}`: Instant multi-media search with live debounced TMDB lookup.
+- `/history`: Local continue watching progress and personal movie watchlist.
+- `/movie/{id}`: Detailed view modal for a specific movie title.
+- `/tv/{id}`: Detailed view modal for a specific TV show title.
+
+## Gateway APIs
+- GET `/api/tmdb/trending` - Returns trending movies/TV shows.
+- GET `/api/tmdb/now_playing` - Returns currently playing theatrical releases.
+- GET `/api/tmdb/top_rated` - Returns top-rated films.
+- GET `/api/tmdb/upcoming` - Returns upcoming releases.
+- GET `/api/tmdb/search?query={term}` - Queries TMDB gateway for movies and TV series matching `{term}`.
+
+## Agentic Browsing Metadata
+- **JSON-LD Schema**: Schema.org `Movie`, `TVSeries`, `WebSite`, and `SearchAction` structured markup embedded in document head.
+- **OpenGraph & Twitter Cards**: Dynamic social graph image cards with poster overlays.
+- **Robots Policy**: Explicit permissions for AI agent crawlers (GPTBot, ChatGPT-User, ClaudeBot, Google-Extended, PerplexityBot, Anthropic-ai).
