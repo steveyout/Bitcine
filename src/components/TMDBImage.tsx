@@ -39,7 +39,7 @@ export const TMDBImage: React.FC<TMDBImageProps> = ({
   return (
     <Image
       {...props}
-      unoptimized={hasError}
+      unoptimized={props.unoptimized ?? true}
       src={hasError ? defaultFallback : (imgSrc || defaultFallback)}
       alt={alt || "Media artwork"}
       className={className}
