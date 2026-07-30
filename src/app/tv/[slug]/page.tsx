@@ -113,20 +113,76 @@ export default async function TVPage({ params }: PageProps) {
     }
   }
 
+  let host = "cineby.mom";
+  try {
+    const headersList = await headers();
+    host = headersList.get("host") || "cineby.mom";
+  } catch (e) {
+    // Fallback
+  }
+  const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
+  const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+  const isCineplay = host.includes("cineplay");
+  const brandCanonicalOrigin = isFlixer 
+    ? "https://flixer.ink" 
+    : (isCineplay ? "https://cineplay.online" : (isCineby ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom") : "https://bitcine.online"));
+  const canonicalUrl = `${brandCanonicalOrigin}/tv/${slug}`;
+
+  const castList = tv?.credits?.cast?.slice(0, 6).map(c => ({
+    "@type": "Person",
+    "name": c.name
+  })) || [];
+
+  const genres = tv?.genres?.map(g => g.name) || ["Drama", "TV Series"];
+  const trailerVideo = tv?.videos?.results?.find(v => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser")) || tv?.videos?.results?.[0];
+
   const schema = tv ? {
     "@context": "https://schema.org",
     "@type": "TVSeries",
     "name": tv.name,
-    "description": tv.overview,
+    "description": tv.overview || `Stream ${tv.name} episodes free in HD.`,
     "image": ogImage,
+    "datePublished": tv.first_air_date,
     "dateCreated": tv.first_air_date,
+    "numberOfSeasons": tv.number_of_seasons || 1,
+    "genre": genres,
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": tv.vote_average || 7.5,
+      "ratingValue": tv.vote_average || 8.0,
       "bestRating": "10",
       "worstRating": "1",
-      "ratingCount": tv.vote_count || 120
-    }
+      "ratingCount": tv.vote_count || 180
+    },
+    ...(castList.length > 0 ? { "actor": castList } : {}),
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "url": canonicalUrl
+    },
+    "potentialAction": {
+      "@type": "WatchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": canonicalUrl,
+        "actionPlatform": [
+          "http://schema.org/DesktopWebPlatform",
+          "http://schema.org/MobileWebPlatform",
+          "http://schema.org/AndroidTVPlatform"
+        ]
+      }
+    },
+    ...(trailerVideo ? {
+      "trailer": {
+        "@type": "VideoObject",
+        "name": `${tv.name} Official Trailer`,
+        "description": `Watch official HD trailer for ${tv.name}`,
+        "thumbnailUrl": ogImage,
+        "uploadDate": tv.first_air_date || "2026-01-01",
+        "embedUrl": `https://www.youtube.com/embed/${trailerVideo.key}`
+      }
+    } : {})
   } : null;
 
   return (

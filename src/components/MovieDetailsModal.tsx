@@ -46,6 +46,9 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
   const [brandLabel, setBrandLabel] = useState("Bitcine");
   const [creditsTab, setCreditsTab] = useState<"cast" | "crew">("cast");
 
+  // YouTube Embedded Trailer Modal State
+  const [isTrailerModalOpen, setIsTrailerModalOpen] = useState(false);
+
   // Detect TV Series
   const isTV = !!(
     movie && (
@@ -397,13 +400,24 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
               <div className="absolute inset-0 bg-gradient-to-t from-[#050102] via-[#050102]/40 to-black/35" />
               <div className="absolute inset-0 bg-gradient-to-r from-red-950/20 via-transparent to-transparent" />
               
-              <button
-                id="modal-backdrop-play-btn"
-                onClick={() => setIsPlaying(true)}
-                className="absolute inset-0 m-auto w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-red-600 via-rose-600 to-red-700 rounded-full flex items-center justify-center cursor-pointer shadow-lg shadow-red-500/35 hover:scale-110 active:scale-95 transition-transform duration-300 z-10 group"
-              >
-                <Play className="w-7 h-7 md:w-9 md:h-9 text-white fill-white ml-1 transition-transform group-hover:scale-105" />
-              </button>
+              <div className="absolute inset-0 m-auto flex flex-col sm:flex-row items-center justify-center gap-4 z-10 p-4">
+                <button
+                  id="modal-backdrop-play-btn"
+                  onClick={() => setIsPlaying(true)}
+                  className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-red-600 via-rose-600 to-red-700 rounded-full flex items-center justify-center cursor-pointer shadow-xl shadow-red-500/40 hover:scale-110 active:scale-95 transition-transform duration-300 group"
+                >
+                  <Play className="w-7 h-7 md:w-9 md:h-9 text-white fill-white ml-1 transition-transform group-hover:scale-105" />
+                </button>
+                
+                <button
+                  id="modal-backdrop-trailer-btn"
+                  onClick={() => setIsTrailerModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl bg-black/80 hover:bg-red-600 text-white border border-red-500/40 font-extrabold text-xs uppercase tracking-wider backdrop-blur-md flex items-center gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg shadow-black/80"
+                >
+                  <Film className="w-4 h-4 text-red-400" />
+                  Watch Trailer
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -610,6 +624,27 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                 TV Series
               </span>
             )}
+          </div>
+
+          {/* Primary Action Row: Direct Stream & Watch Trailer Buttons */}
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              id="details-primary-play-btn"
+              onClick={() => setIsPlaying(true)}
+              className="px-5 py-3 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-red-950/70 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 flex items-center gap-2 cursor-pointer border border-red-500/40"
+            >
+              <Play className="w-4 h-4 fill-white text-white" />
+              Play HD Stream
+            </button>
+
+            <button
+              id="details-watch-trailer-btn"
+              onClick={() => setIsTrailerModalOpen(true)}
+              className="px-5 py-3 rounded-xl bg-red-950/40 hover:bg-red-600 text-white font-black text-xs uppercase tracking-widest border border-red-500/30 hover:border-red-500 shadow-lg hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 flex items-center gap-2 cursor-pointer backdrop-blur-md"
+            >
+              <Film className="w-4 h-4 text-red-400 group-hover:text-white" />
+              Watch Trailer
+            </button>
           </div>
 
           {/* Grid Layout splits details info / side attributes */}
@@ -852,6 +887,72 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
           </div>
 
         </div>
+
+        {/* --- YOUTUBE EMBEDDED TRAILER POPUP MODAL --- */}
+        {isTrailerModalOpen && (
+          <div 
+            id="youtube-trailer-modal-overlay"
+            className="fixed inset-0 z-[10000] flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-xl animate-[fadeIn_0.2s_ease-out]"
+            onClick={() => setIsTrailerModalOpen(false)}
+          >
+            <div 
+              id="youtube-trailer-card"
+              className="relative w-full max-w-4xl bg-[#090204] border border-red-500/30 rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-red-950/90 flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 bg-[#0d0306] border-b border-red-500/20">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="p-1.5 bg-red-600/20 rounded-lg text-red-500 flex-shrink-0">
+                    <Film className="w-4 h-4 md:w-5 md:h-5" />
+                  </span>
+                  <h3 className="text-xs md:text-sm font-black text-white uppercase tracking-wider truncate">
+                    {currentMovie.title || currentMovie.name} - Official Trailer
+                  </h3>
+                </div>
+                
+                <button
+                  id="close-trailer-modal-btn"
+                  onClick={() => setIsTrailerModalOpen(false)}
+                  aria-label="Close trailer"
+                  className="p-2 rounded-full bg-black/60 hover:bg-red-600 text-slate-300 hover:text-white transition-colors cursor-pointer border border-white/10 flex-shrink-0"
+                >
+                  <X className="w-4 h-4 md:w-5 md:h-5" />
+                </button>
+              </div>
+
+              {/* Responsive 16:9 Aspect Video Frame */}
+              <div className="relative w-full aspect-video bg-black flex items-center justify-center">
+                {activePromoVideo?.key ? (
+                  <iframe
+                    id="youtube-trailer-embed-iframe"
+                    src={`https://www.youtube.com/embed/${activePromoVideo.key}?autoplay=1&rel=0&modestbranding=1`}
+                    title={`${currentMovie.title || currentMovie.name} Official Trailer`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    referrerPolicy="no-referrer"
+                    allowFullScreen
+                    className="w-full h-full border-0 absolute inset-0"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center p-8 text-center gap-3">
+                    <AlertCircle className="w-10 h-10 text-red-500 animate-bounce" />
+                    <p className="text-sm font-bold text-white uppercase tracking-wide">
+                      Official trailer key unindexed on TMDB gateway.
+                    </p>
+                    <a
+                      href={`https://www.youtube.com/results?search_query=${encodeURIComponent((currentMovie.title || currentMovie.name || "") + " official trailer")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-red-500 transition-colors cursor-pointer mt-2"
+                    >
+                      Search YouTube for Trailer
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </motion.div>
     </div>
   </div>

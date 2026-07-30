@@ -113,20 +113,81 @@ export default async function MoviePage({ params }: PageProps) {
     }
   }
 
+  let host = "cineby.mom";
+  try {
+    const headersList = await headers();
+    host = headersList.get("host") || "cineby.mom";
+  } catch (e) {
+    // Fallback
+  }
+  const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
+  const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+  const isCineplay = host.includes("cineplay");
+  const brandCanonicalOrigin = isFlixer 
+    ? "https://flixer.ink" 
+    : (isCineplay ? "https://cineplay.online" : (isCineby ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom") : "https://bitcine.online"));
+  const canonicalUrl = `${brandCanonicalOrigin}/movie/${slug}`;
+
+  const castList = movie?.credits?.cast?.slice(0, 6).map(c => ({
+    "@type": "Person",
+    "name": c.name
+  })) || [];
+
+  const directors = movie?.credits?.crew?.filter(c => c.job === "Director").slice(0, 2).map(c => ({
+    "@type": "Person",
+    "name": c.name
+  })) || [];
+
+  const genres = movie?.genres?.map(g => g.name) || ["Action", "Cinema"];
+  const trailerVideo = movie?.videos?.results?.find(v => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser")) || movie?.videos?.results?.[0];
+
   const schema = movie ? {
     "@context": "https://schema.org",
     "@type": "Movie",
     "name": movie.title,
-    "description": movie.overview,
+    "description": movie.overview || `Watch ${movie.title} in HD for free.`,
     "image": ogImage,
+    "datePublished": movie.release_date,
     "dateCreated": movie.release_date,
+    "genre": genres,
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": movie.vote_average || 7.5,
+      "ratingValue": movie.vote_average || 7.8,
       "bestRating": "10",
       "worstRating": "1",
-      "ratingCount": movie.vote_count || 120
-    }
+      "ratingCount": movie.vote_count || 250
+    },
+    ...(directors.length > 0 ? { "director": directors } : {}),
+    ...(castList.length > 0 ? { "actor": castList } : {}),
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "url": canonicalUrl
+    },
+    "potentialAction": {
+      "@type": "WatchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": canonicalUrl,
+        "actionPlatform": [
+          "http://schema.org/DesktopWebPlatform",
+          "http://schema.org/MobileWebPlatform",
+          "http://schema.org/AndroidTVPlatform"
+        ]
+      }
+    },
+    ...(trailerVideo ? {
+      "trailer": {
+        "@type": "VideoObject",
+        "name": `${movie.title} Official Trailer`,
+        "description": `Watch official HD trailer for ${movie.title}`,
+        "thumbnailUrl": ogImage,
+        "uploadDate": movie.release_date || "2026-01-01",
+        "embedUrl": `https://www.youtube.com/embed/${trailerVideo.key}`
+      }
+    } : {})
   } : null;
 
   return (

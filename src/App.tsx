@@ -54,7 +54,7 @@ const Footer = dynamic(() => import("./components/Footer").then(mod => mod.Foote
 });
 
 // Icons 
-import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, History, Heart } from "lucide-react";
+import { AlertCircle, Flame, Sparkles, Film, Compass, ServerCrash, RefreshCw, History, Heart, ArrowUp } from "lucide-react";
 
 interface AppProps {
   initialWatchId?: number;
@@ -146,6 +146,28 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
   // Local stored states initialized consistently to [] to prevent SSR/hydration mismatch (Error #418)
   const [continueWatching, setContinueWatching] = useState<Movie[]>([]);
   const [watchlist, setWatchlist] = useState<Movie[]>([]);
+
+  // Floating 'Back to Top' button visibility state based on Hero viewport height scroll position
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Appear when user scrolls past viewport height of Hero component (~75vh or 500px)
+      const heroThreshold = window.innerHeight * 0.75;
+      if (window.scrollY > heroThreshold) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Sync Continue Watching & Watchlist from localStorage on client mount
   useEffect(() => {
@@ -738,6 +760,19 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
           activeTab={activeTab} 
           setActiveTab={handleTabChange} 
         />
+
+        {/* Floating 'Back to Top' button - appears when scrolled past hero viewport height */}
+        <button
+          id="back-to-top-floating-btn"
+          onClick={scrollToTop}
+          aria-label="Back to top"
+          title="Back to top"
+          className={`fixed bottom-20 md:bottom-8 right-5 md:right-8 z-[90] p-3 md:p-3.5 bg-gradient-to-tr from-red-600 via-rose-600 to-red-700 text-white rounded-full shadow-2xl shadow-red-950/80 border border-red-500/40 hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-md cursor-pointer group flex items-center justify-center ${
+            showBackToTop ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-90 pointer-events-none"
+          }`}
+        >
+          <ArrowUp className="w-5 h-5 md:w-6 md:h-6 transition-transform duration-200 group-hover:-translate-y-1" />
+        </button>
 
         {/* SEO Sister-Site Promotion Modal */}
         {promoOpen && (

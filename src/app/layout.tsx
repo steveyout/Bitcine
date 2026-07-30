@@ -3,7 +3,6 @@ import { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Bebas_Neue, Plus_Jakarta_Sans } from "next/font/google";
 import { headers } from "next/headers";
-import Script from "next/script";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -193,30 +192,6 @@ export default async function RootLayout({
       <body className="antialiased bg-[#040001] text-[#f8fafc] font-sans">
         {children}
         <GoogleAnalytics gaId="G-4F51F8KKEP" />
-        <Script
-            src="//ys.cowergawsie.com/rDbtZOsD8SL117o/144687"
-            strategy="afterInteractive"
-            data-cfasync="false"
-        />
-
-        {/* 1. Define the configuration options inline */}
-        <Script id="at-options" strategy="beforeInteractive">
-          {`
-            window.atOptions = {
-              'key' : 'e77be7a01f5b1b7367422aae10511e22',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          `}
-        </Script>
-
-        {/* 2. Load the external invoke.js script */}
-        <Script
-            src="https://directoryeditorweep.com/e77be7a01f5b1b7367422aae10511e22/invoke.js"
-            strategy="lazyOnload"
-        />
       </body>
     </html>
   );
