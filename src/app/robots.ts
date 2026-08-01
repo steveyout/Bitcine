@@ -12,25 +12,30 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 
   const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
   const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+  const isCineplayInk = host.includes("cineplay.ink");
+  const isCineplayOnline = host.includes("cineplay.online");
   const isCineplay = host.includes("cineplay");
+
   const baseUrl = isFlixer
     ? "https://flixer.ink"
-    : (isCineplay
-      ? "https://cineplay.online"
-      : (isCineby 
-        ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
-        : "https://bitcine.online"));
+    : (isCineplayInk
+      ? "https://cineplay.ink"
+      : (isCineplayOnline || isCineplay
+        ? "https://cineplay.online"
+        : (isCineby 
+          ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
+          : "https://bitcine.online")));
 
   return {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/browse", "/search", "/movies", "/series", "/movie/*", "/tv/*"],
+        allow: ["/", "/browse", "/search", "/movies", "/series", "/movie/*", "/tv/*", "/llms.txt", "/llms-full.txt"],
         disallow: [],
       },
       {
-        userAgent: ["GPTBot", "ChatGPT-User", "ClaudeBot", "Google-Extended", "PerplexityBot", "Anthropic-ai", "Cohere-ai", "Applebot-Extended"],
-        allow: ["/", "/browse", "/search", "/movies", "/series", "/movie/*", "/tv/*"],
+        userAgent: ["GPTBot", "ChatGPT-User", "ClaudeBot", "Claude-Web", "Google-Extended", "GoogleOther", "PerplexityBot", "Anthropic-ai", "Cohere-ai", "Applebot-Extended", "Bytespider", "CCBot"],
+        allow: ["/", "/browse", "/search", "/movies", "/series", "/movie/*", "/tv/*", "/llms.txt", "/llms-full.txt"],
       }
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

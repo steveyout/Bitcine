@@ -20,14 +20,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
   const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+  const isCineplayInk = host.includes("cineplay.ink");
+  const isCineplayOnline = host.includes("cineplay.online");
   const isCineplay = host.includes("cineplay");
+
   const baseUrl = isFlixer
     ? "https://flixer.ink"
-    : (isCineplay
-      ? "https://cineplay.online"
-      : (isCineby 
-        ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
-        : "https://bitcine.online"));
+    : (isCineplayInk
+      ? "https://cineplay.ink"
+      : (isCineplayOnline || isCineplay
+        ? "https://cineplay.online"
+        : (isCineby 
+          ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
+          : "https://bitcine.online")));
 
   // Base routing index entries
   const routes: MetadataRoute.Sitemap = [
@@ -36,6 +41,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/llms.txt`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/llms-full.txt`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/browse`,

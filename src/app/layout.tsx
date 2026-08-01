@@ -180,6 +180,19 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" href={`${domainUrl}/apple-icon.png`} />
         <link rel="shortcut icon" href={`${domainUrl}/favicon.ico`} />
 
+        {/* AI Search Engines & LLM Machine-Readable Endpoint Links */}
+        <link rel="author" href={`${domainUrl}/llms.txt`} />
+        <link rel="alternate" type="text/plain" href={`${domainUrl}/llms.txt`} title="LLM Text Summary" />
+        <link rel="alternate" type="text/plain" href={`${domainUrl}/llms-full.txt`} title="LLM Full Knowledge Base" />
+
+        {/* Search Engine & AI Bot Web Crawler Directives */}
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+        <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+        <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large" />
+        <meta name="gptbot" content="index, follow" />
+        <meta name="claude-web-crawler" content="index, follow" />
+        <meta name="perplexitybot" content="index, follow" />
+
         <link rel="preconnect" href="https://image.tmdb.org" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://image.tmdb.org" />
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
