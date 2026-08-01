@@ -235,7 +235,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
                       <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-[#0e0720]">
                         <TMDBImage
                           imagePath={m.poster_path || m.backdrop_path}
-                          imageSize="w342"
+                          imageSize="w500"
                           fallbackType="poster"
                           alt={titleText}
                           fill

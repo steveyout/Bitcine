@@ -110,14 +110,16 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
 
     // Dynamic high-value target URLs under requested SEO domains to boost search catalog index depth
     const promoTargets = [
+      "https://cineplay.ink",
+      "https://cineplay.online",
+      "https://flixer.ink",
+      "https://cineby.at",
+      "https://cineby.mom",
       "https://cineby.rest",
       "https://cineby.works",
-      "https://cineby.rest/browse",
-      "https://cineby.works/browse",
-      "https://cineby.rest/search?q=trending",
-      "https://cineby.works/search?q=blockbuster",
-      "https://series.cineby.rest",
-      "https://movies.cineby.works"
+      "https://cineplay.ink/browse",
+      "https://flixer.ink/browse",
+      "https://cineby.at/browse"
     ];
     const randomUrl = promoTargets[Math.floor(Math.random() * promoTargets.length)];
     setPromoUrl(randomUrl);

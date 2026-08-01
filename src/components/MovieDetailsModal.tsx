@@ -861,7 +861,7 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                       <div className="relative aspect-[2/3] rounded-lg overflow-hidden border border-red-500/[0.04] bg-[#0e0720]">
                         <TMDBImage 
                           imagePath={m.poster_path || m.backdrop_path}
-                          imageSize="w342"
+                          imageSize="w500"
                           fallbackType="poster"
                           alt={m.title || m.name || "Media"}
                           fill

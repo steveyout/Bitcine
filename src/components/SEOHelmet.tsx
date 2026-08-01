@@ -15,6 +15,8 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
     const host = typeof window !== "undefined" ? window.location.hostname : "";
     const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
     const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+    const isCineplayInk = host.includes("cineplay.ink");
+    const isCineplayOnline = host.includes("cineplay.online");
     const isCineplay = host.includes("cineplay");
     
     const brandName = isFlixer ? "Flixer Stream" : (isCineby ? "Cineby Stream" : (isCineplay ? "Cineplay Stream" : "Bitcine Stream"));
@@ -25,6 +27,8 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
       baseKeywords = "flixer, flixer free movies, flixer.ink, flixer movies, flixer stream, flixer official, flixer site, flixer movies tags, watch movies free on flixer, free movies online, watch hd movies, free streaming sites, watch tv series online";
     } else if (isCineby) {
       baseKeywords = "cineby, cineby.at, movies, free movies, streamex, cineby stremio, stremio, obsession, movie sites, cine, tubi, classico, cinevibe, cineby at tv, rive, cineby net, cinebyte, cineverse, coreflix, cineby free movies, cineby.mom, cineby stream, cineby official, cineby site, cineby movies, cineby tv shows, watch movies free on cineby, free movies online, watch hd movies, free streaming sites, watch tv series online";
+    } else if (isCineplayInk) {
+      baseKeywords = "cineplay, cineplay.ink, cineplay free movies, cineplay stream, cineplay official, cineplay site, cineplay.ink site, cineplay movies, cineplay tv shows, watch movies free on cineplay.ink, free movies online, watch hd movies, free streaming sites, watch tv series online";
     } else if (isCineplay) {
       baseKeywords = "cineplay, cineplay free movies, cineplay.online, cineplay stream, cineplay official, cineplay site, cineplay movies, cineplay tv shows, watch movies free on cineplay, free movies online, watch hd movies, free streaming sites, watch tv series online";
     } else {
@@ -37,6 +41,8 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
       title = "Flixer - Watch Free Movies & TV Shows Online in HD";
     } else if (isCineby) {
       title = "Cineby - Watch Free Movies & TV Shows Online in HD";
+    } else if (isCineplayInk) {
+      title = "Cineplay - Watch Free Movies & TV Shows Online in HD";
     } else if (isCineplay) {
       title = "Cineplay - Watch Free Movies & TV Shows Online in HD";
     } else {
@@ -48,6 +54,8 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
       description = "Watch unlimited movies & TV shows free on Flixer (flixer.ink). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback.";
     } else if (isCineby) {
       description = "Stream full HD movies and TV series for free on Cineby.at (Cineby CC). Enjoy top cinema, seriados, and shows with subtitles or dubbing";
+    } else if (isCineplayInk) {
+      description = "Watch unlimited movies & TV shows free on Cineplay (cineplay.ink). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback.";
     } else if (isCineplay) {
       description = "Watch unlimited movies & TV shows free on Cineplay (cineplay.online). Stream in high-fidelity full HD with zero popups, multiple server links, and clean modern playback.";
     } else {
@@ -56,7 +64,11 @@ export function SEOHelmet({ activeTab, selectedMovie, modalOpen, searchQuery }: 
 
     const brandCanonicalOrigin = isFlixer 
       ? "https://flixer.ink" 
-      : (isCineplay ? "https://cineplay.online" : (isCineby ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom") : "https://bitcine.online"));
+      : (isCineplayInk
+        ? "https://cineplay.ink"
+        : (isCineplayOnline || isCineplay
+          ? "https://cineplay.online"
+          : (isCineby ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom") : "https://bitcine.online")));
 
     let keywords = baseKeywords;
     let type = "video.movie";

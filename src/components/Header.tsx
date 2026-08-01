@@ -18,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [browseAnchor, setBrowseAnchor] = useState(false);
   const [brandLabel, setBrandLabel] = useState("Cineby");
+  const [isCyan, setIsCyan] = useState(false);
   const [apiModalOpen, setApiModalOpen] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -25,23 +26,34 @@ export const Header: React.FC<HeaderProps> = ({
     const hostname = typeof window !== "undefined" ? window.location.hostname : "";
     const isCineby = hostname.includes("cineby") || hostname.includes("cineby.mom") || hostname.includes("cineby.at");
     const isFlixer = hostname.includes("flixer") || hostname.includes("flixer.ink");
+    const isCineplayInk = hostname.includes("cineplay.ink");
     const isCineplay = hostname.includes("cineplay");
     
     if (isFlixer) {
       setBrandLabel("Flixer");
+      setIsCyan(false);
     } else if (isCineby) {
       setBrandLabel("Cineby");
+      setIsCyan(false);
+    } else if (isCineplayInk) {
+      setBrandLabel("Cineplay");
+      setIsCyan(true);
     } else if (isCineplay) {
       setBrandLabel("Cineplay");
+      setIsCyan(false);
     } else {
       setBrandLabel("Bitcine");
+      setIsCyan(false);
     }
   }, []);
 
-  const isRed = brandLabel === "Flixer" || brandLabel === "Cineby";
+  const isRed = (brandLabel === "Flixer" || brandLabel === "Cineby") && !isCyan;
 
   const getActiveTabClass = (isActive: boolean) => {
     if (!isActive) return "text-slate-400 hover:text-white border border-transparent hover:bg-white/[0.03]";
+    if (isCyan) {
+      return "bg-[#06b6d4]/15 border border-[#06b6d4]/30 text-white shadow-[0_0_15px_rgba(6,182,212,0.15)]";
+    }
     return isRed
       ? "bg-[#e50914]/15 border border-[#e50914]/30 text-white shadow-[0_0_15px_rgba(229,9,20,0.15)]"
       : "bg-[#8b5cf6]/15 border border-[#8b5cf6]/30 text-white shadow-[0_0_15px_rgba(139,92,246,0.15)]";
@@ -57,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({
     <>
       <header 
         id="bitcine-header" 
-        className={`fixed top-0 left-0 right-0 z-50 h-16 bg-[#040102]/85 backdrop-blur-2xl border-b ${isRed ? "border-red-950/20" : "border-violet-950/20"} px-4 md:px-10 flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.6)]`}
+        className={`fixed top-0 left-0 right-0 z-50 h-16 bg-[#040102]/85 backdrop-blur-2xl border-b ${isCyan ? "border-cyan-950/30" : (isRed ? "border-red-950/20" : "border-violet-950/20")} px-4 md:px-10 flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.6)]`}
       >
         {/* Brand Logo - Styled precisely like the Cineby red/purple play badge in screenshot */}
         <div 
@@ -71,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Circular Play icon with dynamic color scheme */}
           <div 
             id="bitcine-logo" 
-            className={`w-8 h-8 rounded-full bg-gradient-to-br ${isRed ? "from-[#e50914] to-[#af0810] shadow-[0_0_15px_rgba(229,9,20,0.4)]" : "from-[#8b5cf6] to-[#6d28d9] shadow-[0_0_15px_rgba(139,92,246,0.4)]"} flex items-center justify-center transform group-hover:scale-105 group-hover:rotate-6 transition-all duration-300`}
+            className={`w-8 h-8 rounded-full bg-gradient-to-br ${isCyan ? "from-[#06b6d4] to-[#0891b2] shadow-[0_0_15px_rgba(6,182,212,0.4)]" : (isRed ? "from-[#e50914] to-[#af0810] shadow-[0_0_15px_rgba(229,9,20,0.4)]" : "from-[#8b5cf6] to-[#6d28d9] shadow-[0_0_15px_rgba(139,92,246,0.4)]")} flex items-center justify-center transform group-hover:scale-105 group-hover:rotate-6 transition-all duration-300`}
           >
             <Play className="w-3.5 h-3.5 text-white fill-white ml-0.5" />
           </div>

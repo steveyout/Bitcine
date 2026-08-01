@@ -28,40 +28,50 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
   const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+  const isCineplayInk = host.includes("cineplay.ink");
+  const isCineplayOnline = host.includes("cineplay.online");
   const isCineplay = host.includes("cineplay");
   
   const siteName = isFlixer ? "Flixer" : (isCineby ? "Cineby" : (isCineplay ? "Cineplay" : "Bitcine Stream"));
   const domainUrl = isFlixer
     ? "https://flixer.ink"
-    : (isCineplay
-      ? "https://cineplay.online"
-      : (isCineby 
-        ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
-        : "https://bitcine.online"));
+    : (isCineplayInk
+      ? "https://cineplay.ink"
+      : (isCineplayOnline || isCineplay
+        ? "https://cineplay.online"
+        : (isCineby 
+          ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
+          : "https://bitcine.online")));
   
   const title = isFlixer
     ? "Flixer - Watch Free Movies & TV Shows Online HD"
     : (isCineby 
       ? "Cineby - Watch Free Movies & TV Shows Online HD" 
-      : (isCineplay
-        ? "Cineplay - Watch Free Movies & TV Shows Online HD"
-        : "Bitcine Stream | Watch Movies & TV Series in Premium HD"));
+      : (isCineplayInk
+        ? "Cineplay - Watch Free Movies & TV Shows Online HD (cineplay.ink)"
+        : (isCineplay
+          ? "Cineplay - Watch Free Movies & TV Shows Online HD"
+          : "Bitcine Stream | Watch Movies & TV Series in Premium HD")));
     
   const description = isFlixer
     ? "Watch free movies and TV shows online in full HD on Flixer (flixer.ink). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
     : (isCineby
       ? "Stream full HD movies and TV series for free on Cineby.at (Cineby CC). Enjoy top cinema, seriados, and shows with subtitles or dubbing"
-      : (isCineplay
-        ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.online). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
-        : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream. Test APIs, query TMDB proxy databases, and experience next-gen media viewing."));
+      : (isCineplayInk
+        ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.ink). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
+        : (isCineplay
+          ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.online). Enjoy fast, buffer-free streaming of popular blockbusters, classic cinema, and trending television series with zero popups."
+          : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream. Test APIs, query TMDB proxy databases, and experience next-gen media viewing.")));
     
   const keywords = isFlixer
     ? "flixer, flixer free movies, flixer.ink, flixer movies, flixer stream, flixer official, watch movies free online, watch free tv shows, best free streaming sites, flixer alternative, watch movies free on flixer, free online cinema, flixer movies tags"
     : (isCineby
       ? "cineby, cineby.at, movies, free movies, streamex, cineby stremio, stremio, obsession, movie sites, cine, tubi, classico, cinevibe, cineby at tv, rive, cineby net, cinebyte, cineverse, coreflix, cineby free movies, cineby stream, cineby official, cineby movies, cineby tv shows, cineby.mom, watch movies free online, watch free tv shows, best free streaming sites, cineby alternative, watch movies free on cineby, free online cinema"
-      : (isCineplay
-        ? "cineplay, cineplay free movies, cineplay.online, cineplay stream, cineplay official, cineplay movies, cineplay tv shows, watch movies free online, watch free tv shows, best free streaming sites, cineplay alternative, watch movies free on cineplay, free online cinema"
-        : "bitcine, watch movies, stream free, hd video streaming, cinema list, tmdb backend proxy, developer movie dashboard, movie index, latest tv series, bitcine.online"));
+      : (isCineplayInk
+        ? "cineplay, cineplay.ink, cineplay free movies, cineplay stream, cineplay official, cineplay site, cineplay.ink site, cineplay movies, cineplay tv shows, watch movies free on cineplay.ink, free movies online, watch hd movies, free streaming sites, watch tv series online"
+        : (isCineplay
+          ? "cineplay, cineplay free movies, cineplay.online, cineplay stream, cineplay official, cineplay site, cineplay movies, cineplay tv shows, watch movies free on cineplay, free movies online, watch hd movies, free streaming sites, watch tv series online"
+          : "bitcine, watch movies, stream free, hd video streaming, cinema list, tmdb backend proxy, developer movie dashboard, movie index, latest tv series, bitcine.online")));
 
   return {
     metadataBase: new URL(domainUrl),
@@ -75,12 +85,13 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       icon: [
-        { url: "/favicon.ico", sizes: "any" },
-        { url: "/icon.png", type: "image/png", sizes: "32x32" },
-        { url: "/logo.svg", type: "image/svg+xml" }
+        { url: `${domainUrl}/favicon.ico`, sizes: "any" },
+        { url: `${domainUrl}/icon.png`, type: "image/png", sizes: "32x32" },
+        { url: `${domainUrl}/api/favicon`, type: "image/svg+xml" },
+        { url: `${domainUrl}/logo.svg`, type: "image/svg+xml" }
       ],
-      shortcut: "/favicon.ico",
-      apple: "/apple-icon.png",
+      shortcut: `${domainUrl}/favicon.ico`,
+      apple: `${domainUrl}/apple-icon.png`,
     },
     openGraph: {
       type: "website",
@@ -120,22 +131,30 @@ export default async function RootLayout({
 
   const isCineby = host.includes("cineby") || host.includes("cineby.mom") || host.includes("cineby.at");
   const isFlixer = host.includes("flixer") || host.includes("flixer.ink");
+  const isCineplayInk = host.includes("cineplay.ink");
+  const isCineplayOnline = host.includes("cineplay.online");
   const isCineplay = host.includes("cineplay");
+  
   const brandName = isFlixer ? "Flixer Stream" : (isCineby ? "Cineby Stream" : (isCineplay ? "Cineplay Stream" : "Bitcine Stream"));
   const domainUrl = isFlixer
     ? "https://flixer.ink"
-    : (isCineplay
-      ? "https://cineplay.online"
-      : (isCineby 
-        ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
-        : "https://bitcine.online"));
+    : (isCineplayInk
+      ? "https://cineplay.ink"
+      : (isCineplayOnline || isCineplay
+        ? "https://cineplay.online"
+        : (isCineby 
+          ? (host.includes("cineby.at") ? "https://cineby.at" : "https://cineby.mom")
+          : "https://bitcine.online")));
+
   const brandDesc = isFlixer
     ? "Watch free movies and TV shows online in full HD on Flixer (flixer.ink). Fast, high-fidelity buffer-free streaming of blockbusters and series."
     : (isCineby
       ? "Stream full HD movies and TV series for free on Cineby.at (Cineby CC). Enjoy top cinema, seriados, and shows with subtitles or dubbing"
-      : (isCineplay
-        ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.online). Fast, high-fidelity buffer-free streaming of blockbusters and series."
-        : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream."));
+      : (isCineplayInk
+        ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.ink). Fast, high-fidelity buffer-free streaming of blockbusters and series."
+        : (isCineplay
+          ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.online). Fast, high-fidelity buffer-free streaming of blockbusters and series."
+          : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream.")));
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -154,6 +173,13 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${plusJakartaSans.variable} ${bebasNeue.variable}`}>
       <head>
+        {/* Favicon & Icon Links for Search Engines (Google, Bing, Yandex, Yahoo) */}
+        <link rel="icon" href={`${domainUrl}/favicon.ico`} sizes="any" />
+        <link rel="icon" type="image/svg+xml" href={`${domainUrl}/api/favicon`} />
+        <link rel="icon" type="image/png" sizes="32x32" href={`${domainUrl}/icon.png`} />
+        <link rel="apple-touch-icon" href={`${domainUrl}/apple-icon.png`} />
+        <link rel="shortcut icon" href={`${domainUrl}/favicon.ico`} />
+
         <link rel="preconnect" href="https://image.tmdb.org" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://image.tmdb.org" />
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />

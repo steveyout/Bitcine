@@ -7,7 +7,7 @@ export type TMDBFallbackType = "poster" | "backdrop" | "profile" | (string & {})
  */
 export function getTMDBImageUrl(
   path: string | null | undefined,
-  size: TMDBImageSize = "w342",
+  size: TMDBImageSize = "w500",
   fallbackType: TMDBFallbackType = "poster"
 ): string {
   const defaultPoster = "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=500";

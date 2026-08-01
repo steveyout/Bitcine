@@ -245,7 +245,7 @@ export const MovieSlider: React.FC<MovieSliderProps> = ({
                   <TMDBImage
                     id={`slider-card-img-${movie.id}`}
                     imagePath={movie.poster_path || movie.backdrop_path}
-                    imageSize="w342"
+                    imageSize="w500"
                     fallbackType="poster"
                     alt={titleText}
                     fill
