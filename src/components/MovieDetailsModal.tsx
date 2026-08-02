@@ -286,17 +286,21 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
   if (!open || !movie) return null;
 
   return (
-    <div
+    <motion.div
       id={`movie-details-dialog-${movie.id}`}
-      className="fixed inset-0 z-[9999] overflow-y-auto bg-[#030102]/95 backdrop-blur-xl text-[#f8fafc] select-none"
+      initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+      animate={{ opacity: 1, backdropFilter: "blur(24px)" }}
+      exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="fixed inset-0 z-[9999] overflow-y-auto bg-[#030102]/95 backdrop-blur-xl text-[#f8fafc] select-none transition-all duration-300 animate-modal-backdrop"
     >
       <div id="modal-content-area" className="w-full min-h-screen p-0 relative bg-[#050102]">
         <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 30, scale: 0.96 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full h-full"
+          initial={{ opacity: 0, y: 24, scale: 0.92, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: 24, scale: 0.92, filter: "blur(4px)" }}
+          transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full h-full animate-modal-scale"
         >
           
           {/* Share Success Toast Indicator */}
@@ -955,6 +959,6 @@ export const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
         )}
       </motion.div>
     </div>
-  </div>
+  </motion.div>
 );
 };
