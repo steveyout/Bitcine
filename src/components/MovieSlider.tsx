@@ -193,7 +193,7 @@ export const MovieSlider: React.FC<MovieSliderProps> = ({
                       e.preventDefault();
                       onMovieClick(movie);
                     }}
-                    className="w-[85%] ml-auto h-full relative rounded-xl overflow-hidden border border-purple-500/10 shadow-lg group-hover:border-violet-500/50 group-hover:shadow-violet-500/10 group-hover:scale-102 transition-all duration-300 block cursor-pointer"
+                    className="w-[85%] ml-auto h-full relative rounded-xl overflow-hidden border border-purple-500/10 shadow-lg group-hover:border-red-600/60 group-hover:shadow-[0_0_24px_rgba(229,9,20,0.45)] group-hover:scale-102 transition-all duration-300 block cursor-pointer"
                   >
                     <TMDBImage
                       id={`top10-img-${movie.id}`}
@@ -240,7 +240,7 @@ export const MovieSlider: React.FC<MovieSliderProps> = ({
                     e.preventDefault();
                     onMovieClick(movie);
                   }}
-                  className="relative w-full aspect-[2/3] rounded-2xl overflow-hidden border border-purple-500/5 shadow-md group-hover:border-violet-500/50 group-hover:scale-105 group-hover:shadow-violet-500/15 group-hover:-translate-y-1.5 transition-all duration-300 block cursor-pointer bg-[#0f0720]"
+                  className="relative w-full aspect-[2/3] rounded-2xl overflow-hidden border border-purple-500/10 shadow-md group-hover:border-red-600/60 group-hover:scale-105 group-hover:shadow-[0_0_24px_rgba(229,9,20,0.45)] group-hover:-translate-y-1.5 transition-all duration-300 block cursor-pointer bg-[#0f0720]"
                 >
                   <TMDBImage
                     id={`slider-card-img-${movie.id}`}

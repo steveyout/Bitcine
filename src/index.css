@@ -146,3 +146,12 @@ body {
 .animate-modal-scale {
   animation: modalScaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Cinematic subtle neon red glow hover style */
+.hover-neon-red-glow {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-neon-red-glow:hover {
+  box-shadow: 0 0 24px rgba(229, 9, 20, 0.45), 0 0 8px rgba(229, 9, 20, 0.25);
+  border-color: rgba(220, 38, 38, 0.6);
+}
