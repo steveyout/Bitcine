@@ -108,10 +108,12 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
       setBrandLabel("Bitcine");
     }
 
-    // Promo modal target URL set strictly to cinejoy.online
-    const promoTargets = ["https://cinejoy.online/"];
-    const targetUrl = promoTargets[0];
-    setPromoUrl(targetUrl);
+    // Promo modal target URLs strictly set to flixhq.ink and https://cinejoy.online/
+    const promoTargets = [
+      { name: "FlixHQ Ink", url: "https://flixhq.ink/" },
+      { name: "Cinejoy Online", url: "https://cinejoy.online/" },
+    ];
+    setPromoUrl(promoTargets[0].url);
 
     const timer = setTimeout(() => {
       const hasSeenPromo = sessionStorage.getItem("seen_seo_promo");
@@ -791,26 +793,31 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
 
               {/* Bot-friendly search discoverable links */}
               <div className="w-full flex flex-col gap-3 mb-6">
-                <a
-                  href={promoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => {
-                    sessionStorage.setItem("seen_seo_promo", "true");
-                    setPromoOpen(false);
-                  }}
-                  className={`w-full py-3.5 rounded-xl text-center text-xs font-black tracking-wider uppercase transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-white ${
-                    brandLabel === "Cineplay" || brandLabel === "Bitcine"
-                      ? "bg-gradient-to-r from-[#8b5cf6] to-[#6d28d9] shadow-lg shadow-violet-500/25"
-                      : "bg-gradient-to-r from-[#e50914] to-[#b91c1c] shadow-lg shadow-red-500/25"
-                  }`}
-                >
-                  Visit Sister Stream Mirror
-                </a>
-                
-                <span className="text-[10px] text-slate-500 font-mono tracking-wider">
-                  Partner Node: <span className="text-slate-300 select-all">{promoUrl}</span>
-                </span>
+                {[
+                  { name: "Visit FlixHQ Ink", url: "https://flixhq.ink/" },
+                  { name: "Visit Cinejoy Online", url: "https://cinejoy.online/" },
+                ].map((promo) => (
+                  <a
+                    key={promo.url}
+                    href={promo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => {
+                      sessionStorage.setItem("seen_seo_promo", "true");
+                      setPromoOpen(false);
+                    }}
+                    className={`w-full py-3.5 rounded-xl text-center text-xs font-black tracking-wider uppercase transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-white flex flex-col items-center justify-center gap-0.5 ${
+                      brandLabel === "Cineplay" || brandLabel === "Bitcine"
+                        ? "bg-gradient-to-r from-[#8b5cf6] to-[#6d28d9] shadow-lg shadow-violet-500/25 hover:brightness-110"
+                        : "bg-gradient-to-r from-[#e50914] to-[#b91c1c] shadow-lg shadow-red-500/25 hover:brightness-110"
+                    }`}
+                  >
+                    <span>{promo.name}</span>
+                    <span className="text-[10px] text-slate-200/80 normal-case font-mono tracking-normal">
+                      {promo.url}
+                    </span>
+                  </a>
+                ))}
               </div>
 
               <button

@@ -66,9 +66,11 @@ export const FloatingSocials: React.FC = () => {
             href={social.url}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={social.tooltip}
             className={`w-12 h-12 flex items-center justify-center rounded-full text-white cursor-pointer transition-all duration-300 border border-white/5 shadow-lg active:scale-90 ${social.color} ${social.glowColor}`}
           >
             {social.icon}
+            <span className="sr-only">{social.name}</span>
           </a>
         </motion.div>
       ))}

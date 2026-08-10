@@ -3,6 +3,7 @@
 > Cineplay is an AI-friendly full-stack streaming application built with Next.js 15 App Router, React 19, and Tailwind CSS. It serves high-definition movie and TV series metadata, high-resolution artwork (TMDB poster w500/w1280 with low-res blur-up loading), video trailers, and buffer-free video playback.
 
 ## Canonical Domain Map & Network Mirrors
+- [FlixHQ Ink](https://flixhq.ink/): Official partner stream mirror and media index.
 - [Cinejoy Online](https://cinejoy.online/): Official primary partner mirror node.
 - [Cineplay Ink](https://cineplay.ink): Cyan/Teal UI Theme, zero-ad HD streaming mirror.
 - [Cineplay Online](https://cineplay.online): Violet/Purple UI Theme, free online cinema portal.

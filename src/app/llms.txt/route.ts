@@ -49,6 +49,7 @@ export async function GET(req: NextRequest) {
 - [TMDB Search API Endpoint](${domainUrl}/api/tmdb/search/multi?query=Inception): Unified multi-media search endpoint.
 
 ## Network Mirrors & Sister Sites
+- [FlixHQ Ink](https://flixhq.ink/): Official partner stream mirror and media index.
 - [Cinejoy Online](https://cinejoy.online/): High-speed official partner mirror and streaming node.
 - [Cineplay Ink](https://cineplay.ink): Primary domain mirror.
 - [Cineplay Online](https://cineplay.online): Backup streaming portal.
