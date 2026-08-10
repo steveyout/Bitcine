@@ -1,22 +1,29 @@
-# Cineby / Bitcine Stream
+# Cineplay
 
-> Cineby is a modern high-definition streaming platform offering fast, accessible metadata, trailers, and viewing experience for movies and TV series worldwide.
+> Cineplay is a high-speed cinema and television series discovery and streaming platform offering 1080p and 4K media streaming, comprehensive TMDB metadata, episode guides, and AI search engine integration.
 
-## Core Features
-- **Movie Catalogue**: Detailed information, release years, TMDB ratings, cast members, and high-fidelity trailers for thousands of top movies.
-- **TV Series Catalogue**: Episode guides, season details, and streaming options for popular series.
-- **Browse & Search**: Filter by genres (Action, Sci-Fi, Drama, Comedy, Horror, Animation) or search instantly by title.
-- **Watch History & Watchlist**: Local saving for offline-first personal lists.
+## Main Pages & Search Routes
+- [Homepage](https://cineplay.online): Access the main cinema portal, featured releases, and trending titles.
+- [Browse Catalog](https://cineplay.online/browse): Explore movies and TV series filtered by genre, release year, and rating.
+- [Search Engine](https://cineplay.online/search): Real-time instant search across movies, TV series, actors, and directors.
+- [Movies Library](https://cineplay.online/movies): Trending, popular, and top-rated movies collection.
+- [TV Series Library](https://cineplay.online/series): Popular TV series, season guides, and episode listings.
+- [AI Search Index API](https://cineplay.online/api/ai-search): High-speed structured AI Search & RAG indexing API.
+- [Full LLM Knowledge Base](https://cineplay.online/llms-full.txt): Extended machine-readable knowledge base for LLM web crawlers.
+- [XML Sitemap](https://cineplay.online/sitemap.xml): XML sitemap listing canonical routes and media pages.
 
-## Public API Endpoints
-- GET `/api/tmdb/movie/:id` - Fetch movie details, credits, and videos.
-- GET `/api/tmdb/tv/:id` - Fetch TV show details, credits, and videos.
-- GET `/api/tmdb/trending/all/day` - Fetch daily trending movies and TV shows.
-- GET `/api/tmdb/search/multi` - Multi-query search for movies and TV series.
+## Developer & AI API Endpoints
+- [AI Search Indexing Endpoint](https://cineplay.online/api/ai-search): RAG entity search endpoint formatted for SearchGPT, Perplexity, Gemini, and ChatGPT.
+- [TMDB Movie Details API Endpoint](https://cineplay.online/api/tmdb/movie/550): Detailed movie metadata, cast, crew, and video trailers.
+- [TMDB TV Details API Endpoint](https://cineplay.online/api/tmdb/tv/1399): Full TV show metadata, season breakdowns, and video trailers.
+- [TMDB Trending API Endpoint](https://cineplay.online/api/tmdb/trending/all/day): Daily trending movies and TV series dataset.
+- [TMDB Search API Endpoint](https://cineplay.online/api/tmdb/search/multi?query=Inception): Unified multi-media search endpoint.
 
-## Canonical Domains
-- https://cineby.at
-- https://cineby.mom
-- https://cineplay.online
-- https://flixer.ink
-- https://bitcine.online
+## Network Mirrors & Sister Sites
+- [Cinejoy Online](https://cinejoy.online/): High-speed official partner mirror and streaming node.
+- [Cineplay Ink](https://cineplay.ink): Primary domain mirror.
+- [Cineplay Online](https://cineplay.online): Backup streaming portal.
+- [Flixer Ink](https://flixer.ink): Sister network stream mirror.
+- [Cineby AT](https://cineby.at): European mirror node.
+- [Cineby Mom](https://cineby.mom): Global mirror node.
+- [Bitcine Online](https://bitcine.online): High-speed backup stream node.

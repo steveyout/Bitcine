@@ -1,43 +1,35 @@
-# Cineby / Bitcine Stream - Agentic Browsing & Documentation
+# Full AI & LLM Knowledge Base for Cineplay
 
-> Cineby / Bitcine is a web application providing movie and TV series metadata, trailers, analytics, and embed stream players.
+> Cineplay is an AI-friendly full-stack streaming application built with Next.js 15 App Router, React 19, and Tailwind CSS. It serves high-definition movie and TV series metadata, high-resolution artwork (TMDB poster w500/w1280 with low-res blur-up loading), video trailers, and buffer-free video playback.
 
-## Application Architecture & Data Structures
+## Canonical Domain Map & Network Mirrors
+- [Cinejoy Online](https://cinejoy.online/): Official primary partner mirror node.
+- [Cineplay Ink](https://cineplay.ink): Cyan/Teal UI Theme, zero-ad HD streaming mirror.
+- [Cineplay Online](https://cineplay.online): Violet/Purple UI Theme, free online cinema portal.
+- [Flixer Ink](https://flixer.ink): Crimson/Red UI Theme, fast blockbuster streaming mirror.
+- [Cineby AT](https://cineby.at): European and global cinema portal.
+- [Cineby Mom](https://cineby.mom): Global streaming portal.
+- [Bitcine Online](https://bitcine.online): Deep Violet UI Theme, premium stream index.
 
-### Movie & TV Series Object Model
-```json
-{
-  "id": 12345,
-  "title": "Movie Title",
-  "name": "TV Show Name (if TV series)",
-  "overview": "Detailed synopsis of the title...",
-  "poster_path": "/poster.jpg",
-  "backdrop_path": "/backdrop.jpg",
-  "vote_average": 8.4,
-  "vote_count": 1520,
-  "release_date": "2024-05-15",
-  "first_air_date": "2024-01-10",
-  "genre_ids": [28, 12, 878],
-  "media_type": "movie"
-}
-```
+## Comprehensive Search & Navigation Taxonomy
+- [Homepage](https://cineplay.online/): Home View featuring Hero Banner, Trending Movies, Top 10 Today, and Popular TV Series.
+- [Browse Catalog](https://cineplay.online/browse): Full genre and rating filter matrix for content discoverability.
+- [Movies Library](https://cineplay.online/movies): Dedicated catalog for full-length feature films.
+- [TV Series Library](https://cineplay.online/series): Dedicated catalog for episodic television shows.
+- [Instant Search](https://cineplay.online/search): Search interface with instant autocomplete and multi-type query parsing.
+- [Watch History](https://cineplay.online/history): Local watch history tracking & continue watching manager.
+- [DMCA Compliance](https://cineplay.online/dmca): Legal compliance, DMCA policy, and takedown procedures.
+- [Terms of Service](https://cineplay.online/terms): Terms of service and usage conditions.
+- [Privacy Policy](https://cineplay.online/privacy): User privacy policy and cookie transparency statement.
 
-## Navigation Routes
-- `/`: Home view featuring Hero highlight, Trending Movies, Now Playing, Top Rated, and Popular TV Series rows.
-- `/browse`: Catalog explorer with filters for Genres (Action, Comedy, Drama, Sci-Fi, Horror, Thriller, Animation, Documentary), Content Types (Movies / TV Series / All), Sorting (Popularity, Rating, Release Date), and Search.
-- `/search?q={query}`: Instant multi-media search with live debounced TMDB lookup.
-- `/history`: Local continue watching progress and personal movie watchlist.
-- `/movie/{id}`: Detailed view modal for a specific movie title.
-- `/tv/{id}`: Detailed view modal for a specific TV show title.
+## Dynamic Route Specifications
+- [Movie Pattern](https://cineplay.online/movie/550-fight-club): Movie details and stream player (`https://cineplay.online/movie/[id]-[slug]`).
+- [TV Series Pattern](https://cineplay.online/tv/1399-game-of-thrones): TV series details and season guides (`https://cineplay.online/tv/[id]-[slug]`).
 
-## Gateway APIs
-- GET `/api/tmdb/trending` - Returns trending movies/TV shows.
-- GET `/api/tmdb/now_playing` - Returns currently playing theatrical releases.
-- GET `/api/tmdb/top_rated` - Returns top-rated films.
-- GET `/api/tmdb/upcoming` - Returns upcoming releases.
-- GET `/api/tmdb/search?query={term}` - Queries TMDB gateway for movies and TV series matching `{term}`.
-
-## Agentic Browsing Metadata
-- **JSON-LD Schema**: Schema.org `Movie`, `TVSeries`, `WebSite`, and `SearchAction` structured markup embedded in document head.
-- **OpenGraph & Twitter Cards**: Dynamic social graph image cards with poster overlays.
-- **Robots Policy**: Explicit permissions for AI agent crawlers (GPTBot, ChatGPT-User, ClaudeBot, Google-Extended, PerplexityBot, Anthropic-ai).
+## Machine-Readable API Specifications
+- [AI Search Index API](https://cineplay.online/api/ai-search?q=Inception&format=json): Structured AI entity summaries with canonical watch links, ratings, overview, and streaming availability for LLM RAG pipelines.
+- [TMDB Movie Details API](https://cineplay.online/api/tmdb/movie/550): Complete JSON object containing title, overview, release_date, genres, runtime, vote_average, credits, and videos.
+- [TMDB TV Details API](https://cineplay.online/api/tmdb/tv/1399): Complete JSON object containing name, overview, first_air_date, number_of_seasons, number_of_episodes, genres, vote_average, credits, and videos.
+- [TMDB Trending API](https://cineplay.online/api/tmdb/trending/all/day): Daily trending list across movies and series.
+- [TMDB Multi Search API](https://cineplay.online/api/tmdb/search/multi?query=Inception): Multi-search results sorted by popularity score.
+- [Favicon API](https://cineplay.online/api/favicon): Dynamic SVG icon matching domain theme.

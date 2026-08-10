@@ -108,21 +108,10 @@ export default function App({ initialWatchId, initialWatchType, initialTab }: Ap
       setBrandLabel("Bitcine");
     }
 
-    // Dynamic high-value target URLs under requested SEO domains to boost search catalog index depth
-    const promoTargets = [
-      "https://cineplay.ink",
-      "https://cineplay.online",
-      "https://flixer.ink",
-      "https://cineby.at",
-      "https://cineby.mom",
-      "https://cineby.rest",
-      "https://cineby.works",
-      "https://cineplay.ink/browse",
-      "https://flixer.ink/browse",
-      "https://cineby.at/browse"
-    ];
-    const randomUrl = promoTargets[Math.floor(Math.random() * promoTargets.length)];
-    setPromoUrl(randomUrl);
+    // Promo modal target URL set strictly to cinejoy.online
+    const promoTargets = ["https://cinejoy.online/"];
+    const targetUrl = promoTargets[0];
+    setPromoUrl(targetUrl);
 
     const timer = setTimeout(() => {
       const hasSeenPromo = sessionStorage.getItem("seen_seo_promo");
