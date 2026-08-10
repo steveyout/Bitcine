@@ -1,6 +1,10 @@
 import axios, { AxiosError } from "axios";
 import { Movie, Genre, MovieDetails } from "../types";
 
+// Client-side in-memory cache for ultra-fast PageSpeed Insights response
+const apiCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 // Helper for delay in retry functionality
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -24,9 +28,18 @@ async function fetchFromProxy<T>(
   const queryString = query.toString();
   const url = `/api/tmdb/${endpoint}${queryString ? `?${queryString}` : ""}`;
 
+  // Check in-memory cache first
+  const cached = apiCache.get(url);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    return cached.data as T;
+  }
+
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const response = await axios.get<T>(url);
+      if (response.data) {
+        apiCache.set(url, { data: response.data, timestamp: Date.now() });
+      }
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<{ error?: string }>;

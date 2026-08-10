@@ -157,19 +157,51 @@ export default async function RootLayout({
           ? "Watch free movies and TV shows online in full HD on Cineplay (cineplay.online). Fast, high-fidelity buffer-free streaming of blockbusters and series."
           : "Explore and stream hundreds of premium movies, blockbuster collections, action-packed TV series, and cinematic classics on Bitcine Stream.")));
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": brandName,
-    "url": `${domainUrl}/`,
-    "description": brandDesc,
-    "genre": "Cinema & Television Streaming",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": `${domainUrl}/?q={search_term_string}`,
-      "query-input": "required name=search_term_string"
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": brandName,
+      "url": `${domainUrl}/`,
+      "description": brandDesc,
+      "genre": "Cinema & Television Streaming",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": `${domainUrl}/search?q={search_term_string}`,
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": brandName,
+      "url": `${domainUrl}/`,
+      "logo": `${domainUrl}/logo.svg`,
+      "sameAs": [
+        "https://twitter.com/cineby",
+        "https://github.com/cineby"
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "DataCatalog",
+      "name": `${brandName} Streaming Media Index`,
+      "description": "Structured catalog of high-definition movies, television series, genres, cast credits, and streaming mirrors.",
+      "url": `${domainUrl}/api/ai-search`
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": brandName,
+      "operatingSystem": "All Web Browsers, Android TV, Smart TVs",
+      "applicationCategory": "EntertainmentApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
     }
-  };
+  ];
 
   return (
     <html lang="en" className={`${plusJakartaSans.variable} ${bebasNeue.variable}`}>
@@ -185,6 +217,13 @@ export default async function RootLayout({
         <link rel="author" href={`${domainUrl}/llms.txt`} />
         <link rel="alternate" type="text/plain" href={`${domainUrl}/llms.txt`} title="LLM Text Summary" />
         <link rel="alternate" type="text/plain" href={`${domainUrl}/llms-full.txt`} title="LLM Full Knowledge Base" />
+        <link rel="alternate" type="application/json" href={`${domainUrl}/api/ai-search`} title="AI Search & Entity Index" />
+
+        {/* AI Machine-Readable Meta Directives */}
+        <meta name="ai-search-index" content="enabled" />
+        <meta name="llm-knowledge-base" content={`${domainUrl}/llms-full.txt`} />
+        <meta name="chatgpt-plugin" content="enabled" />
+        <meta name="perplexity-index" content="allow" />
 
         {/* Search Engine & AI Bot Web Crawler Directives */}
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -194,6 +233,9 @@ export default async function RootLayout({
         <meta name="claude-web-crawler" content="index, follow" />
         <meta name="perplexitybot" content="index, follow" />
 
+        {/* Resource Hints for High PageSpeed Performance */}
+        <link rel="preconnect" href="https://api.themoviedb.org" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://api.themoviedb.org" />
         <link rel="preconnect" href="https://image.tmdb.org" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://image.tmdb.org" />
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />

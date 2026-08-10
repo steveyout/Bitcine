@@ -245,10 +245,11 @@ export const MovieSlider: React.FC<MovieSliderProps> = ({
                   <TMDBImage
                     id={`slider-card-img-${movie.id}`}
                     imagePath={movie.poster_path || movie.backdrop_path}
-                    imageSize="w500"
+                    imageSize="w342"
                     fallbackType="poster"
                     alt={titleText}
                     fill
+                    loading={index < 3 ? "eager" : "lazy"}
                     sizes="(max-width: 640px) 144px, (max-width: 768px) 176px, 208px"
                     className="object-cover transition-transform duration-500"
                   />

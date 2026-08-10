@@ -59,18 +59,21 @@ ${brandName} is an AI-friendly full-stack streaming application built with Next.
 - cineplay, cineplay.ink, cineplay.online, cineplay ink, cineplay free movies, watch free movies cineplay ink, cineplay stream, flixer, flixer.ink, flixer free movies, cineby, cineby.at, cineby.mom, cineby free movies, bitcine, bitcine.online, free movies online, watch hd movies 2026, stream tv series online free, zero popups streaming, full hd 1080p movies
 
 ## Machine-Readable API Specifications
-1. **GET \`/api/tmdb/movie/:id\`**
+1. **GET \`/api/ai-search?q={query}&type={type}&format=json|markdown\`**
+   - Query params: \`q\` (search phrase), \`type\` (\`all\` | \`movie\` | \`tv\` | \`trending\`), \`format\` (\`json\` | \`markdown\` | \`llm\`)
+   - Returns: Structured AI entity summaries with canonical watch links, ratings, overview, and streaming availability for LLM RAG pipelines.
+2. **GET \`/api/tmdb/movie/:id\`**
    - Query params: none
    - Returns: Complete JSON object containing title, overview, release_date, genres, runtime, vote_average, credits (cast & crew), and videos (YouTube trailers).
-2. **GET \`/api/tmdb/tv/:id\`**
+3. **GET \`/api/tmdb/tv/:id\`**
    - Query params: none
    - Returns: Complete JSON object containing name, overview, first_air_date, number_of_seasons, number_of_episodes, genres, vote_average, credits, and videos.
-3. **GET \`/api/tmdb/trending/all/day\`**
+4. **GET \`/api/tmdb/trending/all/day\`**
    - Returns: Daily trending list across movies and series.
-4. **GET \`/api/tmdb/search/multi\`**
+5. **GET \`/api/tmdb/search/multi\`**
    - Query params: \`query\` (string)
    - Returns: Multi-search results sorted by popularity score.
-5. **GET \`/api/favicon\`**
+6. **GET \`/api/favicon\`**
    - Returns: Dynamic SVG icon matching domain theme (Cyan #06b6d4 for cineplay.ink, Crimson #e50914 for flixer/cineby, Violet #8b5cf6 for cineplay.online/bitcine).
 `;
 

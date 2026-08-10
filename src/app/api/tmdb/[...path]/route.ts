@@ -96,7 +96,13 @@ async function handleProxy(
     }
 
     if (responseData) {
-      return NextResponse.json(responseData, { status: responseStatus });
+      return NextResponse.json(responseData, {
+        status: responseStatus,
+        headers: {
+          "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
     } else {
       const status = lastError.response?.status || 500;
       const errorData = lastError.response?.data || {};

@@ -30,12 +30,12 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/browse", "/search", "/movies", "/series", "/movie/*", "/tv/*", "/llms.txt", "/llms-full.txt"],
+        allow: ["/", "/browse", "/search", "/movies", "/series", "/movie/*", "/tv/*", "/llms.txt", "/llms-full.txt", "/api/ai-search"],
         disallow: [],
       },
       {
         userAgent: ["GPTBot", "ChatGPT-User", "ClaudeBot", "Claude-Web", "Google-Extended", "GoogleOther", "PerplexityBot", "Anthropic-ai", "Cohere-ai", "Applebot-Extended", "Bytespider", "CCBot"],
-        allow: ["/", "/browse", "/search", "/movies", "/series", "/movie/*", "/tv/*", "/llms.txt", "/llms-full.txt"],
+        allow: ["/", "/browse", "/search", "/movies", "/series", "/movie/*", "/tv/*", "/llms.txt", "/llms-full.txt", "/api/ai-search"],
       }
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

@@ -61,6 +61,7 @@ ${trendingTags}
 - **Zero Ad Interruption**: Clean, fast, buffer-free playback experience.
 
 ## Developer & AI API Endpoints
+- GET \`/api/ai-search?q={query}&format=json|markdown\` - High-speed AI Search Indexing API for RAG, SearchGPT, Perplexity, Gemini, and ChatGPT.
 - GET \`/api/tmdb/movie/:id\` - Full movie detail, metadata, credits, and video trailers.
 - GET \`/api/tmdb/tv/:id\` - Full TV show detail, season data, episode guides, and trailers.
 - GET \`/api/tmdb/trending/all/day\` - Real-time daily trending movies and TV series dataset.
