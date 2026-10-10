@@ -294,9 +294,9 @@ export default async function RootLayout({
               };
             `}
           </Script>
-          {/* 2. Load the external invoke.js script */}
+          {/* 2. Load the external ad script */}
           <Script
-            src="https://directoryeditorweep.com/e77be7a01f5b1b7367422aae10511e22/invoke.js"
+            src="https://bancadeltempoidea.org/22/e77be7a01f5b1b7367422aae10511e22"
             strategy="lazyOnload"
           />
         </div>
